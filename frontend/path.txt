@@ -1,0 +1,1 @@
+/home/monster13liar/.nvm/versions/node/v24.12.0/bin:/home/monster13liar/.local/bin:/home/monster13liar/bin:/usr/local/bin:/usr/bin:/home/monster13liar/.antigravity/extensions/ms-python.debugpy-2025.18.0-linux-x64/bundled/scripts/noConfigScripts

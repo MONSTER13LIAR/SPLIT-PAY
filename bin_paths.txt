@@ -1,0 +1,3 @@
+npm: /usr/bin/npm /home/monster13liar/.nvm/versions/node/v24.12.0/bin/npm /usr/share/man/man1/npm.1.gz
+node: /usr/bin/node /home/monster13liar/.nvm/versions/node/v24.12.0/bin/node /usr/share/man/man1/node.1.gz
+python3: /usr/bin/python3 /usr/share/man/man1/python3.1.gz

@@ -1,0 +1,4 @@
+/usr/bin/fy-compose
+/usr/bin/composefs-info
+/usr/bin/mkcomposefs
+/usr/bin/mount.composefs

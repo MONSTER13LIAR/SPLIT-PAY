@@ -1,0 +1,9 @@
+monster13liar
+/home/monster13liar/SPLIT-PAY
+total 8
+drwxr-xr-x. 1 monster13liar monster13liar  96 Feb  3 12:08 .
+drwx------. 1 monster13liar monster13liar 536 Feb  1 15:42 ..
+drwxr-xr-x. 1 monster13liar monster13liar  96 Feb  2 15:13 backend
+-rw-r--r--. 1 monster13liar monster13liar 722 Feb  2 16:18 docker-compose.yml
+drwxr-xr-x. 1 monster13liar monster13liar 364 Feb  2 17:48 frontend
+-rw-r--r--. 1 monster13liar monster13liar  44 Feb  3 12:08 test_output.txt

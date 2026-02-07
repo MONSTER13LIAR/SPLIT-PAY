@@ -1,0 +1,3 @@
+CONTAINER ID   IMAGE                              COMMAND                  CREATED          STATUS         PORTS                                         NAMES
+60ccb61723b5   postgres:15                        "docker-entrypoint.s…"   10 seconds ago   Up 8 seconds   0.0.0.0:5432->5432/tcp, [::]:5432->5432/tcp   splitpay-db
+2f3e5cf1e880   ghcr.io/github/github-mcp-server   "/server/github-mcp-…"   4 minutes ago    Up 4 minutes                                                 great_cori

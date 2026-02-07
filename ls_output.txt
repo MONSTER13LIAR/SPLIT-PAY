@@ -1,0 +1,19 @@
+total 52
+drwxr-xr-x. 1 monster13liar monster13liar  450 Feb  3 13:53 .
+drwx------. 1 monster13liar monster13liar  536 Feb  1 15:42 ..
+drwxr-xr-x. 1 monster13liar monster13liar  206 Feb  3 13:11 backend
+-rw-r--r--. 1 monster13liar monster13liar  269 Feb  3 12:09 bin_paths.txt
+-rw-r--r--. 1 monster13liar monster13liar   90 Feb  3 12:09 compose_bins.txt
+-rw-r--r--. 1 monster13liar monster13liar 1607 Feb  3 12:10 db_init.log
+-rw-r--r--. 1 monster13liar monster13liar  722 Feb  2 16:18 docker-compose.yml
+-rw-r--r--. 1 monster13liar monster13liar  107 Feb  3 12:08 docker_init.log
+-rw-r--r--. 1 monster13liar monster13liar   43 Feb  3 12:08 docker_status.txt
+-rw-r--r--. 1 monster13liar monster13liar   82 Feb  3 12:08 docker_version.txt
+drwxr-xr-x. 1 monster13liar monster13liar  398 Feb  3 13:10 frontend
+-rw-r--r--. 1 monster13liar monster13liar    0 Feb  3 13:53 ls_output.txt
+-rw-r--r--. 1 monster13liar monster13liar  470 Feb  3 13:09 npm_install.log
+-rw-r--r--. 1 monster13liar monster13liar   88 Feb  3 13:09 package-lock.json
+-rw-r--r--. 1 monster13liar monster13liar  492 Feb  3 12:10 ps_output_2.txt
+-rw-r--r--. 1 monster13liar monster13liar  251 Feb  3 12:09 ps_output.txt
+-rw-r--r--. 1 monster13liar monster13liar   51 Feb  3 13:09 py_version.txt
+-rw-r--r--. 1 monster13liar monster13liar  463 Feb  3 12:08 test_output.txt

@@ -1,0 +1,309 @@
+nohup: ignoring input
+Watching for file changes with StatReloader
+Not Found: /
+[05/Feb/2026 08:19:51] "GET / HTTP/1.1" 404 2163
+Not Found: /favicon.ico
+[05/Feb/2026 08:19:51] "GET /favicon.ico HTTP/1.1" 404 2214
+[05/Feb/2026 08:19:56] "GET /admin/ HTTP/1.1" 302 0
+[05/Feb/2026 08:19:56] "GET /admin/login/?next=/admin/ HTTP/1.1" 200 4158
+[05/Feb/2026 08:19:56] "GET /static/admin/css/dark_mode.css HTTP/1.1" 200 2682
+[05/Feb/2026 08:19:56] "GET /static/admin/css/responsive.css HTTP/1.1" 200 17905
+[05/Feb/2026 08:19:56] "GET /static/admin/css/nav_sidebar.css HTTP/1.1" 200 2810
+[05/Feb/2026 08:19:56] "GET /static/admin/css/login.css HTTP/1.1" 200 958
+[05/Feb/2026 08:19:56] "GET /static/admin/css/base.css HTTP/1.1" 200 21544
+[05/Feb/2026 08:19:56] "GET /static/admin/js/theme.js HTTP/1.1" 200 1943
+[05/Feb/2026 08:19:56] "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 200 3063
+[05/Feb/2026 08:22:00] "OPTIONS /api/request-otp/ HTTP/1.1" 200 0
+[05/Feb/2026 08:22:00] "POST /api/request-otp/ HTTP/1.1" 200 56
+[05/Feb/2026 08:46:34] "OPTIONS /api/verify-otp/ HTTP/1.1" 200 0
+Bad Request: /api/verify-otp/
+[05/Feb/2026 08:46:34] "POST /api/verify-otp/ HTTP/1.1" 400 23
+[05/Feb/2026 08:46:46] "POST /api/request-otp/ HTTP/1.1" 200 56
+/home/monster13liar/SPLIT-PAY/backend/api/views.py changed, reloading.
+Performing system checks...
+
+System check identified no issues (0 silenced).
+February 05, 2026 - 08:17:28
+Django version 5.0.1, using settings 'config.settings'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CONTROL-C.
+
+OTP for 9005486802: 803709
+OTP for 9005486802: 470894
+Watching for file changes with StatReloader
+Exception in thread django-main-thread:
+Traceback (most recent call last):
+  File "/usr/lib64/python3.14/threading.py", line 1082, in _bootstrap_inner
+    self._context.run(self.run)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/usr/lib64/python3.14/threading.py", line 1024, in run
+    self._target(*self._args, **self._kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/utils/autoreload.py", line 64, in wrapper
+    fn(*args, **kwargs)
+    ~~^^^^^^^^^^^^^^^^^
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/core/management/commands/runserver.py", line 133, in inner_run
+    self.check(display_num_errors=True)
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/core/management/base.py", line 485, in check
+    all_issues = checks.run_checks(
+        app_configs=app_configs,
+    ...<2 lines>...
+        databases=databases,
+    )
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/core/checks/registry.py", line 88, in run_checks
+    new_errors = check(app_configs=app_configs, databases=databases)
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/core/checks/urls.py", line 14, in check_url_config
+    return check_resolver(resolver)
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/urls/resolvers.py", line 516, in check
+    for pattern in self.url_patterns:
+                   ^^^^^^^^^^^^^^^^^
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/utils/functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ~~~~~~~~~^^^^^^^^^^
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/urls/resolvers.py", line 735, in url_patterns
+    patterns = getattr(self.urlconf_module, "urlpatterns", self.urlconf_module)
+                       ^^^^^^^^^^^^^^^^^^^
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/utils/functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ~~~~~~~~~^^^^^^^^^^
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/urls/resolvers.py", line 728, in urlconf_module
+    return import_module(self.urlconf_name)
+  File "/usr/lib64/python3.14/importlib/__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1398, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1371, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1342, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 938, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 759, in exec_module
+  File "<frozen importlib._bootstrap>", line 491, in _call_with_frames_removed
+  File "/home/monster13liar/SPLIT-PAY/backend/config/urls.py", line 22, in <module>
+    path('api/', include('api.urls')),
+                 ~~~~~~~^^^^^^^^^^^^
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/urls/conf.py", line 38, in include
+    urlconf_module = import_module(urlconf_module)
+  File "/usr/lib64/python3.14/importlib/__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1398, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1371, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1342, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 938, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 759, in exec_module
+  File "<frozen importlib._bootstrap>", line 491, in _call_with_frames_removed
+  File "/home/monster13liar/SPLIT-PAY/backend/api/urls.py", line 7, in <module>
+    from .views import GroupViewSet, ExpenseViewSet, register_user, request_otp, verify_otp
+ImportError: cannot import name 'request_otp' from 'api.views' (/home/monster13liar/SPLIT-PAY/backend/api/views.py)
+/home/monster13liar/SPLIT-PAY/backend/api/urls.py changed, reloading.
+Performing system checks...
+
+Watching for file changes with StatReloader
+Exception in thread django-main-thread:
+Traceback (most recent call last):
+  File "/usr/lib64/python3.14/threading.py", line 1082, in _bootstrap_inner
+    self._context.run(self.run)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/usr/lib64/python3.14/threading.py", line 1024, in run
+    self._target(*self._args, **self._kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/utils/autoreload.py", line 64, in wrapper
+    fn(*args, **kwargs)
+    ~~^^^^^^^^^^^^^^^^^
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/core/management/commands/runserver.py", line 133, in inner_run
+    self.check(display_num_errors=True)
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/core/management/base.py", line 485, in check
+    all_issues = checks.run_checks(
+        app_configs=app_configs,
+    ...<2 lines>...
+        databases=databases,
+    )
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/core/checks/registry.py", line 88, in run_checks
+    new_errors = check(app_configs=app_configs, databases=databases)
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/core/checks/urls.py", line 14, in check_url_config
+    return check_resolver(resolver)
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/urls/resolvers.py", line 516, in check
+    for pattern in self.url_patterns:
+                   ^^^^^^^^^^^^^^^^^
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/utils/functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ~~~~~~~~~^^^^^^^^^^
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/urls/resolvers.py", line 735, in url_patterns
+    patterns = getattr(self.urlconf_module, "urlpatterns", self.urlconf_module)
+                       ^^^^^^^^^^^^^^^^^^^
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/utils/functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ~~~~~~~~~^^^^^^^^^^
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/urls/resolvers.py", line 728, in urlconf_module
+    return import_module(self.urlconf_name)
+  File "/usr/lib64/python3.14/importlib/__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1398, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1371, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1342, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 938, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 759, in exec_module
+  File "<frozen importlib._bootstrap>", line 491, in _call_with_frames_removed
+  File "/home/monster13liar/SPLIT-PAY/backend/config/urls.py", line 22, in <module>
+    path('api/', include('api.urls')),
+                 ~~~~~~~^^^^^^^^^^^^
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/urls/conf.py", line 38, in include
+    urlconf_module = import_module(urlconf_module)
+  File "/usr/lib64/python3.14/importlib/__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1398, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1371, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1342, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 938, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 759, in exec_module
+  File "<frozen importlib._bootstrap>", line 491, in _call_with_frames_removed
+  File "/home/monster13liar/SPLIT-PAY/backend/api/urls.py", line 7, in <module>
+    from .views import GroupViewSet, ExpenseViewSet, register_user, request_otp, verify_otp
+ImportError: cannot import name 'request_otp' from 'api.views' (/home/monster13liar/SPLIT-PAY/backend/api/views.py)
+/home/monster13liar/SPLIT-PAY/backend/api/models.py changed, reloading.
+Performing system checks...
+
+Watching for file changes with StatReloader
+Exception in thread django-main-thread:
+Traceback (most recent call last):
+  File "/usr/lib64/python3.14/threading.py", line 1082, in _bootstrap_inner
+    self._context.run(self.run)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/usr/lib64/python3.14/threading.py", line 1024, in run
+    self._target(*self._args, **self._kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/utils/autoreload.py", line 64, in wrapper
+    fn(*args, **kwargs)
+    ~~^^^^^^^^^^^^^^^^^
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/core/management/commands/runserver.py", line 133, in inner_run
+    self.check(display_num_errors=True)
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/core/management/base.py", line 485, in check
+    all_issues = checks.run_checks(
+        app_configs=app_configs,
+    ...<2 lines>...
+        databases=databases,
+    )
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/core/checks/registry.py", line 88, in run_checks
+    new_errors = check(app_configs=app_configs, databases=databases)
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/core/checks/urls.py", line 14, in check_url_config
+    return check_resolver(resolver)
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/urls/resolvers.py", line 516, in check
+    for pattern in self.url_patterns:
+                   ^^^^^^^^^^^^^^^^^
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/utils/functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ~~~~~~~~~^^^^^^^^^^
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/urls/resolvers.py", line 735, in url_patterns
+    patterns = getattr(self.urlconf_module, "urlpatterns", self.urlconf_module)
+                       ^^^^^^^^^^^^^^^^^^^
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/utils/functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ~~~~~~~~~^^^^^^^^^^
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/urls/resolvers.py", line 728, in urlconf_module
+    return import_module(self.urlconf_name)
+  File "/usr/lib64/python3.14/importlib/__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1398, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1371, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1342, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 938, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 759, in exec_module
+  File "<frozen importlib._bootstrap>", line 491, in _call_with_frames_removed
+  File "/home/monster13liar/SPLIT-PAY/backend/config/urls.py", line 22, in <module>
+    path('api/', include('api.urls')),
+                 ~~~~~~~^^^^^^^^^^^^
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/urls/conf.py", line 38, in include
+    urlconf_module = import_module(urlconf_module)
+  File "/usr/lib64/python3.14/importlib/__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1398, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1371, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1342, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 938, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 759, in exec_module
+  File "<frozen importlib._bootstrap>", line 491, in _call_with_frames_removed
+  File "/home/monster13liar/SPLIT-PAY/backend/api/urls.py", line 7, in <module>
+    from .views import GroupViewSet, ExpenseViewSet, register_user, request_otp, verify_otp
+ImportError: cannot import name 'request_otp' from 'api.views' (/home/monster13liar/SPLIT-PAY/backend/api/views.py)
+/home/monster13liar/SPLIT-PAY/backend/api/serializers.py changed, reloading.
+Performing system checks...
+
+Watching for file changes with StatReloader
+Exception in thread django-main-thread:
+Traceback (most recent call last):
+  File "/usr/lib64/python3.14/threading.py", line 1082, in _bootstrap_inner
+    self._context.run(self.run)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/usr/lib64/python3.14/threading.py", line 1024, in run
+    self._target(*self._args, **self._kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/utils/autoreload.py", line 64, in wrapper
+    fn(*args, **kwargs)
+    ~~^^^^^^^^^^^^^^^^^
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/core/management/commands/runserver.py", line 133, in inner_run
+    self.check(display_num_errors=True)
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/core/management/base.py", line 485, in check
+    all_issues = checks.run_checks(
+        app_configs=app_configs,
+    ...<2 lines>...
+        databases=databases,
+    )
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/core/checks/registry.py", line 88, in run_checks
+    new_errors = check(app_configs=app_configs, databases=databases)
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/core/checks/urls.py", line 14, in check_url_config
+    return check_resolver(resolver)
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/core/checks/urls.py", line 24, in check_resolver
+    return check_method()
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/urls/resolvers.py", line 516, in check
+    for pattern in self.url_patterns:
+                   ^^^^^^^^^^^^^^^^^
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/utils/functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ~~~~~~~~~^^^^^^^^^^
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/urls/resolvers.py", line 735, in url_patterns
+    patterns = getattr(self.urlconf_module, "urlpatterns", self.urlconf_module)
+                       ^^^^^^^^^^^^^^^^^^^
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/utils/functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ~~~~~~~~~^^^^^^^^^^
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/urls/resolvers.py", line 728, in urlconf_module
+    return import_module(self.urlconf_name)
+  File "/usr/lib64/python3.14/importlib/__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1398, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1371, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1342, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 938, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 759, in exec_module
+  File "<frozen importlib._bootstrap>", line 491, in _call_with_frames_removed
+  File "/home/monster13liar/SPLIT-PAY/backend/config/urls.py", line 22, in <module>
+    path('api/', include('api.urls')),
+                 ~~~~~~~^^^^^^^^^^^^
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/urls/conf.py", line 38, in include
+    urlconf_module = import_module(urlconf_module)
+  File "/usr/lib64/python3.14/importlib/__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1398, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1371, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1342, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 938, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 759, in exec_module
+  File "<frozen importlib._bootstrap>", line 491, in _call_with_frames_removed
+  File "/home/monster13liar/SPLIT-PAY/backend/api/urls.py", line 7, in <module>
+    from .views import GroupViewSet, ExpenseViewSet, register_user, request_otp, verify_otp
+ImportError: cannot import name 'request_otp' from 'api.views' (/home/monster13liar/SPLIT-PAY/backend/api/views.py)

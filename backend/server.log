@@ -1,0 +1,31 @@
+Watching for file changes with StatReloader
+Bad Request: /api/register/
+[06/Feb/2026 12:45:02] "POST /api/register/ HTTP/1.1" 400 101
+Bad Request: /api/register/
+[06/Feb/2026 12:45:11] "POST /api/register/ HTTP/1.1" 400 101
+Bad Request: /api/register/
+[06/Feb/2026 12:45:12] "POST /api/register/ HTTP/1.1" 400 101
+Bad Request: /api/register/
+[06/Feb/2026 12:45:28] "POST /api/register/ HTTP/1.1" 400 101
+Bad Request: /api/register/
+[06/Feb/2026 12:45:34] "POST /api/register/ HTTP/1.1" 400 101
+Bad Request: /api/register/
+[06/Feb/2026 12:45:35] "POST /api/register/ HTTP/1.1" 400 101
+Bad Request: /api/register/
+[06/Feb/2026 12:45:35] "POST /api/register/ HTTP/1.1" 400 101
+Bad Request: /api/register/
+[06/Feb/2026 12:45:35] "POST /api/register/ HTTP/1.1" 400 101
+Bad Request: /api/register/
+[06/Feb/2026 12:45:36] "POST /api/register/ HTTP/1.1" 400 101
+Bad Request: /api/register/
+[06/Feb/2026 12:45:36] "POST /api/register/ HTTP/1.1" 400 101
+Bad Request: /api/register/
+[06/Feb/2026 12:45:37] "POST /api/register/ HTTP/1.1" 400 101
+Bad Request: /api/register/
+[06/Feb/2026 12:45:37] "POST /api/register/ HTTP/1.1" 400 101
+Bad Request: /api/register/
+[06/Feb/2026 12:45:37] "POST /api/register/ HTTP/1.1" 400 101
+Unauthorized: /api/token/
+[06/Feb/2026 12:45:41] "POST /api/token/ HTTP/1.1" 401 63
+[06/Feb/2026 13:24:31] "POST /api/register/ HTTP/1.1" 201 68
+[06/Feb/2026 13:24:31] "POST /api/token/ HTTP/1.1" 200 483
