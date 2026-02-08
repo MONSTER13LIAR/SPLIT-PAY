@@ -1,80 +1,242 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700&display=swap');
 
 .login-container {
-  min-height: 100vh;
   width: 100%;
+  background-color: #ffffff;
+  color: #000000;
+  font-family: 'Inter', sans-serif;
+  overflow-y: auto;
+  height: 100vh;
+  scroll-behavior: smooth;
+}
+
+/* 3D Flowing Grid Overlay */
+.grid-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+  perspective: 1000px;
+}
+
+.grid-side {
+  position: absolute;
+  background:
+    linear-gradient(90deg, rgba(99, 102, 241, 0.15) 1px, transparent 1px),
+    linear-gradient(rgba(99, 102, 241, 0.15) 1px, transparent 1px);
+  background-size: 30px 30px;
+  opacity: 0.4;
+  transform-style: preserve-3d;
+}
+
+.grid-left {
+  left: 0;
+  top: 0;
+  width: 200px;
+  height: 100%;
+  animation: flowGridLeft 20s infinite ease-in-out;
+}
+
+.grid-right {
+  right: 0;
+  top: 0;
+  width: 200px;
+  height: 100%;
+  animation: flowGridRight 18s infinite ease-in-out;
+}
+
+.grid-top {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 150px;
+  animation: flowGridTop 22s infinite ease-in-out;
+}
+
+.grid-bottom {
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 150px;
+  animation: flowGridBottom 19s infinite ease-in-out;
+}
+
+@keyframes flowGridLeft {
+
+  0%,
+  100% {
+    transform: rotateY(60deg) translateZ(0px);
+  }
+
+  50% {
+    transform: rotateY(65deg) translateZ(30px);
+  }
+}
+
+@keyframes flowGridRight {
+
+  0%,
+  100% {
+    transform: rotateY(-60deg) translateZ(0px);
+  }
+
+  50% {
+    transform: rotateY(-65deg) translateZ(30px);
+  }
+}
+
+@keyframes flowGridTop {
+
+  0%,
+  100% {
+    transform: rotateX(60deg) translateZ(0px);
+  }
+
+  50% {
+    transform: rotateX(65deg) translateZ(30px);
+  }
+}
+
+@keyframes flowGridBottom {
+
+  0%,
+  100% {
+    transform: rotateX(-60deg) translateZ(0px);
+  }
+
+  50% {
+    transform: rotateX(-65deg) translateZ(30px);
+  }
+}
+
+.intro-section {
+  height: 100vh;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  background-color: #030712;
-  font-family: 'Inter', sans-serif;
   position: relative;
   overflow: hidden;
 }
 
-.background-shapes {
+.spline-background {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: 0;
+  z-index: 1;
 }
 
-.shape {
+.spline-background canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.auth-section {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff;
+}
+
+/* Typing Animation */
+.typing-text {
+  position: relative;
+  z-index: 10;
+  /* Text on top */
+  font-family: 'Outfit', sans-serif;
+  font-size: 16rem;
+  font-weight: 800;
+  color: #000;
+  white-space: nowrap;
+  overflow: hidden;
+  border-right: 4px solid black;
+  /* The cursor */
+  width: 0;
+  animation:
+    typing 2s steps(9, end) forwards,
+    blink 0.75s step-end infinite;
+}
+
+/* Scroll Indicator */
+.scroll-indicator {
   position: absolute;
-  filter: blur(80px);
-  border-radius: 50%;
-  opacity: 0.6;
+  bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  color: #666;
+  font-size: 0.9rem;
+  opacity: 0;
+  animation: fadeIn 1s ease-out 2.5s forwards, bounce 2s infinite 2.5s;
 }
 
-.shape-1 {
-  width: 400px;
-  height: 400px;
-  background: linear-gradient(135deg, #6366f1, #a855f7);
-  top: -100px;
-  right: -50px;
-  animation: float 15s infinite alternate ease-in-out;
-}
-
-.shape-2 {
-  width: 350px;
-  height: 350px;
-  background: linear-gradient(135deg, #ec4899, #8b5cf6);
-  bottom: -50px;
-  left: -50px;
-  animation: float 12s infinite alternate-reverse ease-in-out;
-}
-
-.shape-3 {
-  width: 250px;
-  height: 250px;
-  background: linear-gradient(135deg, #3b82f6, #2dd4bf);
-  top: 40%;
-  left: 30%;
-  animation: float 18s infinite alternate ease-in-out;
-}
-
-@keyframes float {
+@keyframes typing {
   from {
-    transform: translate(0, 0) scale(1);
+    width: 0
   }
 
   to {
-    transform: translate(50px, 40px) scale(1.1);
+    width: 9ch
+  }
+
+  /* Approximate width for "SPLIT PAY" */
+}
+
+@keyframes blink {
+
+  from,
+  to {
+    border-color: transparent
+  }
+
+  50% {
+    border-color: black
   }
 }
+
+@keyframes bounce {
+
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
+    transform: translateY(0);
+  }
+
+  40% {
+    transform: translateY(-10px);
+  }
+
+  60% {
+    transform: translateY(-5px);
+  }
+}
+
+.auth-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: #111827;
+}
+
+/* Background shapes removed for clean white theme */
 
 .login-card {
   width: 100%;
   max-width: 420px;
   padding: 2.5rem;
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
   border-radius: 24px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
   z-index: 10;
   animation: fadeIn 0.8s ease-out;
 }
@@ -94,25 +256,36 @@
 .login-header {
   text-align: center;
   margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.app-logo {
+  width: 80px;
+  height: 80px;
+  margin-bottom: 1rem;
+  object-fit: contain;
 }
 
 .logo-text {
   font-family: 'Outfit', sans-serif;
   font-size: 2.5rem;
   font-weight: 700;
-  color: #fff;
+  color: #111827;
   letter-spacing: -1px;
   margin-bottom: 0.5rem;
 }
 
 .logo-text span {
-  background: linear-gradient(to right, #6366f1, #a855f7);
+  background: linear-gradient(to right, #4f46e5, #9333ea);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .subtitle {
-  color: #94a3b8;
+  color: #6b7280;
   font-size: 0.95rem;
   font-weight: 400;
 }
@@ -258,6 +431,50 @@
   margin-top: 0.5rem;
   font-size: 0.75rem;
   opacity: 0.6;
+}
+
+/* Google Button Styles */
+.login-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  margin-top: 2rem;
+  width: 100%;
+}
+
+.google-signin-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px;
+  background: white;
+  color: #333;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.google-signin-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  background: #f8f9fa;
+}
+
+.google-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.security-note {
+  color: #666;
+  font-size: 0.85rem;
 }
 
 .login-footer {
