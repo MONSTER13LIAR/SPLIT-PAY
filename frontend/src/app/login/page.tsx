@@ -2,7 +2,12 @@
 
 import React from 'react';
 import './login.css';
-import Spline from '@splinetool/react-spline/next';
+import dynamic from 'next/dynamic';
+
+const Spline = dynamic(() => import('@splinetool/react-spline'), {
+    ssr: false,
+    loading: () => <div style={{ width: '100%', height: '100%', background: '#f0f0f0' }} />,
+});
 
 export default function LoginPage() {
     const handleGoogleLogin = () => {
