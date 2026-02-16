@@ -1,0 +1,133 @@
+nohup: ignoring input
+
+> temp-next-app@0.1.0 dev
+> next dev
+
+⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of /home/monster13liar/SPLIT-PAY/package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * /home/monster13liar/SPLIT-PAY/frontend/package-lock.json
+
+▲ Next.js 16.1.6 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.29.78:3000
+
+✓ Starting...
+✓ Ready in 3.3s
+ GET / 307 in 3.9s (compile: 3.0s, render: 844ms)
+ GET /login 200 in 648ms (compile: 342ms, render: 306ms)
+✓ Compiled in 4.9s
+ GET / 307 in 810ms (compile: 189ms, render: 622ms)
+ GET /login 200 in 582ms (compile: 208ms, render: 374ms)
+✓ Compiled in 1108ms
+ GET / 307 in 582ms (compile: 257ms, render: 326ms)
+ GET /login 200 in 185ms (compile: 50ms, render: 134ms)
+ GET /login 200 in 1757ms (compile: 408ms, render: 1349ms)
+✓ Compiled in 1728ms
+ GET / 307 in 2.4s (compile: 1047ms, render: 1357ms)
+ GET /login 200 in 1315ms (compile: 970ms, render: 345ms)
+ GET /login 200 in 2.2s (compile: 831ms, render: 1341ms)
+✓ Compiled in 767ms
+✓ Compiled in 428ms
+ GET / 307 in 614ms (compile: 36ms, render: 578ms)
+ GET /login 200 in 1226ms (compile: 596ms, render: 630ms)
+✓ Compiled in 1069ms
+✓ Compiled in 282ms
+ GET /login 200 in 406ms (compile: 119ms, render: 287ms)
+ GET / 307 in 252ms (compile: 16ms, render: 236ms)
+ GET /login 200 in 130ms (compile: 9ms, render: 121ms)
+✓ Compiled in 506ms
+✓ Compiled in 1732ms
+⨯ ./frontend/src/app/login/page.tsx:145:1
+Parsing ecmascript source code failed
+[0m [90m 143 |[39m         [33m<[39m[33m/[39m[33mdiv[39m[33m>[39m
+ [90m 144 |[39m     )[33m;[39m
+[31m[1m>[22m[39m[90m 145 |[39m }
+ [90m     |[39m [31m[1m^[22m[39m
+ [90m 146 |[39m[0m
+
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+
+Import traces:
+  Client Component Browser:
+    ./frontend/src/app/login/page.tsx [Client Component Browser]
+    ./frontend/src/app/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./frontend/src/app/login/page.tsx [Client Component SSR]
+    ./frontend/src/app/login/page.tsx [Server Component]
+
+
+○ Compiling /_error ...
+ GET /login 500 in 5.6s (compile: 4.9s, render: 685ms)
+✓ Finished writing to filesystem cache in 16.9s
+⨯ ./frontend/src/app/login/page.tsx:145:1
+Parsing ecmascript source code failed
+[0m [90m 143 |[39m         [33m<[39m[33m/[39m[33mdiv[39m[33m>[39m
+ [90m 144 |[39m     )[33m;[39m
+[31m[1m>[22m[39m[90m 145 |[39m }
+ [90m     |[39m [31m[1m^[22m[39m
+ [90m 146 |[39m[0m
+
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+
+Import traces:
+  Client Component Browser:
+    ./frontend/src/app/login/page.tsx [Client Component Browser]
+    ./frontend/src/app/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./frontend/src/app/login/page.tsx [Client Component SSR]
+    ./frontend/src/app/login/page.tsx [Server Component]
+
+
+ GET /login 500 in 5.5s (compile: 5.0s, render: 440ms)
+✓ Finished filesystem cache database compaction in 42s
+⨯ ./frontend/src/app/login/page.tsx:145:1
+Parsing ecmascript source code failed
+[0m [90m 143 |[39m         [33m<[39m[33m/[39m[33mdiv[39m[33m>[39m
+ [90m 144 |[39m     )[33m;[39m
+[31m[1m>[22m[39m[90m 145 |[39m }
+ [90m     |[39m [31m[1m^[22m[39m
+ [90m 146 |[39m[0m
+
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+
+Import traces:
+  Client Component Browser:
+    ./frontend/src/app/login/page.tsx [Client Component Browser]
+    ./frontend/src/app/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./frontend/src/app/login/page.tsx [Client Component SSR]
+    ./frontend/src/app/login/page.tsx [Server Component]
+
+
+ GET /login 500 in 831ms (compile: 719ms, render: 112ms)
+ GET / 307 in 1904ms (compile: 1115ms, render: 789ms)
+⨯ ./frontend/src/app/login/page.tsx:145:1
+Parsing ecmascript source code failed
+[0m [90m 143 |[39m         [33m<[39m[33m/[39m[33mdiv[39m[33m>[39m
+ [90m 144 |[39m     )[33m;[39m
+[31m[1m>[22m[39m[90m 145 |[39m }
+ [90m     |[39m [31m[1m^[22m[39m
+ [90m 146 |[39m[0m
+
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+
+Import traces:
+  Client Component Browser:
+    ./frontend/src/app/login/page.tsx [Client Component Browser]
+    ./frontend/src/app/login/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./frontend/src/app/login/page.tsx [Client Component SSR]
+    ./frontend/src/app/login/page.tsx [Server Component]
+
+
+ GET /login 500 in 567ms (compile: 450ms, render: 117ms)
+○ Compiling /_not-found/page ...
+ GET /about 404 in 25.4s (compile: 24.2s, render: 1205ms)
+✓ Finished writing to filesystem cache in 10.4s

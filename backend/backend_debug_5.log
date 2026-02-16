@@ -1,0 +1,22 @@
+Watching for file changes with StatReloader
+/home/monster13liar/SPLIT-PAY/backend/.venv/lib64/python3.14/site-packages/dj_rest_auth/registration/serializers.py:225: UserWarning: app_settings.USERNAME_REQUIRED is deprecated, use: app_settings.SIGNUP_FIELDS['username']['required']
+  required=allauth_account_settings.USERNAME_REQUIRED,
+/home/monster13liar/SPLIT-PAY/backend/.venv/lib64/python3.14/site-packages/dj_rest_auth/registration/serializers.py:227: UserWarning: app_settings.EMAIL_REQUIRED is deprecated, use: app_settings.SIGNUP_FIELDS['email']['required']
+  email = serializers.EmailField(required=allauth_account_settings.EMAIL_REQUIRED)
+/home/monster13liar/SPLIT-PAY/backend/.venv/lib64/python3.14/site-packages/dj_rest_auth/registration/serializers.py:285: UserWarning: app_settings.EMAIL_REQUIRED is deprecated, use: app_settings.SIGNUP_FIELDS['email']['required']
+  email = serializers.EmailField(required=allauth_account_settings.EMAIL_REQUIRED)
+System check identified some issues:
+
+WARNINGS:
+?: settings.ACCOUNT_AUTHENTICATION_METHOD is deprecated, use: settings.ACCOUNT_LOGIN_METHODS = {'username', 'email'}
+?: settings.ACCOUNT_EMAIL_REQUIRED is deprecated, use: settings.ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
+
+System check identified 2 issues (0 silenced).
+Not Found: /
+[13/Feb/2026 17:55:36] "HEAD / HTTP/1.1" 404 0
+Not Found: /
+[13/Feb/2026 17:55:36] "GET / HTTP/1.1" 404 2511
+Not Found: /
+[13/Feb/2026 17:59:05] "GET / HTTP/1.1" 404 2511
+Not Found: /favicon.ico
+[13/Feb/2026 17:59:06] "GET /favicon.ico HTTP/1.1" 404 2562
