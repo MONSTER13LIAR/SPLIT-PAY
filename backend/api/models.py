@@ -30,7 +30,9 @@ class ExpenseSplit(models.Model):
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-    phone_number = models.CharField(max_length=15, unique=True)
+    phone_number = models.CharField(max_length=15, unique=True, null=True, blank=True)
+    avatar_url = models.URLField(max_length=500, null=True, blank=True)
+    bio = models.TextField(max_length=500, null=True, blank=True)
 
     def __str__(self):
         return self.user.username

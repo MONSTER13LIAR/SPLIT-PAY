@@ -5,6 +5,9 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.contrib.auth.models import User
 from .models import Group, Expense, ExpenseSplit, UserProfile
 from .serializers import UserSerializer, GroupSerializer, ExpenseSerializer
+from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
+from allauth.socialaccount.providers.oauth2.client import OAuth2Client
+from dj_rest_auth.registration.views import SocialLoginView
 import re
 
 def is_strong_password(password):
@@ -59,3 +62,15 @@ class ExpenseViewSet(viewsets.ModelViewSet):
         # Only return expenses in groups the user belongs to
         user_groups = self.request.user.expense_groups.all()
         return Expense.objects.filter(group__in=user_groups)
+class GoogleLogin(SocialLoginView):
+    adapter_class = GoogleOAuth2Adapter
+    callback_url = "http://localhost:3000/auth/callback"
+    client_class = OAuth2Client
+
+    def get_response(self):
+        # Additional logic to ensure user profile exists after social login
+        response = super().get_response()
+        user = self.user
+        if not hasattr(user, 'profile'):
+            UserProfile.objects.get_or_create(user=user)
+        return response

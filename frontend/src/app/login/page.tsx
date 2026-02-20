@@ -4,6 +4,7 @@ import React from 'react';
 import './login.css';
 import dynamic from 'next/dynamic';
 import { useEffect } from 'react';
+import { getGoogleAuthUrl } from '@/utils/auth';
 
 const Spline = dynamic(() => import('@splinetool/react-spline'), {
     ssr: false,
@@ -12,7 +13,7 @@ const Spline = dynamic(() => import('@splinetool/react-spline'), {
 
 export default function LoginPage() {
     const handleGoogleLogin = () => {
-        window.location.href = 'http://localhost:8000/accounts/google/login/';
+        window.location.href = getGoogleAuthUrl();
     };
 
     useEffect(() => {

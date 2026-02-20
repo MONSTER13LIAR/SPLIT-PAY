@@ -3,10 +3,11 @@
 import React from 'react';
 import './pricing.css';
 import '../login/login.css'; // Importing login.css for the navbar styles
+import { getGoogleAuthUrl } from '@/utils/auth';
 
 export default function PricingPage() {
     const handleGoogleLogin = () => {
-        window.location.href = 'http://localhost:8000/accounts/google/login/';
+        window.location.href = getGoogleAuthUrl();
     };
 
     return (

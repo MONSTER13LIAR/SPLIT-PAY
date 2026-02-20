@@ -1,11 +1,29 @@
 "use client";
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import './dashboard.css';
+import { useAuth } from '@/context/AuthContext';
 
 export default function Dashboard() {
+    const { user, logout } = useAuth();
+    const dashboardRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handleMouseMove = (e: MouseEvent) => {
+            if (dashboardRef.current) {
+                const { clientX, clientY } = e;
+                dashboardRef.current.style.setProperty('--x', `${clientX}px`);
+                dashboardRef.current.style.setProperty('--y', `${clientY}px`);
+            }
+        };
+
+        window.addEventListener('mousemove', handleMouseMove);
+        return () => window.removeEventListener('mousemove', handleMouseMove);
+    }, []);
+
     return (
-        <div className="dashboard-container">
+        <div className="dashboard-container" ref={dashboardRef}>
+            <div className="torch-overlay"></div>
             {/* Sidebar */}
             <aside className="sidebar">
                 <div className="sidebar-logo">
@@ -33,7 +51,7 @@ export default function Dashboard() {
 
                 <div style={{ marginTop: 'auto' }}>
                     <button
-                        onClick={() => window.location.href = '/login'}
+                        onClick={logout}
                         className="nav-item"
                         style={{ width: '100%', background: 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left' }}
                     >
@@ -46,7 +64,7 @@ export default function Dashboard() {
             <main className="main-content">
                 <header className="dashboard-header">
                     <div className="welcome-text">
-                        <h1>Welcome back! 👋</h1>
+                        <h1>Welcome back, {user?.username || user?.first_name || 'Friend'}! 👋</h1>
                         <p>Here's what's happening with your expenses.</p>
                     </div>
                 </header>
