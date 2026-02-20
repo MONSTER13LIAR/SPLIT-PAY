@@ -3,6 +3,9 @@
 import React, { useEffect, useRef } from 'react';
 import './dashboard.css';
 import { useAuth } from '@/context/AuthContext';
+import BackgroundParticles from '@/components/BackgroundParticles';
+import SplineBackground from '@/components/SplineBackground';
+import ThreeDGrid from '@/components/ThreeDGrid';
 
 export default function Dashboard() {
     const { user, logout } = useAuth();
@@ -23,12 +26,15 @@ export default function Dashboard() {
 
     return (
         <div className="dashboard-container" ref={dashboardRef}>
+            <ThreeDGrid />
+            <SplineBackground />
+            <BackgroundParticles />
             <div className="torch-overlay"></div>
             {/* Sidebar */}
             <aside className="sidebar">
                 <div className="sidebar-logo">
-                    <img src="/logo.jpg" alt="SplitPay" width="40" height="40" style={{ borderRadius: '8px' }} />
-                    <span style={{ fontWeight: 800, fontSize: '1.2rem', letterSpacing: '-0.5px' }}>SplitPay</span>
+                    <img src="/logo.jpg" alt="SplitPay" width="64" height="64" style={{ borderRadius: '12px' }} />
+                    <span style={{ fontWeight: 800, fontSize: '2rem', letterSpacing: '-1px' }}>SplitPay</span>
                 </div>
 
                 <nav className="nav-menu">
