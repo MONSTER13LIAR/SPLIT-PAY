@@ -1,0 +1,155 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap');
+
+.username-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(12px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    animation: fadeIn 0.3s ease;
+}
+
+.username-modal {
+    background: rgba(20, 20, 20, 0.95);
+    border: 1px solid rgba(138, 43, 226, 0.25);
+    border-radius: 28px;
+    padding: 3rem 2.5rem;
+    width: 420px;
+    max-width: 90vw;
+    text-align: center;
+    box-shadow:
+        0 40px 80px rgba(0, 0, 0, 0.6),
+        0 0 60px rgba(138, 43, 226, 0.15);
+    animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.username-modal-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.username-modal h2 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.5px;
+}
+
+.username-modal-subtitle {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.95rem;
+    margin-bottom: 2rem;
+    font-family: 'Inter', sans-serif;
+}
+
+.username-input-wrapper {
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 16px;
+    padding: 0 1.25rem;
+    transition: all 0.3s ease;
+}
+
+.username-input-wrapper:focus-within {
+    border-color: rgba(138, 43, 226, 0.5);
+    box-shadow: 0 0 20px rgba(138, 43, 226, 0.15);
+}
+
+.username-prefix {
+    color: rgba(138, 43, 226, 0.8);
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-right: 0.25rem;
+    font-family: 'Inter', sans-serif;
+}
+
+.username-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #fff;
+    font-size: 1.1rem;
+    padding: 1rem 0;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+}
+
+.username-input::placeholder {
+    color: rgba(255, 255, 255, 0.25);
+}
+
+.username-error {
+    color: #ff3d00;
+    font-size: 0.85rem;
+    margin-top: 0.75rem;
+    font-weight: 500;
+    text-align: left;
+    padding-left: 0.25rem;
+}
+
+.username-hint {
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 0.8rem;
+    margin-top: 0.75rem;
+    text-align: left;
+    padding-left: 0.25rem;
+}
+
+.username-submit-btn {
+    width: 100%;
+    margin-top: 1.75rem;
+    padding: 1rem;
+    border: none;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #8a2be2, #6a1bb0);
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Inter', sans-serif;
+    letter-spacing: 0.5px;
+}
+
+.username-submit-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(138, 43, 226, 0.4);
+}
+
+.username-submit-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}

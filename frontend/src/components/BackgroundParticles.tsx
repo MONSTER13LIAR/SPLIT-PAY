@@ -39,7 +39,7 @@ const BackgroundParticles: React.FC = () => {
                 this.size = Math.random() * 2 + 0.5;
                 this.speedX = (Math.random() - 0.5) * 0.5;
                 this.speedY = (Math.random() - 0.5) * 0.5;
-                this.color = `rgba(138, 43, 226, ${Math.random() * 0.3 + 0.1})`;
+                this.color = `rgba(138, 43, 226, ${Math.random() * 0.5 + 0.3})`;
             }
 
             update() {
@@ -75,7 +75,7 @@ const BackgroundParticles: React.FC = () => {
             });
 
             // Draw lines between nearby particles
-            ctx.strokeStyle = 'rgba(138, 43, 226, 0.05)';
+            ctx.strokeStyle = 'rgba(138, 43, 226, 0.4)';
             ctx.lineWidth = 0.5;
             for (let i = 0; i < particles.length; i++) {
                 for (let j = i + 1; j < particles.length; j++) {

@@ -1,23 +1,39 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import Group, Expense, ExpenseSplit
+from .models import Group, Expense, ExpenseSplit, GroupInvitation
 
 class UserSerializer(serializers.ModelSerializer):
     phone_number = serializers.CharField(source='profile.phone_number', read_only=True)
+    has_set_username = serializers.BooleanField(source='profile.has_set_username', read_only=True)
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'phone_number']
+        fields = ['id', 'username', 'email', 'phone_number', 'has_set_username']
+
 
 class GroupSerializer(serializers.ModelSerializer):
     members = UserSerializer(many=True, read_only=True)
-    member_ids = serializers.PrimaryKeyRelatedField(
-        many=True, write_only=True, queryset=User.objects.all(), source='members'
+    created_by = UserSerializer(read_only=True)
+    invited_usernames = serializers.ListField(
+        child=serializers.CharField(), write_only=True, required=False, default=[]
     )
 
     class Meta:
         model = Group
-        fields = ['id', 'name', 'description', 'members', 'member_ids', 'created_at']
+        fields = ['id', 'name', 'description', 'members', 'created_by', 'invited_usernames', 'created_at']
+        read_only_fields = ['created_at']
+
+
+class GroupInvitationSerializer(serializers.ModelSerializer):
+    group = GroupSerializer(read_only=True)
+    invited_by = UserSerializer(read_only=True)
+    invited_user = UserSerializer(read_only=True)
+
+    class Meta:
+        model = GroupInvitation
+        fields = ['id', 'group', 'invited_by', 'invited_user', 'status', 'created_at']
+        read_only_fields = ['created_at']
+
 
 class ExpenseSplitSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)

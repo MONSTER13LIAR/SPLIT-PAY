@@ -12,122 +12,97 @@ nohup: ignoring input
 
 ▲ Next.js 16.1.6 (Turbopack)
 - Local:         http://localhost:3000
-- Network:       http://192.168.29.78:3000
+- Network:       http://192.168.29.165:3000
 
 ✓ Starting...
-✓ Ready in 3.3s
- GET / 307 in 3.9s (compile: 3.0s, render: 844ms)
- GET /login 200 in 648ms (compile: 342ms, render: 306ms)
-✓ Compiled in 4.9s
- GET / 307 in 810ms (compile: 189ms, render: 622ms)
- GET /login 200 in 582ms (compile: 208ms, render: 374ms)
-✓ Compiled in 1108ms
- GET / 307 in 582ms (compile: 257ms, render: 326ms)
- GET /login 200 in 185ms (compile: 50ms, render: 134ms)
- GET /login 200 in 1757ms (compile: 408ms, render: 1349ms)
-✓ Compiled in 1728ms
- GET / 307 in 2.4s (compile: 1047ms, render: 1357ms)
- GET /login 200 in 1315ms (compile: 970ms, render: 345ms)
- GET /login 200 in 2.2s (compile: 831ms, render: 1341ms)
-✓ Compiled in 767ms
-✓ Compiled in 428ms
- GET / 307 in 614ms (compile: 36ms, render: 578ms)
- GET /login 200 in 1226ms (compile: 596ms, render: 630ms)
-✓ Compiled in 1069ms
-✓ Compiled in 282ms
- GET /login 200 in 406ms (compile: 119ms, render: 287ms)
- GET / 307 in 252ms (compile: 16ms, render: 236ms)
- GET /login 200 in 130ms (compile: 9ms, render: 121ms)
-✓ Compiled in 506ms
-✓ Compiled in 1732ms
-⨯ ./frontend/src/app/login/page.tsx:145:1
-Parsing ecmascript source code failed
-[0m [90m 143 |[39m         [33m<[39m[33m/[39m[33mdiv[39m[33m>[39m
- [90m 144 |[39m     )[33m;[39m
-[31m[1m>[22m[39m[90m 145 |[39m }
- [90m     |[39m [31m[1m^[22m[39m
- [90m 146 |[39m[0m
-
-Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
-
-Import traces:
-  Client Component Browser:
-    ./frontend/src/app/login/page.tsx [Client Component Browser]
-    ./frontend/src/app/login/page.tsx [Server Component]
-
-  Client Component SSR:
-    ./frontend/src/app/login/page.tsx [Client Component SSR]
-    ./frontend/src/app/login/page.tsx [Server Component]
-
-
-○ Compiling /_error ...
- GET /login 500 in 5.6s (compile: 4.9s, render: 685ms)
-✓ Finished writing to filesystem cache in 16.9s
-⨯ ./frontend/src/app/login/page.tsx:145:1
-Parsing ecmascript source code failed
-[0m [90m 143 |[39m         [33m<[39m[33m/[39m[33mdiv[39m[33m>[39m
- [90m 144 |[39m     )[33m;[39m
-[31m[1m>[22m[39m[90m 145 |[39m }
- [90m     |[39m [31m[1m^[22m[39m
- [90m 146 |[39m[0m
-
-Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
-
-Import traces:
-  Client Component Browser:
-    ./frontend/src/app/login/page.tsx [Client Component Browser]
-    ./frontend/src/app/login/page.tsx [Server Component]
-
-  Client Component SSR:
-    ./frontend/src/app/login/page.tsx [Client Component SSR]
-    ./frontend/src/app/login/page.tsx [Server Component]
-
-
- GET /login 500 in 5.5s (compile: 5.0s, render: 440ms)
-✓ Finished filesystem cache database compaction in 42s
-⨯ ./frontend/src/app/login/page.tsx:145:1
-Parsing ecmascript source code failed
-[0m [90m 143 |[39m         [33m<[39m[33m/[39m[33mdiv[39m[33m>[39m
- [90m 144 |[39m     )[33m;[39m
-[31m[1m>[22m[39m[90m 145 |[39m }
- [90m     |[39m [31m[1m^[22m[39m
- [90m 146 |[39m[0m
-
-Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
-
-Import traces:
-  Client Component Browser:
-    ./frontend/src/app/login/page.tsx [Client Component Browser]
-    ./frontend/src/app/login/page.tsx [Server Component]
-
-  Client Component SSR:
-    ./frontend/src/app/login/page.tsx [Client Component SSR]
-    ./frontend/src/app/login/page.tsx [Server Component]
-
-
- GET /login 500 in 831ms (compile: 719ms, render: 112ms)
- GET / 307 in 1904ms (compile: 1115ms, render: 789ms)
-⨯ ./frontend/src/app/login/page.tsx:145:1
-Parsing ecmascript source code failed
-[0m [90m 143 |[39m         [33m<[39m[33m/[39m[33mdiv[39m[33m>[39m
- [90m 144 |[39m     )[33m;[39m
-[31m[1m>[22m[39m[90m 145 |[39m }
- [90m     |[39m [31m[1m^[22m[39m
- [90m 146 |[39m[0m
-
-Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
-
-Import traces:
-  Client Component Browser:
-    ./frontend/src/app/login/page.tsx [Client Component Browser]
-    ./frontend/src/app/login/page.tsx [Server Component]
-
-  Client Component SSR:
-    ./frontend/src/app/login/page.tsx [Client Component SSR]
-    ./frontend/src/app/login/page.tsx [Server Component]
-
-
- GET /login 500 in 567ms (compile: 450ms, render: 117ms)
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+✓ Ready in 2.9s
+○ Compiling / ...
+ GET / 307 in 7.9s (compile: 6.5s, render: 1399ms)
+ GET /login 200 in 1707ms (compile: 1360ms, proxy.ts: 145ms, render: 202ms)
+ GET /auth/callback?code=4%2F0AfrIepBEcpzPMxo7w8Am1T6bvdwLlynM1BUaDmMMbw36Arc2DVDZQxGE0F6moWvTuOXaPw&scope=email+profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email+openid&authuser=0&prompt=consent 200 in 1593ms (compile: 1203ms, render: 390ms)
+ GET /login?error=auth_failed 200 in 245ms (compile: 32ms, proxy.ts: 23ms, render: 191ms)
+ GET /login?error=auth_failed 200 in 330ms (compile: 136ms, proxy.ts: 38ms, render: 156ms)
+○ Compiling /pricing ...
+ GET /pricing 200 in 3.6s (compile: 3.4s, render: 207ms)
+ GET /login 200 in 205ms (compile: 17ms, proxy.ts: 12ms, render: 176ms)
+ GET /auth/callback?code=4%2F0AfrIepCYpsFU6H-t3-r1-l5yPguL2CgKc_ODy6MjMflUJUQ1DUNrqKrwHW0oS4ZdA8ex_Q&scope=email+profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email+openid&authuser=1&prompt=consent 200 in 246ms (compile: 71ms, render: 175ms)
+ GET /login?error=auth_failed 200 in 153ms (compile: 32ms, proxy.ts: 14ms, render: 107ms)
+ GET /dashboard 200 in 751ms (compile: 558ms, proxy.ts: 49ms, render: 144ms)
+✓ Compiled in 849ms
+ GET /dashboard 200 in 961ms (compile: 43ms, proxy.ts: 60ms, render: 858ms)
+✓ Compiled in 1234ms
+ GET /dashboard 200 in 1196ms (compile: 496ms, proxy.ts: 31ms, render: 669ms)
+✓ Compiled in 586ms
+✓ Compiled in 686ms
+✓ Compiled in 1166ms
+✓ Compiled in 607ms
+ GET /dashboard 200 in 1567ms (compile: 704ms, proxy.ts: 177ms, render: 686ms)
+✓ Compiled in 505ms
+ GET /dashboard 200 in 3.0s (compile: 631ms, proxy.ts: 355ms, render: 1989ms)
+✓ Compiled in 879ms
+⚠ Fast Refresh had to perform a full reload when ./frontend/src/context/AuthContext.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET /dashboard 200 in 2.1s (compile: 859ms, proxy.ts: 34ms, render: 1166ms)
+✓ Compiled in 2.8s
+ GET /dashboard 200 in 3.2s (compile: 975ms, proxy.ts: 19ms, render: 2.2s)
+ GET /dashboard 200 in 239ms (compile: 25ms, proxy.ts: 26ms, render: 188ms)
+ GET /login 200 in 1781ms (compile: 760ms, proxy.ts: 123ms, render: 898ms)
+ GET /auth/callback?code=4%2F0AfrIepBnVeFPj2SN92vU2HliXYo07mw3LCe5_X1IvQS5HxsHPMUrK6_mmYVsK1EZAy-faQ&scope=email+profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email+openid&authuser=0&prompt=consent 200 in 547ms (compile: 231ms, render: 316ms)
+ GET /dashboard 200 in 154ms (compile: 12ms, proxy.ts: 11ms, render: 132ms)
+ GET /dashboard 200 in 76ms (compile: 11ms, proxy.ts: 8ms, render: 57ms)
+ GET /dashboard 200 in 142ms (compile: 14ms, proxy.ts: 19ms, render: 109ms)
+ GET /dashboard 200 in 70ms (compile: 13ms, proxy.ts: 10ms, render: 48ms)
+ GET /dashboard 200 in 157ms (compile: 11ms, proxy.ts: 14ms, render: 133ms)
+ GET /dashboard 200 in 381ms (compile: 70ms, proxy.ts: 33ms, render: 278ms)
+ GET / 307 in 897ms (compile: 276ms, render: 621ms)
+ GET /dashboard 200 in 240ms (compile: 15ms, proxy.ts: 74ms, render: 150ms)
+ GET /dashboard 200 in 191ms (compile: 39ms, proxy.ts: 11ms, render: 141ms)
+ GET / 307 in 236ms (compile: 42ms, render: 194ms)
+ GET /login 200 in 209ms (compile: 40ms, proxy.ts: 10ms, render: 160ms)
+ GET /auth/callback?code=4%2F0AfrIepBfBk_tmRMmsSpdHZgcqXVWMkLoSLszCwTu6c-dDA1rsKpL8H37A-q3PgSro5MO6A&scope=email+profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email+openid&authuser=0&prompt=consent 200 in 1419ms (compile: 827ms, render: 591ms)
+ GET /login?error=auth_failed 200 in 163ms (compile: 18ms, proxy.ts: 12ms, render: 134ms)
+ GET /dashboard 200 in 107ms (compile: 18ms, proxy.ts: 10ms, render: 79ms)
+✓ Compiled in 1200ms
+✓ Compiled in 607ms
+ GET / 307 in 665ms (compile: 270ms, render: 395ms)
+ GET /dashboard 200 in 1886ms (compile: 289ms, proxy.ts: 7ms, render: 1589ms)
+ GET / 307 in 594ms (compile: 217ms, render: 376ms)
+ GET /login 200 in 207ms (compile: 38ms, proxy.ts: 20ms, render: 149ms)
+ GET /auth/callback?code=4%2F0AfrIepDi1YelirX1xsOXNOffkrVFQxM5O6EF0KnzWCv1PxJyk1ZOnUGISqLAtJ-v6hZzeQ&scope=email+profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email+openid&authuser=0&prompt=consent 200 in 142ms (compile: 13ms, render: 130ms)
+ GET /dashboard 200 in 147ms (compile: 12ms, proxy.ts: 17ms, render: 119ms)
+ GET /dashboard 200 in 132ms (compile: 16ms, proxy.ts: 20ms, render: 96ms)
+ GET /dashboard 200 in 57ms (compile: 10ms, proxy.ts: 7ms, render: 40ms)
+ GET /dashboard 200 in 2.6s (compile: 452ms, proxy.ts: 312ms, render: 1854ms)
+ GET /dashboard 200 in 896ms (compile: 648ms, proxy.ts: 152ms, render: 95ms)
+ GET /dashboard 200 in 544ms (compile: 23ms, proxy.ts: 11ms, render: 510ms)
+ GET /dashboard 200 in 359ms (compile: 25ms, proxy.ts: 16ms, render: 318ms)
+ GET /dashboard 200 in 146ms (compile: 9ms, proxy.ts: 19ms, render: 118ms)
+ GET /dashboard 200 in 1135ms (compile: 21ms, proxy.ts: 14ms, render: 1100ms)
+ GET /dashboard 200 in 989ms (compile: 54ms, proxy.ts: 50ms, render: 885ms)
+ GET /dashboard 200 in 715ms (compile: 24ms, proxy.ts: 28ms, render: 663ms)
 ○ Compiling /_not-found/page ...
- GET /about 404 in 25.4s (compile: 24.2s, render: 1205ms)
-✓ Finished writing to filesystem cache in 10.4s
+ GET /dashboard 200 in 650ms (compile: 50ms, proxy.ts: 43ms, render: 556ms)
+ GET /dashboard 200 in 704ms (compile: 22ms, proxy.ts: 22ms, render: 661ms)
+ GET /dashboard 200 in 731ms (compile: 65ms, proxy.ts: 14ms, render: 651ms)
+ GET /dashboard 200 in 245ms (compile: 19ms, proxy.ts: 8ms, render: 218ms)
+ GET /dashboard 200 in 153ms (compile: 14ms, proxy.ts: 10ms, render: 129ms)
+ GET /dashboard 200 in 510ms (compile: 63ms, proxy.ts: 25ms, render: 423ms)
+ GET /dashboard 200 in 316ms (compile: 118ms, proxy.ts: 84ms, render: 113ms)
+ GET /dashboard 200 in 174ms (compile: 19ms, proxy.ts: 26ms, render: 129ms)
+ GET /dashboard 404 in 7.3s (compile: 5.6s, proxy.ts: 1319ms, render: 474ms)
+ GET /dashboard 200 in 152ms (compile: 16ms, proxy.ts: 30ms, render: 107ms)
+ GET /dashboard 200 in 348ms (compile: 32ms, proxy.ts: 12ms, render: 304ms)
+ GET /dashboard 200 in 326ms (compile: 19ms, proxy.ts: 10ms, render: 297ms)
+ GET /dashboard 200 in 302ms (compile: 14ms, proxy.ts: 12ms, render: 277ms)
+ GET /dashboard 200 in 1375ms (compile: 25ms, proxy.ts: 14ms, render: 1336ms)
+ GET /dashboard 200 in 794ms (compile: 47ms, proxy.ts: 690ms, render: 57ms)
+ GET /dashboard 200 in 1316ms (compile: 71ms, proxy.ts: 147ms, render: 1097ms)
+ GET /dashboard 200 in 1160ms (compile: 265ms, proxy.ts: 22ms, render: 873ms)
+✓ Compiled in 1185ms
+✓ Compiled in 486ms
+✓ Compiled in 44ms
+ GET /groups 200 in 2.7s (compile: 2.1s, proxy.ts: 181ms, render: 409ms)
+ GET /dashboard 200 in 1392ms (compile: 495ms, proxy.ts: 131ms, render: 767ms)
+ GET /groups 200 in 333ms (compile: 26ms, proxy.ts: 31ms, render: 276ms)
+ GET /dashboard 200 in 545ms (compile: 93ms, proxy.ts: 72ms, render: 380ms)
+ GET /groups 200 in 361ms (compile: 40ms, proxy.ts: 33ms, render: 288ms)

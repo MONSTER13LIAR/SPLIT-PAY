@@ -25,8 +25,10 @@ export default function AuthCallback() {
                     return res.json();
                 })
                 .then(data => {
-                    // data typically contains { access: '...', user: '...' } depending on dj-rest-auth config
-                    login(data.access_token || data.access, data.user);
+                    console.log('Google login response:', data);
+                    // dj-rest-auth with USE_JWT returns { access, refresh, user }
+                    const token = data.access_token || data.access || data.key;
+                    login(token, data.user);
                     router.push('/dashboard');
                 })
                 .catch(err => {

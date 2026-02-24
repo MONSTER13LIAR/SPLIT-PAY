@@ -9,9 +9,202 @@ Watching for file changes with StatReloader
 System check identified some issues:
 
 WARNINGS:
-?: settings.ACCOUNT_AUTHENTICATION_METHOD is deprecated, use: settings.ACCOUNT_LOGIN_METHODS = {'email', 'username'}
+?: settings.ACCOUNT_AUTHENTICATION_METHOD is deprecated, use: settings.ACCOUNT_LOGIN_METHODS = {'username', 'email'}
 ?: settings.ACCOUNT_EMAIL_REQUIRED is deprecated, use: settings.ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
 
 System check identified 2 issues (0 silenced).
-Not Found: /api/health/
-[14/Feb/2026 16:17:59] "HEAD /api/health/ HTTP/1.1" 404 0
+[21/Feb/2026 08:38:07] "OPTIONS /api/groups/ HTTP/1.1" 200 0
+[21/Feb/2026 08:38:07] "OPTIONS /api/invitations/ HTTP/1.1" 200 0
+Unauthorized: /api/groups/
+Unauthorized: /api/invitations/
+[21/Feb/2026 08:38:07] "GET /api/invitations/ HTTP/1.1" 401 183
+[21/Feb/2026 08:38:07] "GET /api/groups/ HTTP/1.1" 401 183
+[21/Feb/2026 08:38:17] "OPTIONS /api/set-username/ HTTP/1.1" 200 0
+Unauthorized: /api/set-username/
+[21/Feb/2026 08:38:17] "POST /api/set-username/ HTTP/1.1" 401 183
+Unauthorized: /api/set-username/
+[21/Feb/2026 08:38:25] "POST /api/set-username/ HTTP/1.1" 401 183
+Unauthorized: /api/set-username/
+[21/Feb/2026 08:38:25] "POST /api/set-username/ HTTP/1.1" 401 183
+Unauthorized: /api/set-username/
+[21/Feb/2026 08:38:26] "POST /api/set-username/ HTTP/1.1" 401 183
+Unauthorized: /api/set-username/
+[21/Feb/2026 08:38:26] "POST /api/set-username/ HTTP/1.1" 401 183
+Unauthorized: /api/set-username/
+[21/Feb/2026 08:39:19] "POST /api/set-username/ HTTP/1.1" 401 183
+Unauthorized: /api/set-username/
+[21/Feb/2026 08:39:19] "POST /api/set-username/ HTTP/1.1" 401 183
+Unauthorized: /api/set-username/
+[21/Feb/2026 08:39:20] "POST /api/set-username/ HTTP/1.1" 401 183
+[21/Feb/2026 08:43:19] "OPTIONS /api/google/ HTTP/1.1" 200 0
+[21/Feb/2026 08:43:20] "POST /api/google/ HTTP/1.1" 200 373
+Internal Server Error: /api/google/
+Traceback (most recent call last):
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/db/backends/sqlite3/base.py", line 328, in execute
+    return super().execute(query, params)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+sqlite3.IntegrityError: UNIQUE constraint failed: auth_user.username
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/views/decorators/csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/utils/decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/views/decorators/debug.py", line 141, in sensitive_post_parameters_wrapper
+    return view(request, *args, **kwargs)
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/dj_rest_auth/views.py", line 48, in dispatch
+    return super().dispatch(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/rest_framework/views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/rest_framework/views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/rest_framework/views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/rest_framework/views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/dj_rest_auth/views.py", line 125, in post
+    self.serializer.is_valid(raise_exception=True)
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/rest_framework/serializers.py", line 227, in is_valid
+    self._validated_data = self.run_validation(self.initial_data)
+                           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/rest_framework/serializers.py", line 429, in run_validation
+    value = self.validate(value)
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/dj_rest_auth/registration/serializers.py", line 158, in validate
+    ret = complete_social_login(request, login)
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/allauth/socialaccount/helpers.py", line 70, in complete_social_login
+    return flows.login.complete_login(request, sociallogin)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/allauth/socialaccount/internal/flows/login.py", line 53, in complete_login
+    return _authenticate(request, sociallogin)
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/allauth/socialaccount/internal/flows/login.py", line 80, in _authenticate
+    ret = process_signup(request, sociallogin)
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/allauth/socialaccount/internal/flows/signup.py", line 129, in process_signup
+    get_adapter().save_user(request, sociallogin, form=None)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/allauth/socialaccount/adapter.py", line 106, in save_user
+    sociallogin.save(request)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/allauth/socialaccount/models.py", line 310, in save
+    user.save()
+    ~~~~~~~~~^^
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/contrib/auth/base_user.py", line 77, in save
+    super().save(*args, **kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/db/models/base.py", line 822, in save
+    self.save_base(
+    ~~~~~~~~~~~~~~^
+        using=using,
+        ^^^^^^^^^^^^
+    ...<2 lines>...
+        update_fields=update_fields,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/db/models/base.py", line 909, in save_base
+    updated = self._save_table(
+        raw,
+    ...<4 lines>...
+        update_fields,
+    )
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/db/models/base.py", line 1067, in _save_table
+    results = self._do_insert(
+        cls._base_manager, using, fields, returning_fields, raw
+    )
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/db/models/base.py", line 1108, in _do_insert
+    return manager._insert(
+           ~~~~~~~~~~~~~~~^
+        [self],
+        ^^^^^^^
+    ...<3 lines>...
+        raw=raw,
+        ^^^^^^^^
+    )
+    ^
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/db/models/query.py", line 1845, in _insert
+    return query.get_compiler(using=using).execute_sql(returning_fields)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/db/models/sql/compiler.py", line 1823, in execute_sql
+    cursor.execute(sql, params)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/db/backends/utils.py", line 122, in execute
+    return super().execute(sql, params)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        sql, params, many=False, executor=self._execute
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/django/db/backends/sqlite3/base.py", line 328, in execute
+    return super().execute(query, params)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+django.db.utils.IntegrityError: UNIQUE constraint failed: auth_user.username
+[21/Feb/2026 08:43:20] "POST /api/google/ HTTP/1.1" 500 254438
+Bad Request: /api/google/
+[21/Feb/2026 08:43:20] "POST /api/google/ HTTP/1.1" 400 65
+[21/Feb/2026 08:43:21] "OPTIONS /api/groups/ HTTP/1.1" 200 0
+[21/Feb/2026 08:43:21] "OPTIONS /api/invitations/ HTTP/1.1" 200 0
+[21/Feb/2026 08:43:21] "OPTIONS /api/invitations/ HTTP/1.1" 200 0
+[21/Feb/2026 08:43:21] "OPTIONS /api/groups/ HTTP/1.1" 200 0
+[21/Feb/2026 08:43:21] "GET /api/invitations/ HTTP/1.1" 200 2
+[21/Feb/2026 08:43:21] "GET /api/groups/ HTTP/1.1" 200 2
+[21/Feb/2026 08:43:21] "GET /api/invitations/ HTTP/1.1" 200 2
+[21/Feb/2026 08:43:21] "GET /api/groups/ HTTP/1.1" 200 2
+[21/Feb/2026 08:43:38] "OPTIONS /api/set-username/ HTTP/1.1" 200 0
+[21/Feb/2026 08:43:38] "POST /api/set-username/ HTTP/1.1" 200 113
+[21/Feb/2026 08:44:13] "OPTIONS /api/create-group/ HTTP/1.1" 200 0
+[21/Feb/2026 08:44:13] "POST /api/create-group/ HTTP/1.1" 201 351
+[21/Feb/2026 08:44:13] "GET /api/groups/ HTTP/1.1" 200 353
+[21/Feb/2026 08:46:43] "GET /api/invitations/ HTTP/1.1" 200 2
+[21/Feb/2026 08:46:43] "GET /api/groups/ HTTP/1.1" 200 353
+[21/Feb/2026 08:47:10] "GET /api/groups/ HTTP/1.1" 200 2
+[21/Feb/2026 08:47:10] "GET /api/invitations/ HTTP/1.1" 200 2
+[21/Feb/2026 08:47:10] "GET /api/groups/ HTTP/1.1" 200 353
+[21/Feb/2026 08:47:10] "GET /api/invitations/ HTTP/1.1" 200 691
+[21/Feb/2026 08:47:10] "GET /api/groups/ HTTP/1.1" 200 2
+[21/Feb/2026 08:47:10] "GET /api/invitations/ HTTP/1.1" 200 2
+[21/Feb/2026 08:47:10] "GET /api/groups/ HTTP/1.1" 200 353
+[21/Feb/2026 08:47:10] "GET /api/invitations/ HTTP/1.1" 200 691
+[21/Feb/2026 08:48:27] "GET /api/groups/ HTTP/1.1" 200 2
+[21/Feb/2026 08:48:28] "GET /api/invitations/ HTTP/1.1" 200 691
+[21/Feb/2026 08:48:32] "OPTIONS /api/invitations/1/respond/ HTTP/1.1" 200 0
+[21/Feb/2026 08:48:32] "POST /api/invitations/1/respond/ HTTP/1.1" 200 804
+[21/Feb/2026 08:48:32] "GET /api/invitations/ HTTP/1.1" 200 2
+[21/Feb/2026 08:48:32] "GET /api/groups/ HTTP/1.1" 200 467
+[21/Feb/2026 08:48:47] "GET /api/invitations/ HTTP/1.1" 200 2
+[21/Feb/2026 08:48:47] "GET /api/groups/ HTTP/1.1" 200 467
+[21/Feb/2026 08:48:52] "GET /api/invitations/ HTTP/1.1" 200 2
+[21/Feb/2026 08:48:52] "GET /api/groups/ HTTP/1.1" 200 467
+[21/Feb/2026 08:53:59] "GET /api/invitations/ HTTP/1.1" 200 2
+[21/Feb/2026 08:53:59] "GET /api/groups/ HTTP/1.1" 200 467
+[21/Feb/2026 08:54:24] "GET /api/invitations/ HTTP/1.1" 200 2
+[21/Feb/2026 08:54:24] "GET /api/groups/ HTTP/1.1" 200 467

@@ -4,8 +4,11 @@ import type { NextRequest } from 'next/server';
 export function middleware(request: NextRequest) {
     const token = request.cookies.get('access_token')?.value;
 
-    // If trying to access dashboard without a token, redirect to login
-    if (request.nextUrl.pathname.startsWith('/dashboard') && !token) {
+    // If trying to access protected pages without a token, redirect to login
+    if (
+        (request.nextUrl.pathname.startsWith('/dashboard') || request.nextUrl.pathname.startsWith('/groups'))
+        && !token
+    ) {
         return NextResponse.redirect(new URL('/login', request.url));
     }
 
@@ -18,5 +21,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-    matcher: ['/dashboard/:path*', '/login'],
+    matcher: ['/dashboard/:path*', '/groups/:path*', '/login'],
 };
