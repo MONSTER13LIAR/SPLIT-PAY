@@ -15,7 +15,8 @@ services:
     volumes:
       - ./backend:/app
     ports:
-      - "8000:8000"
+      - "8001:8000"
+    user: root
     environment:
       - POSTGRES_DB=splitpay
       - POSTGRES_USER=postgres

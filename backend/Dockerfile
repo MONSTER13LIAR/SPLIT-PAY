@@ -20,10 +20,12 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy project
+USER root
 COPY . .
+RUN chown -R 1000:1000 /app
 
 # Expose port
 EXPOSE 8000
 
 # Start command
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["/bin/bash", "-c", "python manage.py runserver 0.0.0.0:8000"]
