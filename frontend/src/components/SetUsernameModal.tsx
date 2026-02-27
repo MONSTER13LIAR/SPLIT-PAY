@@ -24,7 +24,7 @@ export default function SetUsernameModal({ token, onUsernameSet }: SetUsernameMo
 
         setLoading(true);
         try {
-            const res = await fetch('http://localhost:8000/api/set-username/', {
+            const res = await fetch('http://localhost:8001/api/set-username/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

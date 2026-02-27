@@ -129,13 +129,12 @@ def set_username(request):
 @permission_classes([IsAuthenticated])
 def create_group(request):
     """Create a group and send invitations to the specified usernames."""
-    name = request.data.get('name', '').strip()
-    description = request.data.get('description', '').strip()
-    invited_usernames = request.data.get('invited_usernames', [])
-
-    if not name:
-        return Response({"error": "Group name is required."}, status=status.HTTP_400_BAD_REQUEST)
-
+    serializer = GroupSerializer(data=request.data)
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    invited_usernames = serializer.validated_data.get('invited_usernames', [])
+    
     # Validate all usernames exist before creating
     invited_users = []
     errors = []
@@ -153,16 +152,16 @@ def create_group(request):
         return Response({"error": errors[0]}, status=status.HTTP_400_BAD_REQUEST)
 
     # Create the group
-    group = Group.objects.create(name=name, description=description, created_by=request.user)
+    group = serializer.save(created_by=request.user)
     group.members.add(request.user)
 
     # Create invitations
     for u in invited_users:
-        GroupInvitation.objects.create(
+        GroupInvitation.objects.get_or_create(
             group=group,
             invited_by=request.user,
             invited_user=u,
-            status='pending',
+            defaults={'status': 'pending'}
         )
 
     return Response(GroupSerializer(group).data, status=status.HTTP_201_CREATED)

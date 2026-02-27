@@ -13,7 +13,7 @@ services:
   backend:
     build: ./backend
     volumes:
-      - ./backend:/app
+      - ./backend:/app:z
     ports:
       - "8001:8000"
     user: root
@@ -29,7 +29,7 @@ services:
   frontend:
     build: ./frontend
     volumes:
-      - ./frontend:/app
+      - ./frontend:/app:z
       - /app/node_modules
     ports:
       - "3000:3000"

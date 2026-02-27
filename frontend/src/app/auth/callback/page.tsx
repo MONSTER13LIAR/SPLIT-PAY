@@ -13,7 +13,7 @@ export default function AuthCallback() {
         const code = searchParams.get('code');
         if (code) {
             // Send the code to our backend to exchange it for a JWT
-            fetch('http://localhost:8000/api/google/', {
+            fetch('http://localhost:8001/api/google/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

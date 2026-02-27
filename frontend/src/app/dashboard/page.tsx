@@ -36,7 +36,7 @@ export default function Dashboard() {
     const fetchGroups = useCallback(async () => {
         if (!token) return;
         try {
-            const res = await fetch('http://localhost:8000/api/groups/', {
+            const res = await fetch('http://localhost:8001/api/groups/', {
                 headers: { 'Authorization': `Bearer ${token}` },
             });
             if (res.ok) {
@@ -51,7 +51,7 @@ export default function Dashboard() {
     const fetchInvitations = useCallback(async () => {
         if (!token) return;
         try {
-            const res = await fetch('http://localhost:8000/api/invitations/', {
+            const res = await fetch('http://localhost:8001/api/invitations/', {
                 headers: { 'Authorization': `Bearer ${token}` },
             });
             if (res.ok) {
@@ -72,7 +72,7 @@ export default function Dashboard() {
         if (!token) return;
         setRespondingId(invitationId);
         try {
-            const res = await fetch(`http://localhost:8000/api/invitations/${invitationId}/respond/`, {
+            const res = await fetch(`http://localhost:8001/api/invitations/${invitationId}/respond/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

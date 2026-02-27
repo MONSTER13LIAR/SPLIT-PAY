@@ -48,7 +48,7 @@ export default function CreateGroupModal({ token, onClose, onGroupCreated }: Cre
 
         setLoading(true);
         try {
-            const res = await fetch('http://localhost:8000/api/create-group/', {
+            const res = await fetch('http://localhost:8001/api/create-group/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

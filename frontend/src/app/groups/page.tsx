@@ -35,7 +35,7 @@ export default function GroupsPage() {
     const fetchGroups = useCallback(async () => {
         if (!token) return;
         try {
-            const res = await fetch('http://localhost:8000/api/groups/', {
+            const res = await fetch('http://localhost:8001/api/groups/', {
                 headers: { 'Authorization': `Bearer ${token}` },
             });
             if (res.ok) setGroups(await res.json());
@@ -45,7 +45,7 @@ export default function GroupsPage() {
     const fetchInvitations = useCallback(async () => {
         if (!token) return;
         try {
-            const res = await fetch('http://localhost:8000/api/invitations/', {
+            const res = await fetch('http://localhost:8001/api/invitations/', {
                 headers: { 'Authorization': `Bearer ${token}` },
             });
             if (res.ok) setInvitations(await res.json());
@@ -61,7 +61,7 @@ export default function GroupsPage() {
         if (!token) return;
         setRespondingId(invId);
         try {
-            const res = await fetch(`http://localhost:8000/api/invitations/${invId}/respond/`, {
+            const res = await fetch(`http://localhost:8001/api/invitations/${invId}/respond/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
