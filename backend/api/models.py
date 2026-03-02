@@ -5,6 +5,8 @@ class Group(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
     members = models.ManyToManyField(User, related_name='expense_groups', blank=True)
+    member_order = models.JSONField(default=list, blank=True)  # Stores list of user IDs in order
+    current_turn_index = models.PositiveIntegerField(default=0)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_groups', null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -54,6 +56,8 @@ class UserProfile(models.Model):
     phone_number = models.CharField(max_length=15, unique=True, null=True, blank=True)
     avatar_url = models.URLField(max_length=500, null=True, blank=True)
     bio = models.TextField(max_length=500, null=True, blank=True)
+    is_non_veg = models.BooleanField(default=False)
+    is_drinker = models.BooleanField(default=False)
     has_set_username = models.BooleanField(default=False)
 
     def __str__(self):

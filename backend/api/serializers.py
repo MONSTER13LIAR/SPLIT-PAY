@@ -5,10 +5,12 @@ from .models import Group, Expense, ExpenseSplit, GroupInvitation
 class UserSerializer(serializers.ModelSerializer):
     phone_number = serializers.CharField(source='profile.phone_number', read_only=True)
     has_set_username = serializers.BooleanField(source='profile.has_set_username', read_only=True)
+    is_non_veg = serializers.BooleanField(source='profile.is_non_veg', read_only=True)
+    is_drinker = serializers.BooleanField(source='profile.is_drinker', read_only=True)
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'phone_number', 'has_set_username']
+        fields = ['id', 'username', 'email', 'phone_number', 'has_set_username', 'is_non_veg', 'is_drinker']
 
 
 class GroupSerializer(serializers.ModelSerializer):
@@ -20,8 +22,15 @@ class GroupSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Group
-        fields = ['id', 'name', 'description', 'members', 'created_by', 'invited_usernames', 'created_at']
-        read_only_fields = ['created_at']
+        fields = ['id', 'name', 'description', 'members', 'created_by', 'invited_usernames', 'member_order', 'current_turn_index', 'created_at']
+        read_only_fields = ['created_at', 'member_order', 'current_turn_index']
+
+    def to_representation(self, instance):
+        """Ensure member_order is populated if empty but members exist."""
+        if not instance.member_order and instance.members.exists():
+            instance.member_order = list(instance.members.all().values_list('id', flat=True))
+            instance.save()
+        return super().to_representation(instance)
 
 
 class GroupInvitationSerializer(serializers.ModelSerializer):

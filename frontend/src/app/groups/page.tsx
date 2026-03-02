@@ -6,12 +6,15 @@ import { useAuth } from '@/context/AuthContext';
 import BackgroundParticles from '@/components/BackgroundParticles';
 import SplineBackground from '@/components/SplineBackground';
 import CreateGroupModal from '@/components/CreateGroupModal';
+import GroupDetailModal from '@/components/GroupDetailModal';
 
 interface GroupData {
     id: number;
     name: string;
     description: string;
-    members: { id: number; username: string }[];
+    members: { id: number; username: string; is_non_veg: boolean; is_drinker: boolean }[];
+    member_order: number[];
+    current_turn_index: number;
     created_by: { id: number; username: string } | null;
     created_at: string;
 }
@@ -25,11 +28,12 @@ interface InvitationData {
 }
 
 export default function GroupsPage() {
-    const { user, logout, token } = useAuth();
+    const { user, logout, token, updateUser } = useAuth();
     const containerRef = useRef<HTMLDivElement>(null);
     const [groups, setGroups] = useState<GroupData[]>([]);
     const [invitations, setInvitations] = useState<InvitationData[]>([]);
     const [showCreateGroup, setShowCreateGroup] = useState(false);
+    const [selectedGroupId, setSelectedGroupId] = useState<number | null>(null);
     const [respondingId, setRespondingId] = useState<number | null>(null);
 
     const fetchGroups = useCallback(async () => {
@@ -38,9 +42,14 @@ export default function GroupsPage() {
             const res = await fetch('http://localhost:8001/api/groups/', {
                 headers: { 'Authorization': `Bearer ${token}` },
             });
-            if (res.ok) setGroups(await res.json());
+            if (res.ok) {
+                const data = await res.json();
+                setGroups(data);
+            }
         } catch (err) { console.error('Failed to fetch groups:', err); }
     }, [token]);
+
+    const selectedGroup = groups.find(g => g.id === selectedGroupId);
 
     const fetchInvitations = useCallback(async () => {
         if (!token) return;
@@ -102,6 +111,15 @@ export default function GroupsPage() {
                 />
             )}
 
+            {selectedGroup && token && (
+                <GroupDetailModal
+                    group={selectedGroup}
+                    token={token}
+                    onClose={() => setSelectedGroupId(null)}
+                    onUpdate={() => fetchGroups()}
+                />
+            )}
+
             {/* Sidebar Trigger */}
             <div className="sidebar-trigger"></div>
             <aside className="sidebar">
@@ -114,7 +132,7 @@ export default function GroupsPage() {
                     <a href="/groups" className="nav-item active"><span>My Groups</span></a>
                     <a href="#" className="nav-item"><span>Activities</span></a>
                     <a href="#" className="nav-item"><span>Settlements</span></a>
-                    <a href="#" className="nav-item"><span>Settings</span></a>
+                    <a href="/settings" className="nav-item"><span>Settings</span></a>
                 </nav>
                 <div style={{ marginTop: 'auto' }}>
                     <button onClick={logout} className="nav-item" style={{ width: '100%', background: 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left' }}>
@@ -177,7 +195,12 @@ export default function GroupsPage() {
                     ) : (
                         <div className="gp-grid">
                             {groups.map(group => (
-                                <div key={group.id} className="gp-card">
+                                <div 
+                                    key={group.id} 
+                                    className="gp-card"
+                                    onClick={() => setSelectedGroupId(group.id)}
+                                    style={{ cursor: 'pointer' }}
+                                >
                                     <div className="gp-card-top">
                                         <h3>{group.name}</h3>
                                         {group.created_by && (

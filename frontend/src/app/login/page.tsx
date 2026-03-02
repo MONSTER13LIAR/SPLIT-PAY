@@ -5,6 +5,7 @@ import './login.css';
 import dynamic from 'next/dynamic';
 import { useEffect } from 'react';
 import { getGoogleAuthUrl } from '@/utils/auth';
+import { useAuth } from '@/context/AuthContext';
 
 const Spline = dynamic(() => import('@splinetool/react-spline'), {
     ssr: false,
@@ -12,8 +13,26 @@ const Spline = dynamic(() => import('@splinetool/react-spline'), {
 });
 
 export default function LoginPage() {
+    const { login } = useAuth();
     const handleGoogleLogin = () => {
         window.location.href = getGoogleAuthUrl();
+    };
+
+    const handleDevLogin = async () => {
+        try {
+            const res = await fetch('http://localhost:8001/api/dev-login/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: 'dev_monster' })
+            });
+            if (res.ok) {
+                const data = await res.json();
+                login(data.access, data.user);
+                window.location.href = '/dashboard';
+            }
+        } catch (err) {
+            console.error("Dev login failed", err);
+        }
     };
 
     useEffect(() => {
@@ -46,7 +65,7 @@ export default function LoginPage() {
                         <a href="/pricing" className="nav-link">Pricing</a>
                     </div>
                     <div className="nav-right">
-                        <button className="nav-cta" onClick={handleGoogleLogin}>Get Started</button>
+                        <button className="nav-cta" onClick={handleDevLogin}>Get Started</button>
                     </div>
                 </div>
             </nav>
@@ -93,8 +112,8 @@ export default function LoginPage() {
                                 Sign in with Google
                             </button>
 
-                            <p className="security-note">
-                                <small>Secure access via Google OAuth</small>
+                            <p className="security-note" style={{ marginTop: '2rem' }}>
+                                <small>Secure authentication powered by Google</small>
                             </p>
                         </div>
                     </div>

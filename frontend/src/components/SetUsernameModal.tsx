@@ -10,8 +10,11 @@ interface SetUsernameModalProps {
 
 export default function SetUsernameModal({ token, onUsernameSet }: SetUsernameModalProps) {
     const [username, setUsername] = useState('');
+    const [isNonVeg, setIsNonVeg] = useState(false);
+    const [isDrinker, setIsDrinker] = useState(false);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [isLinking, setIsLinking] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -30,7 +33,11 @@ export default function SetUsernameModal({ token, onUsernameSet }: SetUsernameMo
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`,
                 },
-                body: JSON.stringify({ username: username.trim() }),
+                body: JSON.stringify({ 
+                    username: username.trim(),
+                    is_non_veg: isNonVeg,
+                    is_drinker: isDrinker
+                }),
             });
 
             const data = await res.json();
@@ -51,10 +58,12 @@ export default function SetUsernameModal({ token, onUsernameSet }: SetUsernameMo
     return (
         <div className="username-modal-overlay">
             <div className="username-modal">
-                <div className="username-modal-icon">✨</div>
-                <h2>Choose your username</h2>
+                <div className="username-modal-icon">{isLinking ? '🔗' : '✨'}</div>
+                <h2>{isLinking ? 'Link your account' : 'Choose your username'}</h2>
                 <p className="username-modal-subtitle">
-                    Pick a unique username for your SplitPay account.
+                    {isLinking 
+                        ? 'Enter your existing username associated with this Google account.'
+                        : 'Pick a unique username for your SplitPay account.'}
                 </p>
 
                 <form onSubmit={handleSubmit}>
@@ -74,10 +83,32 @@ export default function SetUsernameModal({ token, onUsernameSet }: SetUsernameMo
                         />
                     </div>
 
+                    <div className="preferences-wrapper">
+                        <label className="pref-checkbox">
+                            <input
+                                type="checkbox"
+                                checked={isNonVeg}
+                                onChange={(e) => setIsNonVeg(e.target.checked)}
+                            />
+                            <span>Non-Vegetarian</span>
+                        </label>
+
+                        <label className="pref-checkbox">
+                            <input
+                                type="checkbox"
+                                checked={isDrinker}
+                                onChange={(e) => setIsDrinker(e.target.checked)}
+                            />
+                            <span>Drinker</span>
+                        </label>
+                    </div>
+
                     {error && <p className="username-error">{error}</p>}
 
                     <p className="username-hint">
-                        3-30 characters. Letters, numbers, underscores, and hyphens only.
+                        {isLinking 
+                            ? "Entering your previous username will attempt to link your data."
+                            : "3-30 characters. Letters, numbers, underscores, and hyphens only."}
                     </p>
 
                     <button
@@ -85,8 +116,29 @@ export default function SetUsernameModal({ token, onUsernameSet }: SetUsernameMo
                         disabled={loading || !username.trim()}
                         className="username-submit-btn"
                     >
-                        {loading ? 'Setting up...' : 'Continue'}
+                        {loading ? 'Processing...' : isLinking ? 'Link Account' : 'Continue'}
                     </button>
+
+                    <div style={{ marginTop: '1.25rem', textAlign: 'center' }}>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setIsLinking(!isLinking);
+                                setError('');
+                            }}
+                            style={{
+                                background: 'none',
+                                border: 'none',
+                                color: 'rgba(255, 255, 255, 0.4)',
+                                fontSize: '0.85rem',
+                                cursor: 'pointer',
+                                textDecoration: 'underline',
+                                fontFamily: 'Inter, sans-serif'
+                            }}
+                        >
+                            {isLinking ? "No, I'm new here" : "Already have an account?"}
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>

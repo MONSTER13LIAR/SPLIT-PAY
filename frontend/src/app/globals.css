@@ -10,3 +10,9 @@ body {
   background: #ffffff;
   color: #1f2937;
 }
+
+/* Prevent the Spline background from blocking clicks/keyboard input */
+.spline-container,
+.spline-container * {
+  pointer-events: none !important;
+}

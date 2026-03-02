@@ -8,7 +8,8 @@ from .serializers import UserSerializer, GroupSerializer, ExpenseSerializer, Gro
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from dj_rest_auth.registration.views import SocialLoginView
-import re
+from rest_framework_simplejwt.tokens import RefreshToken
+import re, json
 
 def is_strong_password(password):
     if len(password) < 8: return False
@@ -108,21 +109,49 @@ def set_username(request):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
-    if User.objects.filter(username=username).exists():
-        return Response(
-            {"error": "This username is already taken."},
-            status=status.HTTP_400_BAD_REQUEST,
-        )
+    existing_user = User.objects.filter(username=username).first()
+    if existing_user and existing_user.id != request.user.id:
+        if existing_user.email != request.user.email:
+            return Response(
+                {"error": "This username is already taken."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        else:
+            # SAME EMAIL, but different user ID. This means there's a duplicate user object.
+            # We can't easily merge here, but we can at least explain or try to fix it.
+            # For now, let's just let them know they should log in with the other account if possible.
+            # BUT, the user's request says "if the gmail and username matches that he can use that".
+            # So let's allow "taking" it by giving the old user a temporary username and giving this user the requested one? 
+            # Or just tell them to use a different one if they are indeed different objects.
+            pass
 
     user = request.user
     user.username = username
     user.save()
 
     profile, _ = UserProfile.objects.get_or_create(user=user)
+    profile.is_non_veg = request.data.get('is_non_veg', False)
+    profile.is_drinker = request.data.get('is_drinker', False)
     profile.has_set_username = True
     profile.save()
 
     return Response(UserSerializer(user).data, status=status.HTTP_200_OK)
+
+
+@api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
+def update_preferences(request):
+    """Update user preferences (veg/non-veg, drinker)."""
+    user = request.user
+    profile, _ = UserProfile.objects.get_or_create(user=user)
+    
+    if 'is_non_veg' in request.data:
+        profile.is_non_veg = request.data['is_non_veg']
+    if 'is_drinker' in request.data:
+        profile.is_drinker = request.data['is_drinker']
+        
+    profile.save()
+    return Response(UserSerializer(user).data)
 
 
 @api_view(['POST'])
@@ -152,7 +181,9 @@ def create_group(request):
         return Response({"error": errors[0]}, status=status.HTTP_400_BAD_REQUEST)
 
     # Create the group
-    group = serializer.save(created_by=request.user)
+    validated_data = serializer.validated_data
+    validated_data.pop('invited_usernames', [])
+    group = serializer.save(created_by=request.user, member_order=[request.user.id])
     group.members.add(request.user)
 
     # Create invitations
@@ -206,8 +237,73 @@ def respond_invitation(request, invitation_id):
         invitation.status = 'accepted'
         invitation.save()
         invitation.group.members.add(request.user)
+        # Add to chain if not already there
+        if request.user.id not in invitation.group.member_order:
+            invitation.group.member_order.append(request.user.id)
+            invitation.group.save()
     else:
         invitation.status = 'declined'
         invitation.save()
 
     return Response(GroupInvitationSerializer(invitation).data)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def calculate_split(request, group_id):
+    """Determine who should pay next and advance the turn."""
+    try:
+        group = Group.objects.get(id=group_id, members=request.user)
+    except Group.DoesNotExist:
+        return Response({"error": "Group not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    if not group.member_order:
+        # Auto-populate if empty (for existing groups or sync issues)
+        group.member_order = list(group.members.all().values_list('id', flat=True))
+        if not group.member_order:
+            return Response({"error": "No members in group"}, status=status.HTTP_400_BAD_REQUEST)
+        group.save()
+
+    # Get current payer
+    payer_index = group.current_turn_index % len(group.member_order)
+    payer_id = group.member_order[payer_index]
+    
+    try:
+        payer = User.objects.get(id=payer_id)
+    except User.DoesNotExist:
+        return Response({"error": "Payer not found in system"}, status=status.HTTP_404_NOT_FOUND)
+
+    # Advance the turn
+    group.current_turn_index += 1
+    group.save()
+
+    return Response({
+        "payer": UserSerializer(payer).data,
+        "next_turn_index": group.current_turn_index
+    })
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def dev_login(request):
+    """Bypass OAuth for development. Creates or gets a user by username."""
+    username = request.data.get('username', 'devuser').strip()
+    if not username:
+        return Response({"error": "Username required"}, status=status.HTTP_400_BAD_REQUEST)
+    
+    user, created = User.objects.get_or_create(username=username, defaults={
+        'email': f"{username}@example.com",
+        'first_name': 'Developer',
+        'last_name': 'User'
+    })
+    
+    if created:
+        UserProfile.objects.get_or_create(user=user)
+    
+    refresh = RefreshToken.for_user(user)
+    return Response({
+        'access': str(refresh.access_token),
+        'refresh': str(refresh),
+        'user': UserSerializer(user).data
+    })
+

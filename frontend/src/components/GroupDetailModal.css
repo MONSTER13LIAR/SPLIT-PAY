@@ -1,0 +1,206 @@
+.gdm-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(12px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    animation: fadeIn 0.3s ease;
+}
+
+.gdm-modal {
+    background: rgba(20, 20, 20, 0.98);
+    border: 1px solid rgba(138, 43, 226, 0.3);
+    border-radius: 32px;
+    padding: 3.5rem 3rem;
+    width: 520px;
+    max-width: 90vw;
+    position: relative;
+    box-shadow: 
+        0 40px 100px rgba(0,0,0,0.8),
+        0 0 50px rgba(138, 43, 226, 0.1);
+    animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    max-height: 85vh;
+    overflow-y: auto;
+}
+
+.gdm-close {
+    position: absolute;
+    top: 2rem;
+    right: 2rem;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 2.5rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.gdm-close:hover {
+    color: #ff3d00;
+}
+
+.gdm-header {
+    margin-bottom: 3rem;
+}
+
+.gdm-header h2 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 2.2rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    letter-spacing: -1px;
+}
+
+.gdm-header p {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 1.1rem;
+}
+
+.gdm-section h3 {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: rgba(255, 255, 255, 0.3);
+    margin-bottom: 1.5rem;
+}
+
+.gdm-chain {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 3rem;
+}
+
+.gdm-chain-item {
+    display: flex;
+    align-items: center;
+    padding: 1.25rem 1.5rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 16px;
+    transition: all 0.3s ease;
+}
+
+.gdm-chain-item.active {
+    background: linear-gradient(135deg, rgba(138, 43, 226, 0.15), rgba(138, 43, 226, 0.05));
+    border-color: rgba(138, 43, 226, 0.4);
+    transform: translateX(10px);
+}
+
+.gdm-index {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: rgba(255, 255, 255, 0.2);
+    margin-right: 1.25rem;
+    min-width: 1.5rem;
+}
+
+.gdm-chain-item.active .gdm-index {
+    color: #8a2be2;
+}
+
+.gdm-username {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #fff;
+    margin-right: 1rem;
+}
+
+.gdm-turn-badge {
+    background: #8a2be2;
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 800;
+    padding: 0.25rem 0.6rem;
+    border-radius: 100px;
+    margin-right: auto;
+    letter-spacing: 0.5px;
+}
+
+.gdm-prefs {
+    display: flex;
+    gap: 0.5rem;
+    margin-left: auto;
+}
+
+.gdm-actions {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+.gdm-split-btn {
+    width: 100%;
+    padding: 1.25rem;
+    background: linear-gradient(135deg, #ff3d00, #ff8e53);
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    font-size: 1.2rem;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 15px 40px rgba(255, 61, 0, 0.3);
+    transition: all 0.3s ease;
+    letter-spacing: 1px;
+}
+
+.gdm-split-btn:hover:not(:disabled) {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 20px 50px rgba(255, 61, 0, 0.4);
+}
+
+.gdm-split-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: #333;
+    box-shadow: none;
+}
+
+.gdm-result {
+    background: rgba(0, 255, 128, 0.05);
+    border: 1px solid rgba(0, 255, 128, 0.15);
+    border-radius: 24px;
+    padding: 2rem;
+    text-align: center;
+    animation: bounceIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.gdm-result-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.gdm-result h4 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #00ff80;
+    margin-bottom: 0.25rem;
+}
+
+.gdm-result p {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.9rem;
+}
+
+.gdm-error {
+    color: #ff3d00;
+    text-align: center;
+    margin-top: 1rem;
+    font-weight: 500;
+}
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes bounceIn {
+    0% { transform: scale(0.3); opacity: 0; }
+    50% { transform: scale(1.05); opacity: 1; }
+    70% { transform: scale(0.9); }
+    100% { transform: scale(1); }
+}

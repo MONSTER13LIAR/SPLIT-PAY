@@ -149,7 +149,7 @@ export default function Dashboard() {
                     <a href="#" className="nav-item">
                         <span>Settlements</span>
                     </a>
-                    <a href="#" className="nav-item">
+                    <a href="/settings" className="nav-item">
                         <span>Settings</span>
                     </a>
                 </nav>
