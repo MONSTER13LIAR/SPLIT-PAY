@@ -22,13 +22,17 @@ interface Group {
 interface GroupDetailModalProps {
     group: Group;
     token: string;
+    currentUserId: number;
     onClose: () => void;
     onUpdate: () => void;
 }
 
-export default function GroupDetailModal({ group, token, onClose, onUpdate }: GroupDetailModalProps) {
+export default function GroupDetailModal({ group, token, currentUserId, onClose, onUpdate }: GroupDetailModalProps) {
     const [loading, setLoading] = useState(false);
     const [nextPayer, setNextPayer] = useState<User | null>(null);
+    const [totalBill, setTotalBill] = useState('');
+    const [nonVegCost, setNonVegCost] = useState('');
+    const [alcoholCost, setAlcoholCost] = useState('');
     const [error, setError] = useState('');
 
     const handleSplit = async () => {
@@ -107,6 +111,42 @@ export default function GroupDetailModal({ group, token, onClose, onUpdate }: Gr
                             <div className="gdm-result-icon">💸</div>
                             <h4>It's @{nextPayer.username}'s turn to pay!</h4>
                             <p>Turn advanced to next member in chain.</p>
+
+                            {nextPayer.id === currentUserId && (
+                                <div className="gdm-bill-form">
+                                    <h5>Enter Bill Details</h5>
+                                    <div className="gdm-input-group">
+                                        <label>Total Bill Amount (₹)</label>
+                                        <input 
+                                            type="number" 
+                                            placeholder="0.00"
+                                            value={totalBill}
+                                            onChange={(e) => setTotalBill(e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="gdm-input-group">
+                                        <label>Non-Veg Cost (₹)</label>
+                                        <input 
+                                            type="number" 
+                                            placeholder="0.00"
+                                            value={nonVegCost}
+                                            onChange={(e) => setNonVegCost(e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="gdm-input-group">
+                                        <label>Alcohol Cost (₹)</label>
+                                        <input 
+                                            type="number" 
+                                            placeholder="0.00"
+                                            value={alcoholCost}
+                                            onChange={(e) => setAlcoholCost(e.target.value)}
+                                        />
+                                    </div>
+                                    <button className="gdm-submit-bill-btn" onClick={() => alert('Logic coming soon!')}>
+                                        Calculate Shares & Submit
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     )}
 

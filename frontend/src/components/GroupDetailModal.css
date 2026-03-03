@@ -189,6 +189,61 @@
     font-size: 0.9rem;
 }
 
+.gdm-bill-form {
+    background: rgba(0, 0, 0, 0.4);
+    padding: 1.5rem;
+    border-radius: 12px;
+    margin-top: 1.5rem;
+    text-align: left;
+}
+
+.gdm-bill-form h5 {
+    color: #00ff80;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.gdm-input-group {
+    margin-bottom: 1rem;
+}
+
+.gdm-input-group label {
+    display: block;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 0.5rem;
+}
+
+.gdm-input-group input {
+    width: 100%;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: #fff;
+    font-size: 1rem;
+}
+
+.gdm-submit-bill-btn {
+    width: 100%;
+    padding: 1rem;
+    background: linear-gradient(135deg, #00ff80, #00b359);
+    color: #000;
+    border: none;
+    border-radius: 12px;
+    font-weight: 700;
+    margin-top: 1rem;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.gdm-submit-bill-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 255, 128, 0.3);
+}
+
 .gdm-error {
     color: #ff3d00;
     text-align: center;

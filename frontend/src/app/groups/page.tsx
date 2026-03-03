@@ -111,10 +111,11 @@ export default function GroupsPage() {
                 />
             )}
 
-            {selectedGroup && token && (
+            {selectedGroup && token && user && (
                 <GroupDetailModal
                     group={selectedGroup}
                     token={token}
+                    currentUserId={user.id}
                     onClose={() => setSelectedGroupId(null)}
                     onUpdate={() => fetchGroups()}
                 />
