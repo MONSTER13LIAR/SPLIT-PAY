@@ -36,6 +36,8 @@ class GroupInvitation(models.Model):
 class Expense(models.Model):
     description = models.CharField(max_length=255)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
+    non_veg_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    alcohol_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     payer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='expenses_paid')
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='expenses')
     created_at = models.DateTimeField(auto_now_add=True)
@@ -50,6 +52,18 @@ class ExpenseSplit(models.Model):
 
     def __str__(self):
         return f"{self.user.username} owes {self.amount} for {self.expense.description}"
+
+class Settlement(models.Model):
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='settlements')
+    debtor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='debts')
+    creditor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='credits')
+    amount = models.DecimalField(max_digits=12, decimal_places=2, default=0) # positive means debtor owes creditor
+
+    class Meta:
+        unique_together = ('group', 'debtor', 'creditor')
+
+    def __str__(self):
+        return f"{self.debtor.username} owes {self.creditor.username}: {self.amount} in {self.group.name}"
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')

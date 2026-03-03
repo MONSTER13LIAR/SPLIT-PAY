@@ -25,12 +25,26 @@ interface InvitationData {
     created_at: string;
 }
 
+interface SettlementData {
+    id: number;
+    debtor: { id: number; username: string };
+    creditor: { id: number; username: string };
+    amount: string;
+    group_name: string;
+}
+
+interface SettlementResponse {
+    debts: SettlementData[];
+    credits: SettlementData[];
+}
+
 export default function Dashboard() {
     const { user, logout, token, updateUser } = useAuth();
     const dashboardRef = useRef<HTMLDivElement>(null);
     const [showCreateGroup, setShowCreateGroup] = useState(false);
     const [groups, setGroups] = useState<GroupData[]>([]);
     const [invitations, setInvitations] = useState<InvitationData[]>([]);
+    const [settlements, setSettlements] = useState<SettlementResponse>({ debts: [], credits: [] });
     const [respondingId, setRespondingId] = useState<number | null>(null);
 
     const fetchGroups = useCallback(async () => {
@@ -63,10 +77,30 @@ export default function Dashboard() {
         }
     }, [token]);
 
+    const fetchSettlements = useCallback(async () => {
+        if (!token) return;
+        try {
+            const res = await fetch('http://localhost:8001/api/settlements/', {
+                headers: { 'Authorization': `Bearer ${token}` },
+            });
+            if (res.ok) {
+                const data = await res.json();
+                setSettlements(data);
+            }
+        } catch (err) { console.error('Failed to fetch settlements:', err); }
+    }, [token]);
+
     useEffect(() => {
         fetchGroups();
         fetchInvitations();
-    }, [fetchGroups, fetchInvitations]);
+        fetchSettlements();
+    }, [fetchGroups, fetchInvitations, fetchSettlements]);
+
+    // ... handleRespondInvitation ...
+
+    const totalDebts = settlements.debts.reduce((acc, curr) => acc + parseFloat(curr.amount), 0);
+    const totalCredits = settlements.credits.reduce((acc, curr) => acc + parseFloat(curr.amount), 0);
+    const netBalance = totalCredits - totalDebts;
 
     const handleRespondInvitation = async (invitationId: number, action: 'accept' | 'decline') => {
         if (!token) return;
@@ -146,7 +180,7 @@ export default function Dashboard() {
                     <a href="#" className="nav-item">
                         <span>Activities</span>
                     </a>
-                    <a href="#" className="nav-item">
+                    <a href="/settlements" className="nav-item">
                         <span>Settlements</span>
                     </a>
                     <a href="/settings" className="nav-item">
@@ -176,16 +210,21 @@ export default function Dashboard() {
 
                 <div className="stats-grid">
                     <div className="stat-card">
-                        <div className="stat-label">Total Outstanding</div>
-                        <div className="stat-value">₹0.00</div>
+                        <div className="stat-label">Net Balance</div>
+                        <div className="stat-value" style={{ color: netBalance >= 0 ? '#00e676' : '#ff3d00' }}>
+                            ₹{Math.abs(netBalance).toFixed(2)}
+                            <span style={{ fontSize: '0.8rem', marginLeft: '5px', opacity: 0.7 }}>
+                                {netBalance >= 0 ? ' (Owed to you)' : ' (You owe)'}
+                            </span>
+                        </div>
                     </div>
                     <div className="stat-card">
                         <div className="stat-label">You are owed</div>
-                        <div className="stat-value" style={{ color: '#00e676' }}>₹0.00</div>
+                        <div className="stat-value" style={{ color: '#00e676' }}>₹{totalCredits.toFixed(2)}</div>
                     </div>
                     <div className="stat-card">
                         <div className="stat-label">You owe</div>
-                        <div className="stat-value" style={{ color: '#ff3d00' }}>₹0.00</div>
+                        <div className="stat-value" style={{ color: '#ff3d00' }}>₹{totalDebts.toFixed(2)}</div>
                     </div>
                 </div>
 

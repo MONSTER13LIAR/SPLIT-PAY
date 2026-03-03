@@ -25,7 +25,7 @@
         0 40px 100px rgba(0,0,0,0.8),
         0 0 50px rgba(138, 43, 226, 0.1);
     animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    max-height: 85vh;
+    max-height: 90vh;
     overflow-y: auto;
 }
 
@@ -47,7 +47,7 @@
 }
 
 .gdm-header {
-    margin-bottom: 3rem;
+    margin-bottom: 2rem;
 }
 
 .gdm-header h2 {
@@ -63,25 +63,28 @@
     font-size: 1.1rem;
 }
 
+.gdm-section {
+    margin-bottom: 2.5rem;
+}
+
 .gdm-section h3 {
     font-size: 0.9rem;
     text-transform: uppercase;
     letter-spacing: 1.5px;
     color: rgba(255, 255, 255, 0.3);
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.25rem;
 }
 
 .gdm-chain {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
-    margin-bottom: 3rem;
 }
 
 .gdm-chain-item {
     display: flex;
     align-items: center;
-    padding: 1.25rem 1.5rem;
+    padding: 1rem 1.25rem;
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: 16px;
@@ -95,11 +98,11 @@
 }
 
 .gdm-index {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     font-weight: 800;
     color: rgba(255, 255, 255, 0.2);
     margin-right: 1.25rem;
-    min-width: 1.5rem;
+    min-width: 1.25rem;
 }
 
 .gdm-chain-item.active .gdm-index {
@@ -108,7 +111,7 @@
 
 .gdm-username {
     font-weight: 600;
-    font-size: 1.1rem;
+    font-size: 1rem;
     color: #fff;
     margin-right: 1rem;
 }
@@ -116,7 +119,7 @@
 .gdm-turn-badge {
     background: #8a2be2;
     color: #fff;
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     font-weight: 800;
     padding: 0.25rem 0.6rem;
     border-radius: 100px;
@@ -126,136 +129,145 @@
 
 .gdm-prefs {
     display: flex;
-    gap: 0.5rem;
+    gap: 0.4rem;
     margin-left: auto;
 }
 
-.gdm-actions {
+.gdm-bill-section {
+    background: rgba(138, 43, 226, 0.05);
+    border: 1px solid rgba(138, 43, 226, 0.15);
+    border-radius: 24px;
+    padding: 2rem;
+    animation: fadeIn 0.5s ease;
+}
+
+.gdm-instruction {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 1.5rem;
+}
+
+.gdm-bill-form {
     display: flex;
-    justify-content: center;
-    margin-bottom: 2rem;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.gdm-input-group label {
+    display: block;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.4);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.gdm-input-group input {
+    width: 100%;
+    padding: 0.9rem 1.25rem;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: #fff;
+    font-size: 1.1rem;
+    font-family: 'Outfit', sans-serif;
+    transition: all 0.3s ease;
+}
+
+.gdm-input-group input:focus {
+    outline: none;
+    border-color: #8a2be2;
+    background: rgba(138, 43, 226, 0.05);
 }
 
 .gdm-split-btn {
     width: 100%;
     padding: 1.25rem;
-    background: linear-gradient(135deg, #ff3d00, #ff8e53);
+    background: linear-gradient(135deg, #8a2be2, #4b0082);
     color: #fff;
     border: none;
-    border-radius: 20px;
-    font-size: 1.2rem;
-    font-weight: 800;
+    border-radius: 16px;
+    font-size: 1.1rem;
+    font-weight: 700;
     cursor: pointer;
-    box-shadow: 0 15px 40px rgba(255, 61, 0, 0.3);
+    box-shadow: 0 10px 30px rgba(138, 43, 226, 0.3);
     transition: all 0.3s ease;
-    letter-spacing: 1px;
 }
 
 .gdm-split-btn:hover:not(:disabled) {
-    transform: translateY(-4px) scale(1.02);
-    box-shadow: 0 20px 50px rgba(255, 61, 0, 0.4);
-}
-
-.gdm-split-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    background: #333;
-    box-shadow: none;
-}
-
-.gdm-result {
-    background: rgba(0, 255, 128, 0.05);
-    border: 1px solid rgba(0, 255, 128, 0.15);
-    border-radius: 24px;
-    padding: 2rem;
-    text-align: center;
-    animation: bounceIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.gdm-result-icon {
-    font-size: 2.5rem;
-    margin-bottom: 0.5rem;
-}
-
-.gdm-result h4 {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: #00ff80;
-    margin-bottom: 0.25rem;
-}
-
-.gdm-result p {
-    color: rgba(255, 255, 255, 0.4);
-    font-size: 0.9rem;
-}
-
-.gdm-bill-form {
-    background: rgba(0, 0, 0, 0.4);
-    padding: 1.5rem;
-    border-radius: 12px;
-    margin-top: 1.5rem;
-    text-align: left;
-}
-
-.gdm-bill-form h5 {
-    color: #00ff80;
-    margin-bottom: 1rem;
-    font-size: 1rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.gdm-input-group {
-    margin-bottom: 1rem;
-}
-
-.gdm-input-group label {
-    display: block;
-    font-size: 0.85rem;
-    color: rgba(255, 255, 255, 0.6);
-    margin-bottom: 0.5rem;
-}
-
-.gdm-input-group input {
-    width: 100%;
-    padding: 0.75rem;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    color: #fff;
-    font-size: 1rem;
-}
-
-.gdm-submit-bill-btn {
-    width: 100%;
-    padding: 1rem;
-    background: linear-gradient(135deg, #00ff80, #00b359);
-    color: #000;
-    border: none;
-    border-radius: 12px;
-    font-weight: 700;
-    margin-top: 1rem;
-    cursor: pointer;
-    transition: transform 0.2s;
-}
-
-.gdm-submit-bill-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 255, 128, 0.3);
+    box-shadow: 0 15px 40px rgba(138, 43, 226, 0.4);
+}
+
+.gdm-waiting {
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px dashed rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 2rem;
+}
+
+.gdm-settlements {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.gdm-settlement-card {
+    display: flex;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background: rgba(0, 255, 128, 0.03);
+    border: 1px solid rgba(0, 255, 128, 0.1);
+    border-radius: 16px;
+}
+
+.gdm-s-user {
+    font-weight: 600;
+    color: #fff;
+}
+
+.gdm-s-user.is-me {
+    color: #00ff80;
+}
+
+.gdm-s-arrow {
+    margin: 0 1rem;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.gdm-s-amount {
+    margin-left: auto;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: #00ff80;
+}
+
+.gdm-success {
+    background: rgba(0, 255, 128, 0.1);
+    color: #00ff80;
+    padding: 1rem;
+    border-radius: 12px;
+    text-align: center;
+    font-weight: 600;
+    margin-top: 1rem;
 }
 
 .gdm-error {
+    background: rgba(255, 61, 0, 0.1);
     color: #ff3d00;
+    padding: 1rem;
+    border-radius: 12px;
     text-align: center;
+    font-weight: 600;
     margin-top: 1rem;
-    font-weight: 500;
 }
 
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes bounceIn {
-    0% { transform: scale(0.3); opacity: 0; }
-    50% { transform: scale(1.05); opacity: 1; }
-    70% { transform: scale(0.9); }
-    100% { transform: scale(1); }
-}
+@keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }

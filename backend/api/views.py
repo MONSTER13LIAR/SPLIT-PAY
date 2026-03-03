@@ -3,8 +3,10 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.contrib.auth.models import User
-from .models import Group, Expense, ExpenseSplit, UserProfile, GroupInvitation
-from .serializers import UserSerializer, GroupSerializer, ExpenseSerializer, GroupInvitationSerializer
+from django.db import transaction
+from decimal import Decimal
+from .models import Group, Expense, ExpenseSplit, UserProfile, GroupInvitation, Settlement
+from .serializers import UserSerializer, GroupSerializer, ExpenseSerializer, GroupInvitationSerializer, SettlementSerializer
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from dj_rest_auth.registration.views import SocialLoginView
@@ -109,23 +111,22 @@ def set_username(request):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
+    user = request.user
     existing_user = User.objects.filter(username=username).first()
-    if existing_user and existing_user.id != request.user.id:
-        if existing_user.email != request.user.email:
+    
+    if existing_user and existing_user.id != user.id:
+        if existing_user.email != user.email:
             return Response(
                 {"error": "This username is already taken."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
         else:
-            # SAME EMAIL, but different user ID. This means there's a duplicate user object.
-            # We can't easily merge here, but we can at least explain or try to fix it.
-            # For now, let's just let them know they should log in with the other account if possible.
-            # BUT, the user's request says "if the gmail and username matches that he can use that".
-            # So let's allow "taking" it by giving the old user a temporary username and giving this user the requested one? 
-            # Or just tell them to use a different one if they are indeed different objects.
-            pass
+            # SAME EMAIL, different ID. The user is trying to reclaim their username.
+            # We rename the old user to free up the username.
+            import uuid
+            existing_user.username = f"old_{existing_user.username}_{uuid.uuid4().hex[:8]}"
+            existing_user.save()
 
-    user = request.user
     user.username = username
     user.save()
 
@@ -158,43 +159,62 @@ def update_preferences(request):
 @permission_classes([IsAuthenticated])
 def create_group(request):
     """Create a group and send invitations to the specified usernames."""
+    print(f"DEBUG: create_group called by {request.user.username}")
+    print(f"DEBUG: Request data: {request.data}")
+    
     serializer = GroupSerializer(data=request.data)
     if not serializer.is_valid():
+        print(f"DEBUG: Serializer invalid: {serializer.errors}")
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    invited_usernames = serializer.validated_data.get('invited_usernames', [])
+    invited_usernames = request.data.get('invited_usernames', [])
+    print(f"DEBUG: Invited usernames: {invited_usernames}")
     
     # Validate all usernames exist before creating
     invited_users = []
     errors = []
     for uname in invited_usernames:
         uname = uname.strip()
-        if uname == request.user.username:
+        if not uname: continue
+        if uname.lower() == request.user.username.lower():
             continue  # Skip self
         try:
-            u = User.objects.get(username=uname)
+            # Case-insensitive search for user
+            u = User.objects.get(username__iexact=uname)
             invited_users.append(u)
         except User.DoesNotExist:
+            print(f"DEBUG: User '{uname}' not found")
             errors.append(f"User '{uname}' does not exist.")
 
     if errors:
+        print(f"DEBUG: Validation errors: {errors}")
         return Response({"error": errors[0]}, status=status.HTTP_400_BAD_REQUEST)
 
     # Create the group
-    validated_data = serializer.validated_data
-    validated_data.pop('invited_usernames', [])
-    group = serializer.save(created_by=request.user, member_order=[request.user.id])
-    group.members.add(request.user)
+    try:
+        group = serializer.save(created_by=request.user, member_order=[request.user.id])
+        group.members.add(request.user)
+        print(f"DEBUG: Group created: {group.name} (ID: {group.id})")
+    except Exception as e:
+        print(f"DEBUG: Failed to save group: {str(e)}")
+        return Response({"error": f"Failed to save group: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     # Create invitations
+    inv_count = 0
     for u in invited_users:
-        GroupInvitation.objects.get_or_create(
+        inv, created = GroupInvitation.objects.get_or_create(
             group=group,
             invited_by=request.user,
             invited_user=u,
             defaults={'status': 'pending'}
         )
+        if created:
+            inv_count += 1
+            print(f"DEBUG: Invitation created for {u.username}")
+        else:
+            print(f"DEBUG: Invitation already existed for {u.username}")
 
+    print(f"DEBUG: Total invitations created: {inv_count}")
     return Response(GroupSerializer(group).data, status=status.HTTP_201_CREATED)
 
 
@@ -251,37 +271,134 @@ def respond_invitation(request, invitation_id):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def calculate_split(request, group_id):
-    """Determine who should pay next and advance the turn."""
+    """
+    1. Calculate shares based on total, non-veg, and alcohol costs.
+    2. Create Expense and ExpenseSplit records.
+    3. Update Settlements (balances) between users.
+    4. Advance the turn.
+    """
     try:
         group = Group.objects.get(id=group_id, members=request.user)
     except Group.DoesNotExist:
         return Response({"error": "Group not found"}, status=status.HTTP_404_NOT_FOUND)
 
+    data = request.data
+    try:
+        total_amount = Decimal(str(data.get('total_amount', '0')))
+        non_veg_amount = Decimal(str(data.get('non_veg_amount', '0') or '0'))
+        alcohol_amount = Decimal(str(data.get('alcohol_amount', '0') or '0'))
+    except Exception:
+        return Response({"error": "Invalid amount format"}, status=status.HTTP_400_BAD_REQUEST)
+
+    description = data.get('description', f"Expense in {group.name}")
+
+    if total_amount <= 0:
+        return Response({"error": "Total amount must be greater than 0"}, status=status.HTTP_400_BAD_REQUEST)
+
+    if non_veg_amount + alcohol_amount > total_amount:
+         return Response({"error": "Non-veg + Alcohol cannot exceed total"}, status=status.HTTP_400_BAD_REQUEST)
+
+    common_amount = total_amount - non_veg_amount - alcohol_amount
+    
+    members = list(group.members.all())
+    num_members = len(members)
+    if num_members == 0:
+        return Response({"error": "No members in group"}, status=status.HTTP_400_BAD_REQUEST)
+
+    non_veg_members = [m for m in members if hasattr(m, 'profile') and m.profile.is_non_veg]
+    drinker_members = [m for m in members if hasattr(m, 'profile') and m.profile.is_drinker]
+
+    if non_veg_amount > 0 and not non_veg_members:
+        return Response({"error": "Non-veg cost specified but no non-veg members in group"}, status=status.HTTP_400_BAD_REQUEST)
+    if alcohol_amount > 0 and not drinker_members:
+        return Response({"error": "Alcohol cost specified but no drinkers in group"}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Current Payer
     if not group.member_order:
-        # Auto-populate if empty (for existing groups or sync issues)
         group.member_order = list(group.members.all().values_list('id', flat=True))
         if not group.member_order:
-            return Response({"error": "No members in group"}, status=status.HTTP_400_BAD_REQUEST)
+             return Response({"error": "No members in group"}, status=status.HTTP_400_BAD_REQUEST)
         group.save()
 
-    # Get current payer
     payer_index = group.current_turn_index % len(group.member_order)
     payer_id = group.member_order[payer_index]
-    
     try:
         payer = User.objects.get(id=payer_id)
     except User.DoesNotExist:
-        return Response({"error": "Payer not found in system"}, status=status.HTTP_404_NOT_FOUND)
+        return Response({"error": "Payer not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    # Advance the turn
-    group.current_turn_index += 1
-    group.save()
+    with transaction.atomic():
+        # Create Expense
+        expense = Expense.objects.create(
+            group=group,
+            payer=payer,
+            amount=total_amount,
+            non_veg_amount=non_veg_amount,
+            alcohol_amount=alcohol_amount,
+            description=description
+        )
+
+        # Calculate shares
+        shares = {m.id: Decimal('0') for m in members}
+        
+        # 1. Common split (veg/others)
+        common_share = common_amount / num_members
+        for m in members:
+            shares[m.id] += common_share
+        
+        # 2. Non-veg split
+        if non_veg_members:
+            nv_share = non_veg_amount / len(non_veg_members)
+            for m in non_veg_members:
+                shares[m.id] += nv_share
+        
+        # 3. Alcohol split
+        if drinker_members:
+            alc_share = alcohol_amount / len(drinker_members)
+            for m in drinker_members:
+                shares[m.id] += alc_share
+
+        # Create ExpenseSplits and Update Settlements
+        for m in members:
+            amount_owed = shares[m.id]
+            ExpenseSplit.objects.create(expense=expense, user=m, amount=amount_owed)
+
+            if m.id != payer.id:
+                # User m owes payer 'amount_owed'
+                # Case 1: m owes payer
+                s1, _ = Settlement.objects.get_or_create(group=group, debtor=m, creditor=payer)
+                s1.amount += amount_owed
+                s1.save()
+
+                # Case 2: simplify (if payer owes m, reduce that first)
+                s2, _ = Settlement.objects.get_or_create(group=group, debtor=payer, creditor=m)
+                
+                if s1.amount >= s2.amount:
+                    s1.amount -= s2.amount
+                    s2.amount = 0
+                else:
+                    s2.amount -= s1.amount
+                    s1.amount = 0
+                
+                s1.save()
+                s2.save()
+
+        # Advance Turn
+        group.current_turn_index += 1
+        group.save()
 
     return Response({
-        "payer": UserSerializer(payer).data,
+        "message": "Split calculated and turn advanced",
+        "expense": ExpenseSerializer(expense).data,
         "next_turn_index": group.current_turn_index
     })
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_settlements(request, group_id):
+    """Get net balances for a group."""
+    settlements = Settlement.objects.filter(group_id=group_id, amount__gt=0)
+    return Response(SettlementSerializer(settlements, many=True).data)
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -307,3 +424,14 @@ def dev_login(request):
         'user': UserSerializer(user).data
     })
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def list_user_settlements(request):
+    """List all settlements involving the current user across all groups."""
+    debts = Settlement.objects.filter(debtor=request.user, amount__gt=0)
+    credits = Settlement.objects.filter(creditor=request.user, amount__gt=0)
+    
+    return Response({
+        "debts": SettlementSerializer(debts, many=True).data,
+        "credits": SettlementSerializer(credits, many=True).data
+    })

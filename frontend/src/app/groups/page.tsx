@@ -61,10 +61,17 @@ export default function GroupsPage() {
         } catch (err) { console.error('Failed to fetch invitations:', err); }
     }, [token]);
 
-    useEffect(() => {
+    const fetchAllData = useCallback(() => {
         fetchGroups();
         fetchInvitations();
     }, [fetchGroups, fetchInvitations]);
+
+    useEffect(() => {
+        fetchAllData();
+        // Poll for invitations every 5 seconds
+        const interval = setInterval(fetchInvitations, 5000);
+        return () => clearInterval(interval);
+    }, [fetchAllData, fetchInvitations]);
 
     const handleRespond = async (invId: number, action: 'accept' | 'decline') => {
         if (!token) return;
@@ -107,7 +114,7 @@ export default function GroupsPage() {
                 <CreateGroupModal
                     token={token}
                     onClose={() => setShowCreateGroup(false)}
-                    onGroupCreated={() => fetchGroups()}
+                    onGroupCreated={() => fetchAllData()}
                 />
             )}
 
@@ -132,7 +139,7 @@ export default function GroupsPage() {
                     <a href="/dashboard" className="nav-item"><span>Dashboard</span></a>
                     <a href="/groups" className="nav-item active"><span>My Groups</span></a>
                     <a href="#" className="nav-item"><span>Activities</span></a>
-                    <a href="#" className="nav-item"><span>Settlements</span></a>
+                    <a href="/settlements" className="nav-item"><span>Settlements</span></a>
                     <a href="/settings" className="nav-item"><span>Settings</span></a>
                 </nav>
                 <div style={{ marginTop: 'auto' }}>

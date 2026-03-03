@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './GroupDetailModal.css';
 
 interface User {
@@ -19,6 +19,13 @@ interface Group {
     current_turn_index: number;
 }
 
+interface Settlement {
+    id: number;
+    debtor: User;
+    creditor: User;
+    amount: string;
+}
+
 interface GroupDetailModalProps {
     group: Group;
     token: string;
@@ -29,15 +36,43 @@ interface GroupDetailModalProps {
 
 export default function GroupDetailModal({ group, token, currentUserId, onClose, onUpdate }: GroupDetailModalProps) {
     const [loading, setLoading] = useState(false);
-    const [nextPayer, setNextPayer] = useState<User | null>(null);
+    const [settlements, setSettlements] = useState<Settlement[]>([]);
     const [totalBill, setTotalBill] = useState('');
-    const [nonVegCost, setNonVegCost] = useState('');
-    const [alcoholCost, setAlcoholCost] = useState('');
+    const [nonVegCost, setNonVegCost] = useState('0');
+    const [alcoholCost, setAlcoholCost] = useState('0');
     const [error, setError] = useState('');
+    const [successMsg, setSuccessMsg] = useState('');
+
+    const fetchSettlements = useCallback(async () => {
+        try {
+            const res = await fetch(`http://localhost:8001/api/groups/${group.id}/settlements/`, {
+                headers: { 'Authorization': `Bearer ${token}` },
+            });
+            if (res.ok) {
+                const data = await res.json();
+                setSettlements(data);
+            }
+        } catch (err) { console.error("Failed to fetch settlements", err); }
+    }, [group.id, token]);
+
+    useEffect(() => {
+        fetchSettlements();
+    }, [fetchSettlements]);
 
     const handleSplit = async () => {
+        if (!totalBill || parseFloat(totalBill) <= 0) {
+            setError("Please enter a valid total amount");
+            return;
+        }
+
+        if (!token) {
+            setError("Authentication token missing. Please log in again.");
+            return;
+        }
+
         setLoading(true);
         setError('');
+        setSuccessMsg('');
         try {
             const res = await fetch(`http://localhost:8001/api/groups/${group.id}/calculate-split/`, {
                 method: 'POST',
@@ -45,17 +80,27 @@ export default function GroupDetailModal({ group, token, currentUserId, onClose,
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`,
                 },
+                body: JSON.stringify({
+                    total_amount: totalBill,
+                    non_veg_amount: nonVegCost || '0',
+                    alcohol_amount: alcoholCost || '0',
+                    description: `Bill for ${group.name}`
+                })
             });
 
             const data = await res.json();
             if (res.ok) {
-                setNextPayer(data.payer);
-                onUpdate(); // Refresh parent data
+                setSuccessMsg("Bill split successfully! Turn advanced.");
+                setTotalBill('');
+                setNonVegCost('0');
+                setAlcoholCost('0');
+                fetchSettlements();
+                onUpdate(); // Refresh parent data (group turn index)
             } else {
-                setError(data.error || 'Failed to calculate split');
+                setError(data.error || data.detail || 'Failed to calculate split');
             }
         } catch (err) {
-            setError('Network error');
+            setError('Network error: ' + (err as Error).message);
         } finally {
             setLoading(false);
         }
@@ -67,6 +112,8 @@ export default function GroupDetailModal({ group, token, currentUserId, onClose,
     ).filter(Boolean) as User[];
 
     const currentPayerIndex = group.current_turn_index % (group.member_order.length || 1);
+    const currentPayer = orderedMembers[currentPayerIndex];
+    const isMyTurn = currentPayer?.id === currentUserId;
 
     return (
         <div className="gdm-overlay">
@@ -86,7 +133,7 @@ export default function GroupDetailModal({ group, token, currentUserId, onClose,
                                 <div key={member.id} className={`gdm-chain-item ${idx === currentPayerIndex ? 'active' : ''}`}>
                                     <span className="gdm-index">{idx + 1}</span>
                                     <span className="gdm-username">@{member.username}</span>
-                                    {idx === currentPayerIndex && <span className="gdm-turn-badge">NEXT TURN</span>}
+                                    {idx === currentPayerIndex && <span className="gdm-turn-badge">PAYER</span>}
                                     <div className="gdm-prefs">
                                         {member.is_non_veg && <span title="Non-Veg">🍗</span>}
                                         {member.is_drinker && <span title="Drinker">🍺</span>}
@@ -96,60 +143,71 @@ export default function GroupDetailModal({ group, token, currentUserId, onClose,
                         </div>
                     </section>
 
-                    <div className="gdm-actions">
-                        <button 
-                            className="gdm-split-btn" 
-                            onClick={handleSplit}
-                            disabled={loading || group.members.length === 0}
-                        >
-                            {loading ? 'Calculating...' : '🚀 SPLIT'}
-                        </button>
-                    </div>
-
-                    {nextPayer && (
-                        <div className="gdm-result">
-                            <div className="gdm-result-icon">💸</div>
-                            <h4>It's @{nextPayer.username}'s turn to pay!</h4>
-                            <p>Turn advanced to next member in chain.</p>
-
-                            {nextPayer.id === currentUserId && (
-                                <div className="gdm-bill-form">
-                                    <h5>Enter Bill Details</h5>
-                                    <div className="gdm-input-group">
-                                        <label>Total Bill Amount (₹)</label>
-                                        <input 
-                                            type="number" 
-                                            placeholder="0.00"
-                                            value={totalBill}
-                                            onChange={(e) => setTotalBill(e.target.value)}
-                                        />
-                                    </div>
-                                    <div className="gdm-input-group">
-                                        <label>Non-Veg Cost (₹)</label>
-                                        <input 
-                                            type="number" 
-                                            placeholder="0.00"
-                                            value={nonVegCost}
-                                            onChange={(e) => setNonVegCost(e.target.value)}
-                                        />
-                                    </div>
-                                    <div className="gdm-input-group">
-                                        <label>Alcohol Cost (₹)</label>
-                                        <input 
-                                            type="number" 
-                                            placeholder="0.00"
-                                            value={alcoholCost}
-                                            onChange={(e) => setAlcoholCost(e.target.value)}
-                                        />
-                                    </div>
-                                    <button className="gdm-submit-bill-btn" onClick={() => alert('Logic coming soon!')}>
-                                        Calculate Shares & Submit
-                                    </button>
+                    {isMyTurn ? (
+                        <section className="gdm-section gdm-bill-section">
+                            <h3>💸 Your Turn to Pay!</h3>
+                            <p className="gdm-instruction">Enter the bill details below to split with the group.</p>
+                            
+                            <div className="gdm-bill-form">
+                                <div className="gdm-input-group">
+                                    <label>Total Bill Amount (₹)</label>
+                                    <input 
+                                        type="number" 
+                                        placeholder="0.00"
+                                        value={totalBill}
+                                        onChange={(e) => setTotalBill(e.target.value)}
+                                    />
                                 </div>
-                            )}
+                                <div className="gdm-input-group">
+                                    <label>Non-Veg Cost (₹)</label>
+                                    <input 
+                                        type="number" 
+                                        placeholder="0.00"
+                                        value={nonVegCost}
+                                        onChange={(e) => setNonVegCost(e.target.value)}
+                                    />
+                                </div>
+                                <div className="gdm-input-group">
+                                    <label>Alcohol Cost (₹)</label>
+                                    <input 
+                                        type="number" 
+                                        placeholder="0.00"
+                                        value={alcoholCost}
+                                        onChange={(e) => setAlcoholCost(e.target.value)}
+                                    />
+                                </div>
+                                <button 
+                                    className="gdm-split-btn" 
+                                    onClick={handleSplit}
+                                    disabled={loading}
+                                >
+                                    {loading ? 'Processing...' : '🚀 Split Bill & Finish Turn'}
+                                </button>
+                            </div>
+                        </section>
+                    ) : (
+                        <div className="gdm-waiting">
+                            <p>Waiting for <strong>@{currentPayer?.username}</strong> to pay and split the bill.</p>
                         </div>
                     )}
 
+                    {settlements.length > 0 && (
+                        <section className="gdm-section">
+                            <h3>📊 Current Balances</h3>
+                            <div className="gdm-settlements">
+                                {settlements.map(s => (
+                                    <div key={s.id} className="gdm-settlement-card">
+                                        <span className={`gdm-s-user ${s.debtor.id === currentUserId ? 'is-me' : ''}`}>@{s.debtor.username}</span>
+                                        <span className="gdm-s-arrow">owes</span>
+                                        <span className={`gdm-s-user ${s.creditor.id === currentUserId ? 'is-me' : ''}`}>@{s.creditor.username}</span>
+                                        <span className="gdm-s-amount">₹{parseFloat(s.amount).toFixed(2)}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </section>
+                    )}
+
+                    {successMsg && <p className="gdm-success">{successMsg}</p>}
                     {error && <p className="gdm-error">{error}</p>}
                 </div>
             </div>

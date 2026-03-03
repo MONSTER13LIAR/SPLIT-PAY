@@ -63,7 +63,7 @@ export default function CreateGroupModal({ token, onClose, onGroupCreated }: Cre
             const data = await res.json();
 
             if (!res.ok) {
-                setError(data.error || 'Something went wrong.');
+                setError(data.error || data.detail || (res.status === 401 ? 'Unauthorized: Please log in again.' : 'Something went wrong.'));
                 setLoading(false);
                 return;
             }
