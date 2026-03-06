@@ -65,7 +65,7 @@ export default function LoginPage() {
                         <a href="/pricing" className="nav-link">Pricing</a>
                     </div>
                     <div className="nav-right">
-                        <button className="nav-cta" onClick={handleDevLogin}>Get Started</button>
+                        <button className="nav-cta" onClick={handleGoogleLogin}>Get Started</button>
                     </div>
                 </div>
             </nav>

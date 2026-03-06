@@ -153,6 +153,45 @@
     gap: 1.25rem;
 }
 
+.gdm-preview {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.gdm-preview-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.gdm-preview-row strong {
+    color: #fff;
+}
+
+.gdm-preview-total {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 0.75rem;
+    margin-top: 0.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #00ff80;
+}
+
+.gdm-preview-error {
+    color: #ff3d00;
+    font-size: 0.85rem;
+    text-align: center;
+}
+
 .gdm-input-group label {
     display: block;
     font-size: 0.8rem;

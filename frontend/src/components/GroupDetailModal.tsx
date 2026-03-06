@@ -115,6 +115,29 @@ export default function GroupDetailModal({ group, token, currentUserId, onClose,
     const currentPayer = orderedMembers[currentPayerIndex];
     const isMyTurn = currentPayer?.id === currentUserId;
 
+    // Live calculation for preview
+    const calculatePreview = () => {
+        const total = parseFloat(totalBill || '0');
+        const nv = parseFloat(nonVegCost || '0');
+        const alc = parseFloat(alcoholCost || '0');
+        
+        if (total <= 0) return null;
+        
+        const common = total - nv - alc;
+        if (common < 0) return "Error: Specialty costs exceed total";
+        
+        const commonShare = common / group.members.length;
+        const nvMembers = group.members.filter(m => m.is_non_veg).length;
+        const alcMembers = group.members.filter(m => m.is_drinker).length;
+        
+        const nvShare = nvMembers > 0 ? nv / nvMembers : 0;
+        const alcShare = alcMembers > 0 ? alc / alcMembers : 0;
+
+        return { commonShare, nvShare, alcShare, nvMembers, alcMembers };
+    };
+
+    const preview = calculatePreview();
+
     return (
         <div className="gdm-overlay">
             <div className="gdm-modal">
@@ -176,6 +199,33 @@ export default function GroupDetailModal({ group, token, currentUserId, onClose,
                                         onChange={(e) => setAlcoholCost(e.target.value)}
                                     />
                                 </div>
+                                
+                                {preview && typeof preview !== 'string' && (
+                                    <div className="gdm-preview">
+                                        <div className="gdm-preview-row">
+                                            <span>Common Share (Everyone):</span>
+                                            <strong>₹{preview.commonShare.toFixed(2)}</strong>
+                                        </div>
+                                        {preview.nvShare > 0 && (
+                                            <div className="gdm-preview-row">
+                                                <span>Non-Veg Share ({preview.nvMembers} ppl):</span>
+                                                <strong>₹{preview.nvShare.toFixed(2)}</strong>
+                                            </div>
+                                        )}
+                                        {preview.alcShare > 0 && (
+                                            <div className="gdm-preview-row">
+                                                <span>Alcohol Share ({preview.alcMembers} ppl):</span>
+                                                <strong>₹{preview.alcShare.toFixed(2)}</strong>
+                                            </div>
+                                        )}
+                                        <div className="gdm-preview-total">
+                                            <span>Veg Owe: ₹{preview.commonShare.toFixed(2)}</span>
+                                            <span>Non-Veg Owe: ₹{(preview.commonShare + preview.nvShare).toFixed(2)}</span>
+                                        </div>
+                                    </div>
+                                )}
+                                {typeof preview === 'string' && <p className="gdm-preview-error">{preview}</p>}
+
                                 <button 
                                     className="gdm-split-btn" 
                                     onClick={handleSplit}
