@@ -1,48 +1,48 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import Cookies from 'js-cookie';
+import { apiFetch } from '../utils/api';
 
 interface AuthContextType {
     user: any;
-    token: string | null;
     isAuthenticated: boolean;
     isLoading: boolean;
-    login: (token: string, user: any) => void;
+    login: (user: any) => void;
     logout: () => void;
     updateUser: (user: any) => void;
+    checkAuth: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<any>(null);
-    const [token, setToken] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
-    useEffect(() => {
-        const storedToken = localStorage.getItem('access_token');
-        const storedUser = localStorage.getItem('user');
-
-        if (storedToken && storedUser && storedUser !== "undefined") {
-            try {
-                setToken(storedToken);
-                setUser(JSON.parse(storedUser));
-            } catch (err) {
-                console.error("Failed to parse stored user data:", err);
-                localStorage.removeItem('access_token');
-                localStorage.removeItem('user');
+    const checkAuth = async () => {
+        try {
+            const res = await apiFetch('dj-rest-auth/user/');
+            if (res.ok) {
+                const userData = await res.json();
+                setUser(userData);
+            } else {
+                setUser(null);
             }
+        } catch (err) {
+            console.error("Auth check failed:", err);
+            setUser(null);
+        } finally {
+            setIsLoading(false);
         }
-        setIsLoading(false);
+    };
+
+    useEffect(() => {
+        checkAuth();
     }, []);
 
-    const login = (newToken: string, newUser: any) => {
-        setToken(newToken);
+    const login = (newUser: any) => {
         setUser(newUser);
-        localStorage.setItem('access_token', newToken);
         localStorage.setItem('user', JSON.stringify(newUser));
-        Cookies.set('access_token', newToken, { expires: 7 });
     };
 
     const updateUser = (newUser: any) => {
@@ -50,17 +50,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         localStorage.setItem('user', JSON.stringify(newUser));
     };
 
-    const logout = () => {
-        setToken(null);
+    const logout = async () => {
+        try {
+            await apiFetch('dj-rest-auth/logout/', { method: 'POST' });
+        } catch (err) {
+            console.error("Logout request failed:", err);
+        }
         setUser(null);
-        localStorage.removeItem('access_token');
         localStorage.removeItem('user');
-        Cookies.remove('access_token');
         window.location.href = '/login';
     };
 
     return (
-        <AuthContext.Provider value={{ user, token, isAuthenticated: !!token, isLoading, login, logout, updateUser }}>
+        <AuthContext.Provider value={{ user, isAuthenticated: !!user, isLoading, login, logout, updateUser, checkAuth }}>
             {children}
         </AuthContext.Provider>
     );

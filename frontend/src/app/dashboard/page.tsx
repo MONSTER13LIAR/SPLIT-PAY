@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import './dashboard.css';
 import { useAuth } from '@/context/AuthContext';
+import { apiFetch } from '@/utils/api';
 import BackgroundParticles from '@/components/BackgroundParticles';
 import SplineBackground from '@/components/SplineBackground';
 import SetUsernameModal from '@/components/SetUsernameModal';
@@ -39,7 +40,7 @@ interface SettlementResponse {
 }
 
 export default function Dashboard() {
-    const { user, logout, token, updateUser } = useAuth();
+    const { user, logout, updateUser } = useAuth();
     const dashboardRef = useRef<HTMLDivElement>(null);
     const [showCreateGroup, setShowCreateGroup] = useState(false);
     const [groups, setGroups] = useState<GroupData[]>([]);
@@ -48,11 +49,8 @@ export default function Dashboard() {
     const [respondingId, setRespondingId] = useState<number | null>(null);
 
     const fetchGroups = useCallback(async () => {
-        if (!token) return;
         try {
-            const res = await fetch('http://localhost:8001/api/groups/', {
-                headers: { 'Authorization': `Bearer ${token}` },
-            });
+            const res = await apiFetch('groups/');
             if (res.ok) {
                 const data = await res.json();
                 setGroups(data);
@@ -60,14 +58,11 @@ export default function Dashboard() {
         } catch (err) {
             console.error('Failed to fetch groups:', err);
         }
-    }, [token]);
+    }, []);
 
     const fetchInvitations = useCallback(async () => {
-        if (!token) return;
         try {
-            const res = await fetch('http://localhost:8001/api/invitations/', {
-                headers: { 'Authorization': `Bearer ${token}` },
-            });
+            const res = await apiFetch('invitations/');
             if (res.ok) {
                 const data = await res.json();
                 setInvitations(data);
@@ -75,20 +70,17 @@ export default function Dashboard() {
         } catch (err) {
             console.error('Failed to fetch invitations:', err);
         }
-    }, [token]);
+    }, []);
 
     const fetchSettlements = useCallback(async () => {
-        if (!token) return;
         try {
-            const res = await fetch('http://localhost:8001/api/settlements/', {
-                headers: { 'Authorization': `Bearer ${token}` },
-            });
+            const res = await apiFetch('settlements/');
             if (res.ok) {
                 const data = await res.json();
                 setSettlements(data);
             }
         } catch (err) { console.error('Failed to fetch settlements:', err); }
-    }, [token]);
+    }, []);
 
     useEffect(() => {
         fetchGroups();
@@ -103,15 +95,10 @@ export default function Dashboard() {
     const netBalance = totalCredits - totalDebts;
 
     const handleRespondInvitation = async (invitationId: number, action: 'accept' | 'decline') => {
-        if (!token) return;
         setRespondingId(invitationId);
         try {
-            const res = await fetch(`http://localhost:8001/api/invitations/${invitationId}/respond/`, {
+            const res = await apiFetch(`invitations/${invitationId}/respond/`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
                 body: JSON.stringify({ action }),
             });
             if (res.ok) {
@@ -145,17 +132,15 @@ export default function Dashboard() {
             <div className="torch-overlay"></div>
 
             {/* Username Setup Modal */}
-            {user && !user.has_set_username && token && (
+            {user && !user.has_set_username && (
                 <SetUsernameModal
-                    token={token}
                     onUsernameSet={(updatedUser) => updateUser(updatedUser)}
                 />
             )}
 
             {/* Create Group Modal */}
-            {showCreateGroup && token && (
+            {showCreateGroup && (
                 <CreateGroupModal
-                    token={token}
                     onClose={() => setShowCreateGroup(false)}
                     onGroupCreated={() => { fetchGroups(); }}
                 />

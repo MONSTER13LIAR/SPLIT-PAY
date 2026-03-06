@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useEffect } from 'react';
+import React, { useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import { apiFetch } from '@/utils/api';
 
-export default function AuthCallback() {
+function AuthCallbackContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const { login } = useAuth();
@@ -12,12 +13,9 @@ export default function AuthCallback() {
     useEffect(() => {
         const code = searchParams.get('code');
         if (code) {
-            // Send the code to our backend to exchange it for a JWT
-            fetch('http://localhost:8001/api/google/', {
+            // Send the code to our backend to exchange it for a JWT (now in HttpOnly cookie)
+            apiFetch('api/google/', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
                 body: JSON.stringify({ code }),
             })
                 .then(res => {
@@ -26,9 +24,8 @@ export default function AuthCallback() {
                 })
                 .then(data => {
                     console.log('Google login response:', data);
-                    // dj-rest-auth with USE_JWT returns { access, refresh, user }
-                    const token = data.access_token || data.access || data.key;
-                    login(token, data.user);
+                    // Cookies are set by the backend, we just need the user object
+                    login(data.user);
                     router.push('/dashboard');
                 })
                 .catch(err => {
@@ -68,5 +65,13 @@ export default function AuthCallback() {
                 }
             `}</style>
         </div>
+    );
+}
+
+export default function AuthCallback() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <AuthCallbackContent />
+        </Suspense>
     );
 }

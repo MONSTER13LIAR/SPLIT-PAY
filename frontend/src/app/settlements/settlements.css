@@ -230,6 +230,35 @@
     letter-spacing: -1px;
 }
 
+.sp-settle-btn {
+    background: rgba(255, 61, 0, 0.1);
+    border: 1px solid rgba(255, 61, 0, 0.3);
+    color: #ff3d00;
+    padding: 0.5rem 1rem;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.sp-settle-btn:hover {
+    background: #ff3d00;
+    color: #fff;
+    transform: scale(1.05);
+}
+
+.sp-settle-btn.credit-settle {
+    background: rgba(0, 230, 118, 0.1);
+    border: 1px solid rgba(0, 230, 118, 0.3);
+    color: #00e676;
+}
+
+.sp-settle-btn.credit-settle:hover {
+    background: #00e676;
+    color: #fff;
+}
+
 .sp-debt .sp-amount { color: #ff3d00; }
 .sp-credit .sp-amount { color: #00e676; }
 

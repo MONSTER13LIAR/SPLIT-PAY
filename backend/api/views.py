@@ -71,8 +71,31 @@ class ExpenseViewSet(viewsets.ModelViewSet):
 
 class GoogleLogin(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
+    # If using code, the callback_url must match EXACTLY what was sent to Google
     callback_url = "http://localhost:3000/auth/callback"
     client_class = OAuth2Client
+
+    def post(self, request, *args, **kwargs):
+        print(f"DEBUG: GoogleLogin callback_url: {self.callback_url}")
+        print(f"DEBUG: GoogleLogin post data: {request.data}")
+        try:
+            # Check if we have the right model instances
+            from allauth.socialaccount.models import SocialApp
+            app = SocialApp.objects.get(provider='google')
+            print(f"DEBUG: SocialApp found: ID={app.client_id[:10]}... Secret={app.secret[:5]}...")
+            
+            response = super().post(request, *args, **kwargs)
+            if response.status_code >= 400:
+                print(f"DEBUG: GoogleLogin ERROR response status: {response.status_code}")
+                print(f"DEBUG: GoogleLogin ERROR response data: {response.data}")
+            else:
+                print(f"DEBUG: GoogleLogin success response status: {response.status_code}")
+            return response
+        except Exception as e:
+            print(f"DEBUG: GoogleLogin EXCEPTION: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     def get_response(self):
         # Additional logic to ensure user profile exists after social login
@@ -273,7 +296,7 @@ def respond_invitation(request, invitation_id):
 def calculate_split(request, group_id):
     """
     1. Calculate shares based on total, non-veg, and alcohol costs.
-    2. Create Expense and ExpenseSplit records.
+    2. ONLY account for members present for this specific bill.
     3. Update Settlements (balances) between users.
     4. Advance the turn.
     """
@@ -287,8 +310,12 @@ def calculate_split(request, group_id):
         total_amount = Decimal(str(data.get('total_amount', '0')))
         non_veg_amount = Decimal(str(data.get('non_veg_amount', '0') or '0'))
         alcohol_amount = Decimal(str(data.get('alcohol_amount', '0') or '0'))
+        present_member_ids = data.get('present_member_ids', [])
     except Exception:
-        return Response({"error": "Invalid amount format"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"error": "Invalid input format"}, status=status.HTTP_400_BAD_REQUEST)
+
+    if not present_member_ids:
+        return Response({"error": "At least one member must be present"}, status=status.HTTP_400_BAD_REQUEST)
 
     description = data.get('description', f"Expense in {group.name}")
 
@@ -300,24 +327,25 @@ def calculate_split(request, group_id):
 
     common_amount = total_amount - non_veg_amount - alcohol_amount
     
-    members = list(group.members.all())
-    num_members = len(members)
-    if num_members == 0:
-        return Response({"error": "No members in group"}, status=status.HTTP_400_BAD_REQUEST)
+    # Filter only members who were present
+    all_members = list(group.members.all())
+    present_members = [m for m in all_members if m.id in present_member_ids]
+    num_present = len(present_members)
 
-    non_veg_members = [m for m in members if hasattr(m, 'profile') and m.profile.is_non_veg]
-    drinker_members = [m for m in members if hasattr(m, 'profile') and m.profile.is_drinker]
+    if num_present == 0:
+        return Response({"error": "No valid members selected as present"}, status=status.HTTP_400_BAD_REQUEST)
 
-    if non_veg_amount > 0 and not non_veg_members:
-        return Response({"error": "Non-veg cost specified but no non-veg members in group"}, status=status.HTTP_400_BAD_REQUEST)
-    if alcohol_amount > 0 and not drinker_members:
-        return Response({"error": "Alcohol cost specified but no drinkers in group"}, status=status.HTTP_400_BAD_REQUEST)
+    non_veg_present = [m for m in present_members if hasattr(m, 'profile') and m.profile.is_non_veg]
+    drinker_present = [m for m in present_members if hasattr(m, 'profile') and m.profile.is_drinker]
 
-    # Current Payer
+    if non_veg_amount > 0 and not non_veg_present:
+        return Response({"error": "Non-veg cost specified but no non-veg members present"}, status=status.HTTP_400_BAD_REQUEST)
+    if alcohol_amount > 0 and not drinker_present:
+        return Response({"error": "Alcohol cost specified but no drinkers present"}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Current Payer (Turn always follows member_order regardless of presence for a single bill)
     if not group.member_order:
         group.member_order = list(group.members.all().values_list('id', flat=True))
-        if not group.member_order:
-             return Response({"error": "No members in group"}, status=status.HTTP_400_BAD_REQUEST)
         group.save()
 
     payer_index = group.current_turn_index % len(group.member_order)
@@ -338,48 +366,45 @@ def calculate_split(request, group_id):
             description=description
         )
 
-        # Calculate shares
-        shares = {m.id: Decimal('0') for m in members}
+        # Calculate shares for present members
+        shares = {m.id: Decimal('0') for m in present_members}
         
-        # 1. Common split (veg/others)
-        common_share = common_amount / num_members
-        for m in members:
+        # 1. Common split (veg/others) among all present
+        common_share = common_amount / num_present
+        for m in present_members:
             shares[m.id] += common_share
         
-        # 2. Non-veg split
-        if non_veg_members:
-            nv_share = non_veg_amount / len(non_veg_members)
-            for m in non_veg_members:
+        # 2. Non-veg split among present non-veg members
+        if non_veg_present:
+            nv_share = non_veg_amount / len(non_veg_present)
+            for m in non_veg_present:
                 shares[m.id] += nv_share
         
-        # 3. Alcohol split
-        if drinker_members:
-            alc_share = alcohol_amount / len(drinker_members)
-            for m in drinker_members:
+        # 3. Alcohol split among present drinkers
+        if drinker_present:
+            alc_share = alcohol_amount / len(drinker_present)
+            for m in drinker_present:
                 shares[m.id] += alc_share
 
         # Create ExpenseSplits and Update Settlements
-        for m in members:
+        for m in present_members:
             amount_owed = shares[m.id]
             ExpenseSplit.objects.create(expense=expense, user=m, amount=amount_owed)
 
             if m.id != payer.id:
                 # User m owes payer 'amount_owed'
-                # Case 1: m owes payer
                 s1, _ = Settlement.objects.get_or_create(group=group, debtor=m, creditor=payer)
                 s1.amount += amount_owed
                 s1.save()
 
-                # Case 2: simplify (if payer owes m, reduce that first)
+                # Simplify: if payer owes m, reduce that first
                 s2, _ = Settlement.objects.get_or_create(group=group, debtor=payer, creditor=m)
-                
                 if s1.amount >= s2.amount:
                     s1.amount -= s2.amount
                     s2.amount = 0
                 else:
                     s2.amount -= s1.amount
                     s1.amount = 0
-                
                 s1.save()
                 s2.save()
 
@@ -400,29 +425,15 @@ def get_settlements(request, group_id):
     settlements = Settlement.objects.filter(group_id=group_id, amount__gt=0)
     return Response(SettlementSerializer(settlements, many=True).data)
 
-@api_view(['POST'])
-@permission_classes([AllowAny])
-def dev_login(request):
-    """Bypass OAuth for development. Creates or gets a user by username."""
-    username = request.data.get('username', 'devuser').strip()
-    if not username:
-        return Response({"error": "Username required"}, status=status.HTTP_400_BAD_REQUEST)
-    
-    user, created = User.objects.get_or_create(username=username, defaults={
-        'email': f"{username}@example.com",
-        'first_name': 'Developer',
-        'last_name': 'User'
-    })
-    
-    if created:
-        UserProfile.objects.get_or_create(user=user)
-    
-    refresh = RefreshToken.for_user(user)
-    return Response({
-        'access': str(refresh.access_token),
-        'refresh': str(refresh),
-        'user': UserSerializer(user).data
-    })
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def list_group_expenses(request, group_id):
+    """List all expenses for a group."""
+    expenses = Expense.objects.filter(group_id=group_id).order_by('-created_at')
+    return Response(ExpenseSerializer(expenses, many=True).data)
+
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -435,3 +446,36 @@ def list_user_settlements(request):
         "debts": SettlementSerializer(debts, many=True).data,
         "credits": SettlementSerializer(credits, many=True).data
     })
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def mark_settled(request, settlement_id):
+    """Mark a settlement as paid (partially or fully)."""
+    try:
+        # The creditor is usually the one who confirms they received money
+        # or the debtor marks it as paid and the creditor might need to confirm later.
+        # For simplicity, we'll allow either for now, but usually it's the creditor.
+        settlement = Settlement.objects.get(id=settlement_id)
+    except Settlement.DoesNotExist:
+        return Response({"error": "Settlement not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    if request.user != settlement.creditor and request.user != settlement.debtor:
+        return Response({"error": "You are not part of this settlement"}, status=status.HTTP_403_FORBIDDEN)
+
+    amount_to_settle = Decimal(str(request.data.get('amount', settlement.amount)))
+    
+    if amount_to_settle <= 0:
+        return Response({"error": "Amount must be greater than 0"}, status=status.HTTP_400_BAD_REQUEST)
+        
+    if amount_to_settle > settlement.amount:
+        return Response({"error": "Cannot settle more than the owed amount"}, status=status.HTTP_400_BAD_REQUEST)
+
+    with transaction.atomic():
+        settlement.amount -= amount_to_settle
+        settlement.save()
+        
+        # Create a special Expense to record this settlement?
+        # For now, just updating the settlement object is enough for the balance.
+        
+    return Response(SettlementSerializer(settlement).data)

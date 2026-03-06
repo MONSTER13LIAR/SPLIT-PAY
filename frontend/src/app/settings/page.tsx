@@ -3,10 +3,11 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import { apiFetch } from '@/utils/api';
 import './settings.css';
 
 export default function SettingsPage() {
-    const { user, token, logout, login, isLoading } = useAuth();
+    const { user, logout, login, isLoading, isAuthenticated } = useAuth();
     const router = useRouter();
     
     const [isNonVeg, setIsNonVeg] = useState(user?.is_non_veg || false);
@@ -15,10 +16,10 @@ export default function SettingsPage() {
     const [message, setMessage] = useState({ text: '', type: '' });
 
     useEffect(() => {
-        if (!isLoading && !token) {
+        if (!isLoading && !isAuthenticated) {
             router.push('/login');
         }
-    }, [token, isLoading, router]);
+    }, [isAuthenticated, isLoading, router]);
 
     useEffect(() => {
         if (user) {
@@ -31,12 +32,8 @@ export default function SettingsPage() {
         setLoading(true);
         setMessage({ text: '', type: '' });
         try {
-            const res = await fetch('http://localhost:8001/api/update-preferences/', {
+            const res = await apiFetch('update-preferences/', {
                 method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
                 body: JSON.stringify({
                     is_non_veg: isNonVeg,
                     is_drinker: isDrinker
@@ -46,7 +43,7 @@ export default function SettingsPage() {
             if (res.ok) {
                 const updatedUser = await res.json();
                 // Update local auth context
-                login(token!, updatedUser);
+                login(updatedUser);
                 setMessage({ text: 'Preferences updated successfully! ✨', type: 'success' });
             } else {
                 setMessage({ text: 'Failed to update preferences.', type: 'error' });
@@ -126,7 +123,7 @@ export default function SettingsPage() {
                             <label>Username</label>
                             <div className="read-only-input">
                                 <span className="prefix">@</span>
-                                <input type="text" value={user.username} read_only disabled />
+                                <input type="text" value={user.username} readOnly disabled />
                                 <span className="lock-icon">🔒</span>
                             </div>
                             <p className="field-hint">Usernames cannot be changed once set.</p>

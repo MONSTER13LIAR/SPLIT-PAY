@@ -18,23 +18,6 @@ export default function LoginPage() {
         window.location.href = getGoogleAuthUrl();
     };
 
-    const handleDevLogin = async () => {
-        try {
-            const res = await fetch('http://localhost:8001/api/dev-login/', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username: 'dev_monster' })
-            });
-            if (res.ok) {
-                const data = await res.json();
-                login(data.access, data.user);
-                window.location.href = '/dashboard';
-            }
-        } catch (err) {
-            console.error("Dev login failed", err);
-        }
-    };
-
     useEffect(() => {
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {

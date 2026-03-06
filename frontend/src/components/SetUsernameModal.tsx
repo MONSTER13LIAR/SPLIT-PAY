@@ -2,13 +2,13 @@
 
 import React, { useState } from 'react';
 import './SetUsernameModal.css';
+import { apiFetch } from '@/utils/api';
 
 interface SetUsernameModalProps {
-    token: string;
     onUsernameSet: (updatedUser: any) => void;
 }
 
-export default function SetUsernameModal({ token, onUsernameSet }: SetUsernameModalProps) {
+export default function SetUsernameModal({ onUsernameSet }: SetUsernameModalProps) {
     const [username, setUsername] = useState('');
     const [isNonVeg, setIsNonVeg] = useState(false);
     const [isDrinker, setIsDrinker] = useState(false);
@@ -27,12 +27,8 @@ export default function SetUsernameModal({ token, onUsernameSet }: SetUsernameMo
 
         setLoading(true);
         try {
-            const res = await fetch('http://localhost:8001/api/set-username/', {
+            const res = await apiFetch('set-username/', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
                 body: JSON.stringify({ 
                     username: username.trim(),
                     is_non_veg: isNonVeg,

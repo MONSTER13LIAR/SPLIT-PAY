@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import './GroupDetailModal.css';
+import { apiFetch } from '@/utils/api';
 
 interface User {
     id: number;
@@ -24,40 +25,88 @@ interface Settlement {
     debtor: User;
     creditor: User;
     amount: string;
+    group_name: string;
+}
+
+interface Expense {
+    id: number;
+    description: string;
+    amount: string;
+    payer: User;
+    created_at: string;
 }
 
 interface GroupDetailModalProps {
     group: Group;
-    token: string;
     currentUserId: number;
     onClose: () => void;
     onUpdate: () => void;
 }
 
-export default function GroupDetailModal({ group, token, currentUserId, onClose, onUpdate }: GroupDetailModalProps) {
+export default function GroupDetailModal({ group, currentUserId, onClose, onUpdate }: GroupDetailModalProps) {
     const [loading, setLoading] = useState(false);
     const [settlements, setSettlements] = useState<Settlement[]>([]);
+    const [expenses, setExpenses] = useState<Expense[]>([]);
+    const [activeTab, setActiveTab] = useState<'pay' | 'balances' | 'history'>('pay');
     const [totalBill, setTotalBill] = useState('');
     const [nonVegCost, setNonVegCost] = useState('0');
     const [alcoholCost, setAlcoholCost] = useState('0');
+    const [presentMemberIds, setPresentMemberIds] = useState<number[]>(group.members.map(m => m.id));
     const [error, setError] = useState('');
     const [successMsg, setSuccessMsg] = useState('');
 
     const fetchSettlements = useCallback(async () => {
         try {
-            const res = await fetch(`http://localhost:8001/api/groups/${group.id}/settlements/`, {
-                headers: { 'Authorization': `Bearer ${token}` },
-            });
+            const res = await apiFetch(`groups/${group.id}/settlements/`);
             if (res.ok) {
                 const data = await res.json();
                 setSettlements(data);
             }
         } catch (err) { console.error("Failed to fetch settlements", err); }
-    }, [group.id, token]);
+    }, [group.id]);
+
+    const fetchExpenses = useCallback(async () => {
+        try {
+            const res = await apiFetch(`groups/${group.id}/expenses/`);
+            if (res.ok) {
+                const data = await res.json();
+                setExpenses(data);
+            }
+        } catch (err) { console.error("Failed to fetch expenses", err); }
+    }, [group.id]);
+
+    const handleSettle = async (settlementId: number, amount: string) => {
+        if (!confirm(`Mark ₹${parseFloat(amount).toFixed(2)} as paid?`)) return;
+        
+        try {
+            const res = await apiFetch(`settlements/${settlementId}/mark-settled/`, {
+                method: 'POST',
+                body: JSON.stringify({ amount }),
+            });
+            if (res.ok) {
+                fetchSettlements();
+                onUpdate();
+            } else {
+                const data = await res.json();
+                setError(data.error || 'Failed to settle');
+            }
+        } catch (err) {
+            console.error('Error settling:', err);
+        }
+    };
 
     useEffect(() => {
         fetchSettlements();
-    }, [fetchSettlements]);
+        fetchExpenses();
+    }, [fetchSettlements, fetchExpenses]);
+
+    const toggleMemberPresence = (userId: number) => {
+        setPresentMemberIds(prev => 
+            prev.includes(userId) 
+                ? prev.filter(id => id !== userId) 
+                : [...prev, userId]
+        );
+    };
 
     const handleSplit = async () => {
         if (!totalBill || parseFloat(totalBill) <= 0) {
@@ -65,8 +114,8 @@ export default function GroupDetailModal({ group, token, currentUserId, onClose,
             return;
         }
 
-        if (!token) {
-            setError("Authentication token missing. Please log in again.");
+        if (presentMemberIds.length === 0) {
+            setError("At least one member must be present");
             return;
         }
 
@@ -74,16 +123,13 @@ export default function GroupDetailModal({ group, token, currentUserId, onClose,
         setError('');
         setSuccessMsg('');
         try {
-            const res = await fetch(`http://localhost:8001/api/groups/${group.id}/calculate-split/`, {
+            const res = await apiFetch(`groups/${group.id}/calculate-split/`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
                 body: JSON.stringify({
                     total_amount: totalBill,
                     non_veg_amount: nonVegCost || '0',
                     alcohol_amount: alcoholCost || '0',
+                    present_member_ids: presentMemberIds,
                     description: `Bill for ${group.name}`
                 })
             });
@@ -95,7 +141,7 @@ export default function GroupDetailModal({ group, token, currentUserId, onClose,
                 setNonVegCost('0');
                 setAlcoholCost('0');
                 fetchSettlements();
-                onUpdate(); // Refresh parent data (group turn index)
+                onUpdate(); // Refresh parent data
             } else {
                 setError(data.error || data.detail || 'Failed to calculate split');
             }
@@ -106,6 +152,31 @@ export default function GroupDetailModal({ group, token, currentUserId, onClose,
         }
     };
 
+    // Live calculation for preview
+    const calculatePreview = () => {
+        const total = parseFloat(totalBill || '0');
+        const nv = parseFloat(nonVegCost || '0');
+        const alc = parseFloat(alcoholCost || '0');
+        
+        if (total <= 0 || presentMemberIds.length === 0) return null;
+        
+        const common = total - nv - alc;
+        if (common < 0) return "Error: Specialty costs exceed total";
+        
+        const presentMembers = group.members.filter(m => presentMemberIds.includes(m.id));
+        const commonShare = common / presentMembers.length;
+        
+        const nvPresent = presentMembers.filter(m => m.is_non_veg).length;
+        const alcPresent = presentMembers.filter(m => m.is_drinker).length;
+        
+        const nvShare = nvPresent > 0 ? nv / nvPresent : 0;
+        const alcShare = alcPresent > 0 ? alc / alcPresent : 0;
+
+        return { commonShare, nvShare, alcShare, nvPresent, alcPresent };
+    };
+
+    const preview = calculatePreview();
+
     // Map member_order IDs to actual member objects for display
     const orderedMembers = group.member_order.map(id => 
         group.members.find(m => m.id === id)
@@ -114,29 +185,6 @@ export default function GroupDetailModal({ group, token, currentUserId, onClose,
     const currentPayerIndex = group.current_turn_index % (group.member_order.length || 1);
     const currentPayer = orderedMembers[currentPayerIndex];
     const isMyTurn = currentPayer?.id === currentUserId;
-
-    // Live calculation for preview
-    const calculatePreview = () => {
-        const total = parseFloat(totalBill || '0');
-        const nv = parseFloat(nonVegCost || '0');
-        const alc = parseFloat(alcoholCost || '0');
-        
-        if (total <= 0) return null;
-        
-        const common = total - nv - alc;
-        if (common < 0) return "Error: Specialty costs exceed total";
-        
-        const commonShare = common / group.members.length;
-        const nvMembers = group.members.filter(m => m.is_non_veg).length;
-        const alcMembers = group.members.filter(m => m.is_drinker).length;
-        
-        const nvShare = nvMembers > 0 ? nv / nvMembers : 0;
-        const alcShare = alcMembers > 0 ? alc / alcMembers : 0;
-
-        return { commonShare, nvShare, alcShare, nvMembers, alcMembers };
-    };
-
-    const preview = calculatePreview();
 
     return (
         <div className="gdm-overlay">
@@ -148,112 +196,176 @@ export default function GroupDetailModal({ group, token, currentUserId, onClose,
                     <p>{group.description || 'No description provided.'}</p>
                 </header>
 
+                <div className="gdm-tabs">
+                    <button className={`gdm-tab ${activeTab === 'pay' ? 'active' : ''}`} onClick={() => setActiveTab('pay')}>💸 Pay</button>
+                    <button className={`gdm-tab ${activeTab === 'balances' ? 'active' : ''}`} onClick={() => setActiveTab('balances')}>📊 Balances</button>
+                    <button className={`gdm-tab ${activeTab === 'history' ? 'active' : ''}`} onClick={() => setActiveTab('history')}>📜 History</button>
+                </div>
+
                 <div className="gdm-content">
-                    <section className="gdm-section">
-                        <h3>⛓️ Payment Chain</h3>
-                        <div className="gdm-chain">
-                            {orderedMembers.map((member, idx) => (
-                                <div key={member.id} className={`gdm-chain-item ${idx === currentPayerIndex ? 'active' : ''}`}>
-                                    <span className="gdm-index">{idx + 1}</span>
-                                    <span className="gdm-username">@{member.username}</span>
-                                    {idx === currentPayerIndex && <span className="gdm-turn-badge">PAYER</span>}
-                                    <div className="gdm-prefs">
-                                        {member.is_non_veg && <span title="Non-Veg">🍗</span>}
-                                        {member.is_drinker && <span title="Drinker">🍺</span>}
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </section>
-
-                    {isMyTurn ? (
-                        <section className="gdm-section gdm-bill-section">
-                            <h3>💸 Your Turn to Pay!</h3>
-                            <p className="gdm-instruction">Enter the bill details below to split with the group.</p>
-                            
-                            <div className="gdm-bill-form">
-                                <div className="gdm-input-group">
-                                    <label>Total Bill Amount (₹)</label>
-                                    <input 
-                                        type="number" 
-                                        placeholder="0.00"
-                                        value={totalBill}
-                                        onChange={(e) => setTotalBill(e.target.value)}
-                                    />
-                                </div>
-                                <div className="gdm-input-group">
-                                    <label>Non-Veg Cost (₹)</label>
-                                    <input 
-                                        type="number" 
-                                        placeholder="0.00"
-                                        value={nonVegCost}
-                                        onChange={(e) => setNonVegCost(e.target.value)}
-                                    />
-                                </div>
-                                <div className="gdm-input-group">
-                                    <label>Alcohol Cost (₹)</label>
-                                    <input 
-                                        type="number" 
-                                        placeholder="0.00"
-                                        value={alcoholCost}
-                                        onChange={(e) => setAlcoholCost(e.target.value)}
-                                    />
-                                </div>
-                                
-                                {preview && typeof preview !== 'string' && (
-                                    <div className="gdm-preview">
-                                        <div className="gdm-preview-row">
-                                            <span>Common Share (Everyone):</span>
-                                            <strong>₹{preview.commonShare.toFixed(2)}</strong>
+                    {activeTab === 'pay' && (
+                        <>
+                            <section className="gdm-section">
+                                <h3>⛓️ Payment Chain</h3>
+                                <div className="gdm-chain">
+                                    {orderedMembers.map((member, idx) => (
+                                        <div key={member.id} className={`gdm-chain-item ${idx === currentPayerIndex ? 'active' : ''}`}>
+                                            <span className="gdm-index">{idx + 1}</span>
+                                            <span className="gdm-username">@{member.username}</span>
+                                            {idx === currentPayerIndex && <span className="gdm-turn-badge">PAYER</span>}
+                                            <div className="gdm-prefs">
+                                                {member.is_non_veg && <span title="Non-Veg">🍗</span>}
+                                                {member.is_drinker && <span title="Drinker">🍺</span>}
+                                            </div>
                                         </div>
-                                        {preview.nvShare > 0 && (
-                                            <div className="gdm-preview-row">
-                                                <span>Non-Veg Share ({preview.nvMembers} ppl):</span>
-                                                <strong>₹{preview.nvShare.toFixed(2)}</strong>
+                                    ))}
+                                </div>
+                            </section>
+
+                            {isMyTurn ? (
+                                <section className="gdm-section gdm-bill-section">
+                                    <h3>💸 Your Turn to Pay!</h3>
+                                    
+                                    <div className="gdm-bill-form">
+                                        <div className="gdm-input-group">
+                                            <label>Total Bill Amount (₹)</label>
+                                            <input 
+                                                type="number" 
+                                                placeholder="0.00"
+                                                value={totalBill}
+                                                onChange={(e) => setTotalBill(e.target.value)}
+                                            />
+                                        </div>
+                                        <div className="gdm-input-group">
+                                            <label>Non-Veg Cost (₹)</label>
+                                            <input 
+                                                type="number" 
+                                                placeholder="0.00"
+                                                value={nonVegCost}
+                                                onChange={(e) => setNonVegCost(e.target.value)}
+                                            />
+                                        </div>
+                                        <div className="gdm-input-group">
+                                            <label>Alcohol Cost (₹)</label>
+                                            <input 
+                                                type="number" 
+                                                placeholder="0.00"
+                                                value={alcoholCost}
+                                                onChange={(e) => setAlcoholCost(e.target.value)}
+                                            />
+                                        </div>
+
+                                        <div className="gdm-presence-section">
+                                            <label className="gdm-presence-label">Who was present?</label>
+                                            <div className="gdm-member-checklist">
+                                                {group.members.map(m => (
+                                                    <label key={m.id} className="gdm-check-item">
+                                                        <input 
+                                                            type="checkbox"
+                                                            checked={presentMemberIds.includes(m.id)}
+                                                            onChange={() => toggleMemberPresence(m.id)}
+                                                        />
+                                                        <span className="gdm-check-name">@{m.username}</span>
+                                                        <div className="gdm-check-prefs">
+                                                            {m.is_non_veg && <span>🍗</span>}
+                                                            {m.is_drinker && <span>🍺</span>}
+                                                        </div>
+                                                    </label>
+                                                ))}
+                                            </div>
+                                        </div>
+                                        
+                                        {preview && typeof preview !== 'string' && (
+                                            <div className="gdm-preview">
+                                                <div className="gdm-preview-row">
+                                                    <span>Common Share ({presentMemberIds.length} ppl):</span>
+                                                    <strong>₹{preview.commonShare.toFixed(2)}</strong>
+                                                </div>
+                                                {preview.nvShare > 0 && (
+                                                    <div className="gdm-preview-row">
+                                                        <span>Non-Veg Share ({preview.nvPresent} present):</span>
+                                                        <strong>₹{preview.nvShare.toFixed(2)}</strong>
+                                                    </div>
+                                                )}
+                                                {preview.alcShare > 0 && (
+                                                    <div className="gdm-preview-row">
+                                                        <span>Alcohol Share ({preview.alcPresent} present):</span>
+                                                        <strong>₹{preview.alcShare.toFixed(2)}</strong>
+                                                    </div>
+                                                )}
+                                                <div className="gdm-preview-total">
+                                                    <span>Veg Owe: ₹{preview.commonShare.toFixed(2)}</span>
+                                                    <span>Non-Veg Owe: ₹{(preview.commonShare + preview.nvShare).toFixed(2)}</span>
+                                                </div>
                                             </div>
                                         )}
-                                        {preview.alcShare > 0 && (
-                                            <div className="gdm-preview-row">
-                                                <span>Alcohol Share ({preview.alcMembers} ppl):</span>
-                                                <strong>₹{preview.alcShare.toFixed(2)}</strong>
-                                            </div>
-                                        )}
-                                        <div className="gdm-preview-total">
-                                            <span>Veg Owe: ₹{preview.commonShare.toFixed(2)}</span>
-                                            <span>Non-Veg Owe: ₹{(preview.commonShare + preview.nvShare).toFixed(2)}</span>
-                                        </div>
-                                    </div>
-                                )}
-                                {typeof preview === 'string' && <p className="gdm-preview-error">{preview}</p>}
+                                        {typeof preview === 'string' && <p className="gdm-preview-error">{preview}</p>}
 
-                                <button 
-                                    className="gdm-split-btn" 
-                                    onClick={handleSplit}
-                                    disabled={loading}
-                                >
-                                    {loading ? 'Processing...' : '🚀 Split Bill & Finish Turn'}
-                                </button>
-                            </div>
-                        </section>
-                    ) : (
-                        <div className="gdm-waiting">
-                            <p>Waiting for <strong>@{currentPayer?.username}</strong> to pay and split the bill.</p>
-                        </div>
+                                        <button 
+                                            className="gdm-split-btn" 
+                                            onClick={handleSplit}
+                                            disabled={loading}
+                                        >
+                                            {loading ? 'Processing...' : '🚀 Split Bill & Finish Turn'}
+                                        </button>
+                                    </div>
+                                </section>
+                            ) : (
+                                <div className="gdm-waiting">
+                                    <p>Waiting for <strong>@{currentPayer?.username}</strong> to pay and split the bill.</p>
+                                </div>
+                            )}
+                        </>
                     )}
 
-                    {settlements.length > 0 && (
+                    {activeTab === 'balances' && (
                         <section className="gdm-section">
-                            <h3>📊 Current Balances</h3>
-                            <div className="gdm-settlements">
-                                {settlements.map(s => (
-                                    <div key={s.id} className="gdm-settlement-card">
-                                        <span className={`gdm-s-user ${s.debtor.id === currentUserId ? 'is-me' : ''}`}>@{s.debtor.username}</span>
-                                        <span className="gdm-s-arrow">owes</span>
-                                        <span className={`gdm-s-user ${s.creditor.id === currentUserId ? 'is-me' : ''}`}>@{s.creditor.username}</span>
-                                        <span className="gdm-s-amount">₹{parseFloat(s.amount).toFixed(2)}</span>
-                                    </div>
-                                ))}
-                            </div>
+                            <h3>📊 Group Balances</h3>
+                            {settlements.length === 0 ? (
+                                <div className="gdm-waiting"><p>All settled up! 🌴</p></div>
+                            ) : (
+                                <div className="gdm-settlements">
+                                    {settlements.map(s => (
+                                        <div key={s.id} className="gdm-settlement-card">
+                                            <div className="gdm-settlement-info">
+                                                <span className={`gdm-s-user ${s.debtor.id === currentUserId ? 'is-me' : ''}`}>@{s.debtor.username}</span>
+                                                <span className="gdm-s-arrow">owes</span>
+                                                <span className={`gdm-s-user ${s.creditor.id === currentUserId ? 'is-me' : ''}`}>@{s.creditor.username}</span>
+                                                <span className="gdm-s-amount">₹{parseFloat(s.amount).toFixed(2)}</span>
+                                            </div>
+                                            {(s.debtor.id === currentUserId || s.creditor.id === currentUserId) && (
+                                                <button 
+                                                    className="gdm-settle-btn"
+                                                    onClick={() => handleSettle(s.id, s.amount)}
+                                                >
+                                                    {s.debtor.id === currentUserId ? 'Settle' : 'Mark Paid'}
+                                                </button>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </section>
+                    )}
+
+                    {activeTab === 'history' && (
+                        <section className="gdm-section">
+                            <h3>📜 Expense History</h3>
+                            {expenses.length === 0 ? (
+                                <div className="gdm-waiting"><p>No expenses yet.</p></div>
+                            ) : (
+                                <div className="gdm-history-list">
+                                    {expenses.map(exp => (
+                                        <div key={exp.id} className="gdm-history-card">
+                                            <div className="gdm-h-left">
+                                                <span className="gdm-h-desc">{exp.description}</span>
+                                                <span className="gdm-h-meta">Paid by @{exp.payer.username} • {new Date(exp.created_at).toLocaleDateString()}</span>
+                                            </div>
+                                            <span className="gdm-h-amount">₹{parseFloat(exp.amount).toFixed(2)}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </section>
                     )}
 

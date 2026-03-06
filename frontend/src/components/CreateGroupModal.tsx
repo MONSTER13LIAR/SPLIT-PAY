@@ -2,14 +2,14 @@
 
 import React, { useState } from 'react';
 import './CreateGroupModal.css';
+import { apiFetch } from '@/utils/api';
 
 interface CreateGroupModalProps {
-    token: string;
     onClose: () => void;
     onGroupCreated: () => void;
 }
 
-export default function CreateGroupModal({ token, onClose, onGroupCreated }: CreateGroupModalProps) {
+export default function CreateGroupModal({ onClose, onGroupCreated }: CreateGroupModalProps) {
     const [groupName, setGroupName] = useState('');
     const [usernameInput, setUsernameInput] = useState('');
     const [invitedUsernames, setInvitedUsernames] = useState<string[]>([]);
@@ -48,12 +48,8 @@ export default function CreateGroupModal({ token, onClose, onGroupCreated }: Cre
 
         setLoading(true);
         try {
-            const res = await fetch('http://localhost:8001/api/create-group/', {
+            const res = await apiFetch('create-group/', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
                 body: JSON.stringify({
                     name: groupName.trim(),
                     invited_usernames: invitedUsernames,

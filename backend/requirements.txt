@@ -7,3 +7,5 @@ python-dotenv==1.0.0
 django-allauth[socialaccount]
 dj-rest-auth
 requests
+gunicorn==21.2.0
+whitenoise==6.6.0

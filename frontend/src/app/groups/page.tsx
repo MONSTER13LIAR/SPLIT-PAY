@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import './groups.css';
 import { useAuth } from '@/context/AuthContext';
+import { apiFetch } from '@/utils/api';
 import BackgroundParticles from '@/components/BackgroundParticles';
 import SplineBackground from '@/components/SplineBackground';
 import CreateGroupModal from '@/components/CreateGroupModal';
@@ -28,7 +29,7 @@ interface InvitationData {
 }
 
 export default function GroupsPage() {
-    const { user, logout, token, updateUser } = useAuth();
+    const { user, logout, updateUser } = useAuth();
     const containerRef = useRef<HTMLDivElement>(null);
     const [groups, setGroups] = useState<GroupData[]>([]);
     const [invitations, setInvitations] = useState<InvitationData[]>([]);
@@ -37,29 +38,23 @@ export default function GroupsPage() {
     const [respondingId, setRespondingId] = useState<number | null>(null);
 
     const fetchGroups = useCallback(async () => {
-        if (!token) return;
         try {
-            const res = await fetch('http://localhost:8001/api/groups/', {
-                headers: { 'Authorization': `Bearer ${token}` },
-            });
+            const res = await apiFetch('groups/');
             if (res.ok) {
                 const data = await res.json();
                 setGroups(data);
             }
         } catch (err) { console.error('Failed to fetch groups:', err); }
-    }, [token]);
+    }, []);
 
     const selectedGroup = groups.find(g => g.id === selectedGroupId);
 
     const fetchInvitations = useCallback(async () => {
-        if (!token) return;
         try {
-            const res = await fetch('http://localhost:8001/api/invitations/', {
-                headers: { 'Authorization': `Bearer ${token}` },
-            });
+            const res = await apiFetch('invitations/');
             if (res.ok) setInvitations(await res.json());
         } catch (err) { console.error('Failed to fetch invitations:', err); }
-    }, [token]);
+    }, []);
 
     const fetchAllData = useCallback(() => {
         fetchGroups();
@@ -74,15 +69,10 @@ export default function GroupsPage() {
     }, [fetchAllData, fetchInvitations]);
 
     const handleRespond = async (invId: number, action: 'accept' | 'decline') => {
-        if (!token) return;
         setRespondingId(invId);
         try {
-            const res = await fetch(`http://localhost:8001/api/invitations/${invId}/respond/`, {
+            const res = await apiFetch(`invitations/${invId}/respond/`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
                 body: JSON.stringify({ action }),
             });
             if (res.ok) {
@@ -110,23 +100,22 @@ export default function GroupsPage() {
             <BackgroundParticles />
             <div className="torch-overlay"></div>
 
-            {showCreateGroup && token && (
-                <CreateGroupModal
-                    token={token}
-                    onClose={() => setShowCreateGroup(false)}
-                    onGroupCreated={() => fetchAllData()}
+            {showCreateGroup && (
+                <CreateGroupModal 
+                    onClose={() => setShowCreateGroup(false)} 
+                    onGroupCreated={fetchGroups} 
                 />
             )}
 
-            {selectedGroup && token && user && (
+            {selectedGroup && (
                 <GroupDetailModal
                     group={selectedGroup}
-                    token={token}
-                    currentUserId={user.id}
+                    currentUserId={user?.id || 0}
                     onClose={() => setSelectedGroupId(null)}
-                    onUpdate={() => fetchGroups()}
+                    onUpdate={fetchGroups}
                 />
             )}
+
 
             {/* Sidebar Trigger */}
             <div className="sidebar-trigger"></div>

@@ -63,6 +63,86 @@
     font-size: 1.1rem;
 }
 
+.gdm-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 0.4rem;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.gdm-tab {
+    flex: 1;
+    padding: 0.8rem;
+    border: none;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.gdm-tab:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.gdm-tab.active {
+    background: #8a2be2;
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3);
+}
+
+.gdm-history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.gdm-history-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 1.5rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 18px;
+    transition: all 0.3s ease;
+}
+
+.gdm-history-card:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(138, 43, 226, 0.3);
+    transform: scale(1.02);
+}
+
+.gdm-h-left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.gdm-h-desc {
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.gdm-h-meta {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.gdm-h-amount {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 800;
+    font-size: 1.3rem;
+    color: #fff;
+}
+
 .gdm-section {
     margin-bottom: 2.5rem;
 }
@@ -192,6 +272,66 @@
     text-align: center;
 }
 
+.gdm-presence-section {
+    margin-top: 0.5rem;
+}
+
+.gdm-presence-label {
+    display: block;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.4);
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.gdm-member-checklist {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 16px;
+    padding: 1rem;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.gdm-check-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.gdm-check-item:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.gdm-check-item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #8a2be2;
+    cursor: pointer;
+}
+
+.gdm-check-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #fff;
+    flex: 1;
+}
+
+.gdm-check-prefs {
+    display: flex;
+    gap: 0.4rem;
+    font-size: 0.8rem;
+}
+
 .gdm-input-group label {
     display: block;
     font-size: 0.8rem;
@@ -256,11 +396,19 @@
 
 .gdm-settlement-card {
     display: flex;
+    justify-content: space-between;
     align-items: center;
     padding: 1rem 1.5rem;
     background: rgba(0, 255, 128, 0.03);
     border: 1px solid rgba(0, 255, 128, 0.1);
     border-radius: 16px;
+    gap: 1rem;
+}
+
+.gdm-settlement-info {
+    display: flex;
+    align-items: center;
+    flex: 1;
 }
 
 .gdm-s-user {
@@ -273,11 +421,12 @@
 }
 
 .gdm-s-arrow {
-    margin: 0 1rem;
-    font-size: 0.8rem;
+    margin: 0 0.75rem;
+    font-size: 0.7rem;
     color: rgba(255, 255, 255, 0.3);
     text-transform: uppercase;
     letter-spacing: 1px;
+    white-space: nowrap;
 }
 
 .gdm-s-amount {
@@ -286,6 +435,25 @@
     font-weight: 800;
     font-size: 1.1rem;
     color: #00ff80;
+}
+
+.gdm-settle-btn {
+    background: rgba(0, 255, 128, 0.1);
+    border: 1px solid rgba(0, 255, 128, 0.3);
+    color: #00ff80;
+    padding: 0.4rem 0.8rem;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.gdm-settle-btn:hover {
+    background: #00ff80;
+    color: #000;
+    transform: translateY(-1px);
 }
 
 .gdm-success {

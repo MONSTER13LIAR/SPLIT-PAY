@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import './settlements.css';
 import { useAuth } from '@/context/AuthContext';
+import { apiFetch } from '@/utils/api';
 import BackgroundParticles from '@/components/BackgroundParticles';
 import SplineBackground from '@/components/SplineBackground';
 
@@ -20,24 +21,40 @@ interface SettlementResponse {
 }
 
 export default function SettlementsPage() {
-    const { user, logout, token } = useAuth();
+    const { user, logout } = useAuth();
     const containerRef = useRef<HTMLDivElement>(null);
     const [settlements, setSettlements] = useState<SettlementResponse>({ debts: [], credits: [] });
     const [isLoading, setIsLoading] = useState(true);
 
     const fetchSettlements = useCallback(async () => {
-        if (!token) return;
         try {
-            const res = await fetch('http://localhost:8001/api/settlements/', {
-                headers: { 'Authorization': `Bearer ${token}` },
-            });
+            const res = await apiFetch('settlements/');
             if (res.ok) {
                 const data = await res.json();
                 setSettlements(data);
             }
         } catch (err) { console.error('Failed to fetch settlements:', err); }
         finally { setIsLoading(false); }
-    }, [token]);
+    }, []);
+
+    const handleSettle = async (settlementId: number, amount: string) => {
+        if (!confirm(`Mark ₹${parseFloat(amount).toFixed(2)} as paid?`)) return;
+        
+        try {
+            const res = await apiFetch(`settlements/${settlementId}/mark-settled/`, {
+                method: 'POST',
+                body: JSON.stringify({ amount }),
+            });
+            if (res.ok) {
+                fetchSettlements();
+            } else {
+                const data = await res.json();
+                alert(data.error || 'Failed to settle');
+            }
+        } catch (err) {
+            console.error('Error settling:', err);
+        }
+    };
 
     useEffect(() => {
         fetchSettlements();
@@ -124,7 +141,15 @@ export default function SettlementsPage() {
                                             <span className="sp-username">@{s.creditor.username}</span>
                                             <span className="sp-group">in {s.group_name}</span>
                                         </div>
-                                        <span className="sp-amount">₹{parseFloat(s.amount).toFixed(2)}</span>
+                                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}>
+                                            <span className="sp-amount">₹{parseFloat(s.amount).toFixed(2)}</span>
+                                            <button 
+                                                className="sp-settle-btn"
+                                                onClick={() => handleSettle(s.id, s.amount)}
+                                            >
+                                                Settle
+                                            </button>
+                                        </div>
                                     </div>
                                 ))}
                             </div>
@@ -144,7 +169,15 @@ export default function SettlementsPage() {
                                             <span className="sp-username">@{s.debtor.username}</span>
                                             <span className="sp-group">in {s.group_name}</span>
                                         </div>
-                                        <span className="sp-amount">₹{parseFloat(s.amount).toFixed(2)}</span>
+                                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}>
+                                            <span className="sp-amount">₹{parseFloat(s.amount).toFixed(2)}</span>
+                                            <button 
+                                                className="sp-settle-btn credit-settle"
+                                                onClick={() => handleSettle(s.id, s.amount)}
+                                            >
+                                                Mark Received
+                                            </button>
+                                        </div>
                                     </div>
                                 ))}
                             </div>
