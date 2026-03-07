@@ -40,7 +40,8 @@ interface SettlementResponse {
 }
 
 export default function Dashboard() {
-    const { user, logout, updateUser } = useAuth();
+    const { user, logout, updateUser, isLoading } = useAuth();
+    console.log("DEBUG: Dashboard current user:", user);
     const dashboardRef = useRef<HTMLDivElement>(null);
     const [showCreateGroup, setShowCreateGroup] = useState(false);
     const [groups, setGroups] = useState<GroupData[]>([]);
@@ -83,12 +84,41 @@ export default function Dashboard() {
     }, []);
 
     useEffect(() => {
-        fetchGroups();
-        fetchInvitations();
-        fetchSettlements();
-    }, [fetchGroups, fetchInvitations, fetchSettlements]);
+        if (!isLoading && user) {
+            fetchGroups();
+            fetchInvitations();
+            fetchSettlements();
+        }
+    }, [isLoading, user, fetchGroups, fetchInvitations, fetchSettlements]);
 
-    // ... handleRespondInvitation ...
+    if (isLoading) {
+        return (
+            <div style={{
+                height: '100vh',
+                background: '#000',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+            }}>
+                <div className="spinner" style={{
+                    width: '40px',
+                    height: '40px',
+                    border: '3px solid rgba(255,255,255,0.1)',
+                    borderTopColor: '#8a2be2',
+                    borderRadius: '50%',
+                    animation: 'spin 1s linear infinite'
+                }}></div>
+                <style jsx>{`
+                    @keyframes spin { to { transform: rotate(360deg); } }
+                `}</style>
+            </div>
+        );
+    }
+
+    if (!user) {
+        // This case should be handled by middleware, but adding a fallback
+        return null;
+    }
 
     const totalDebts = settlements.debts.reduce((acc, curr) => acc + parseFloat(curr.amount), 0);
     const totalCredits = settlements.credits.reduce((acc, curr) => acc + parseFloat(curr.amount), 0);

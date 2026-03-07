@@ -77,8 +77,9 @@ class GoogleLogin(SocialLoginView):
     permission_classes = [AllowAny]
 
     def post(self, request, *args, **kwargs):
-        print(f"DEBUG: GoogleLogin callback_url: {self.callback_url}")
-        print(f"DEBUG: GoogleLogin post data: {request.data}")
+        print(f"DEBUG: --- GoogleLogin.post START ---")
+        print(f"DEBUG: Request Data: {request.data}")
+        print(f"DEBUG: Callback URL: {self.callback_url}")
         try:
             # Check if we have the right model instances
             from allauth.socialaccount.models import SocialApp
@@ -89,7 +90,10 @@ class GoogleLogin(SocialLoginView):
                 print("DEBUG: Google SocialApp secret is missing or not configured!")
                 return Response({"error": "Google SocialApp secret is not configured in backend"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+            print("DEBUG: Calling super().post...")
             response = super().post(request, *args, **kwargs)
+            print(f"DEBUG: super().post returned status: {response.status_code}")
+            
             if response.status_code >= 400:
                 print(f"DEBUG: GoogleLogin ERROR response status: {response.status_code}")
                 print(f"DEBUG: GoogleLogin ERROR response data: {response.data}")
@@ -100,10 +104,10 @@ class GoogleLogin(SocialLoginView):
             print("DEBUG: Google SocialApp not found in database!")
             return Response({"error": "Google SocialApp not configured"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         except Exception as e:
-            print(f"DEBUG: GoogleLogin EXCEPTION: {str(e)}")
+            print(f"DEBUG: GoogleLogin EXCEPTION: {type(e).__name__}: {str(e)}")
             import traceback
             traceback.print_exc()
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": f"Internal Error: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
 
     def get_response(self):
         # Additional logic to ensure user profile exists after social login
@@ -122,6 +126,7 @@ class GoogleLogin(SocialLoginView):
 def set_username(request):
     """Allow an authenticated user to set their username (once)."""
     username = request.data.get('username', '').strip()
+    print(f"DEBUG: set_username called for user {request.user.id} ({request.user.email}) with username: {username}")
 
     if not username or len(username) < 3:
         return Response(
@@ -146,7 +151,22 @@ def set_username(request):
     existing_user = User.objects.filter(username=username).first()
     
     if existing_user and existing_user.id != user.id:
-        if existing_user.email != user.email:
+        print(f"DEBUG: Username '{username}' already taken by user {existing_user.id} ({existing_user.email})")
+        
+        # If the current user doesn't have an email set on the User model, 
+        # try to get it from their SocialAccount
+        user_email = user.email
+        if not user_email:
+            from allauth.socialaccount.models import SocialAccount
+            social_acc = SocialAccount.objects.filter(user=user).first()
+            if social_acc:
+                user_email = social_acc.extra_data.get('email')
+                if user_email:
+                    user.email = user_email
+                    user.save()
+                    print(f"DEBUG: Updated user {user.id} email from SocialAccount: {user_email}")
+
+        if existing_user.email != user_email:
             return Response(
                 {"error": "This username is already taken."},
                 status=status.HTTP_400_BAD_REQUEST,
@@ -154,20 +174,29 @@ def set_username(request):
         else:
             # SAME EMAIL, different ID. The user is trying to reclaim their username.
             # We rename the old user to free up the username.
+            print(f"DEBUG: Same email detected. Renaming old user {existing_user.id}")
             import uuid
             existing_user.username = f"old_{existing_user.username}_{uuid.uuid4().hex[:8]}"
             existing_user.save()
 
-    user.username = username
-    user.save()
+    try:
+        user.username = username
+        user.save()
+        print(f"DEBUG: User {user.id} updated with username: {user.username}")
 
-    profile, _ = UserProfile.objects.get_or_create(user=user)
-    profile.is_non_veg = request.data.get('is_non_veg', False)
-    profile.is_drinker = request.data.get('is_drinker', False)
-    profile.has_set_username = True
-    profile.save()
+        profile, created = UserProfile.objects.get_or_create(user=user)
+        profile.is_non_veg = request.data.get('is_non_veg', False)
+        profile.is_drinker = request.data.get('is_drinker', False)
+        profile.has_set_username = True
+        profile.save()
+        print(f"DEBUG: UserProfile for {user.id} {'created' if created else 'updated'}")
 
-    return Response(UserSerializer(user).data, status=status.HTTP_200_OK)
+        return Response(UserSerializer(user).data, status=status.HTTP_200_OK)
+    except Exception as e:
+        print(f"DEBUG: set_username EXCEPTION for user {user.id}: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return Response({"error": f"Internal error: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['PATCH'])

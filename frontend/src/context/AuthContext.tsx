@@ -24,12 +24,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             const res = await apiFetch('dj-rest-auth/user/');
             if (res.ok) {
                 const userData = await res.json();
+                console.log("DEBUG: checkAuth SUCCESS:", userData);
                 setUser(userData);
             } else {
+                console.log("DEBUG: checkAuth FAILED (not ok):", res.status);
                 setUser(null);
             }
         } catch (err) {
-            console.error("Auth check failed:", err);
+            console.error("Auth check failed with exception:", err);
             setUser(null);
         } finally {
             setIsLoading(false);

@@ -18,8 +18,12 @@ function AuthCallbackContent() {
                 method: 'POST',
                 body: JSON.stringify({ code }),
             })
-                .then(res => {
-                    if (!res.ok) throw new Error('Authentication failed');
+                .then(async res => {
+                    if (!res.ok) {
+                        const errorData = await res.json().catch(() => ({}));
+                        console.error('DEBUG: Google Login API Error Response:', errorData);
+                        throw new Error(errorData.error || 'Authentication failed');
+                    }
                     return res.json();
                 })
                 .then(data => {
