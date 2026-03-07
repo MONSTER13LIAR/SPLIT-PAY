@@ -75,26 +75,6 @@ export default function GroupDetailModal({ group, currentUserId, onClose, onUpda
         } catch (err) { console.error("Failed to fetch expenses", err); }
     }, [group.id]);
 
-    const handleSettle = async (settlementId: number, amount: string) => {
-        if (!confirm(`Mark ₹${parseFloat(amount).toFixed(2)} as paid?`)) return;
-        
-        try {
-            const res = await apiFetch(`settlements/${settlementId}/mark-settled/`, {
-                method: 'POST',
-                body: JSON.stringify({ amount }),
-            });
-            if (res.ok) {
-                fetchSettlements();
-                onUpdate();
-            } else {
-                const data = await res.json();
-                setError(data.error || 'Failed to settle');
-            }
-        } catch (err) {
-            console.error('Error settling:', err);
-        }
-    };
-
     useEffect(() => {
         fetchSettlements();
         fetchExpenses();
@@ -130,7 +110,8 @@ export default function GroupDetailModal({ group, currentUserId, onClose, onUpda
                     non_veg_amount: nonVegCost || '0',
                     alcohol_amount: alcoholCost || '0',
                     present_member_ids: presentMemberIds,
-                    description: `Bill for ${group.name}`
+                    description: `Bill for ${group.name}`,
+                    payer_id: currentUserId
                 })
             });
 
@@ -183,8 +164,37 @@ export default function GroupDetailModal({ group, currentUserId, onClose, onUpda
     ).filter(Boolean) as User[];
 
     const currentPayerIndex = group.current_turn_index % (group.member_order.length || 1);
-    const currentPayer = orderedMembers[currentPayerIndex];
-    const isMyTurn = currentPayer?.id === currentUserId;
+    
+    // The active payer is the first person in the chain (starting from the turn index) who is PRESENT
+    const getActivePayer = () => {
+        for (let i = 0; i < orderedMembers.length; i++) {
+            const idx = (currentPayerIndex + i) % orderedMembers.length;
+            const candidate = orderedMembers[idx];
+            if (presentMemberIds.includes(candidate.id)) return candidate;
+        }
+        return orderedMembers[currentPayerIndex]; // Fallback
+    };
+
+    const activePayer = getActivePayer();
+    
+    // The person who can take over is the next present person in the chain after the active payer
+    const getNextAvailablePayer = () => {
+        if (!activePayer) return null;
+        const activeIdx = orderedMembers.findIndex(m => m.id === activePayer.id);
+        if (activeIdx === -1) return null;
+        
+        for (let i = 1; i < orderedMembers.length; i++) {
+            const idx = (activeIdx + i) % orderedMembers.length;
+            const candidate = orderedMembers[idx];
+            if (presentMemberIds.includes(candidate.id)) return candidate;
+        }
+        return null;
+    };
+
+    const nextAvailablePayer = getNextAvailablePayer();
+    
+    const isMyTurnToPay = activePayer?.id === currentUserId;
+    const canITakeOver = nextAvailablePayer?.id === currentUserId;
 
     return (
         <div className="gdm-overlay">
@@ -222,7 +232,7 @@ export default function GroupDetailModal({ group, currentUserId, onClose, onUpda
                                 </div>
                             </section>
 
-                            {isMyTurn ? (
+                            {isMyTurnToPay ? (
                                 <section className="gdm-section gdm-bill-section">
                                     <h3>💸 Your Turn to Pay!</h3>
                                     
@@ -312,7 +322,20 @@ export default function GroupDetailModal({ group, currentUserId, onClose, onUpda
                                 </section>
                             ) : (
                                 <div className="gdm-waiting">
-                                    <p>Waiting for <strong>@{currentPayer?.username}</strong> to pay and split the bill.</p>
+                                    <p>Waiting for <strong>@{activePayer?.username}</strong> to pay.</p>
+                                    {canITakeOver && (
+                                        <div className="gdm-takeover-box">
+                                            <p>Is <strong>@{activePayer?.username}</strong> absent?</p>
+                                            <button 
+                                                className="gdm-takeover-btn"
+                                                onClick={() => {
+                                                    setPresentMemberIds(prev => prev.filter(id => id !== activePayer.id));
+                                                }}
+                                            >
+                                                🙋‍♂️ Yes, I will pay instead
+                                            </button>
+                                        </div>
+                                    )}
                                 </div>
                             )}
                         </>
@@ -333,14 +356,6 @@ export default function GroupDetailModal({ group, currentUserId, onClose, onUpda
                                                 <span className={`gdm-s-user ${s.creditor.id === currentUserId ? 'is-me' : ''}`}>@{s.creditor.username}</span>
                                                 <span className="gdm-s-amount">₹{parseFloat(s.amount).toFixed(2)}</span>
                                             </div>
-                                            {(s.debtor.id === currentUserId || s.creditor.id === currentUserId) && (
-                                                <button 
-                                                    className="gdm-settle-btn"
-                                                    onClick={() => handleSettle(s.id, s.amount)}
-                                                >
-                                                    {s.debtor.id === currentUserId ? 'Settle' : 'Mark Paid'}
-                                                </button>
-                                            )}
                                         </div>
                                     ))}
                                 </div>

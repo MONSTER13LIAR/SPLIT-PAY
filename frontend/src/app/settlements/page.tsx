@@ -15,16 +15,32 @@ interface SettlementData {
     group_name: string;
 }
 
+interface SettlementRequestData {
+    id: number;
+    debtor: { id: number; username: string };
+    creditor: { id: number; username: string };
+    amount: string;
+    status: string;
+    group_name: string;
+}
+
 interface SettlementResponse {
     debts: SettlementData[];
     credits: SettlementData[];
+}
+
+interface SettlementRequestsResponse {
+    received: SettlementRequestData[];
+    sent: SettlementRequestData[];
 }
 
 export default function SettlementsPage() {
     const { user, logout } = useAuth();
     const containerRef = useRef<HTMLDivElement>(null);
     const [settlements, setSettlements] = useState<SettlementResponse>({ debts: [], credits: [] });
+    const [requests, setRequests] = useState<SettlementRequestsResponse>({ received: [], sent: [] });
     const [isLoading, setIsLoading] = useState(true);
+    const [isActionLoading, setIsActionLoading] = useState<number | null>(null);
 
     const fetchSettlements = useCallback(async () => {
         try {
@@ -34,11 +50,25 @@ export default function SettlementsPage() {
                 setSettlements(data);
             }
         } catch (err) { console.error('Failed to fetch settlements:', err); }
-        finally { setIsLoading(false); }
     }, []);
 
-    const handleSettle = async (settlementId: number, amount: string) => {
-        if (!confirm(`Mark ₹${parseFloat(amount).toFixed(2)} as paid?`)) return;
+    const fetchRequests = useCallback(async () => {
+        try {
+            const res = await apiFetch('settlement-requests/');
+            if (res.ok) {
+                const data = await res.json();
+                setRequests(data);
+            }
+        } catch (err) { console.error('Failed to fetch requests:', err); }
+    }, []);
+
+    const fetchAllData = useCallback(async () => {
+        await Promise.all([fetchSettlements(), fetchRequests()]);
+        setIsLoading(false);
+    }, [fetchSettlements, fetchRequests]);
+
+    const handleSettleRequest = async (settlementId: number, amount: string) => {
+        if (!confirm(`Send settlement request for ₹${parseFloat(amount).toFixed(2)}?`)) return;
         
         try {
             const res = await apiFetch(`settlements/${settlementId}/mark-settled/`, {
@@ -46,22 +76,43 @@ export default function SettlementsPage() {
                 body: JSON.stringify({ amount }),
             });
             if (res.ok) {
-                fetchSettlements();
+                alert("Settlement request sent! Waiting for creditor confirmation.");
+                fetchRequests();
             } else {
                 const data = await res.json();
-                alert(data.error || 'Failed to settle');
+                alert(data.error || 'Failed to send request');
             }
         } catch (err) {
             console.error('Error settling:', err);
         }
     };
 
+    const handleRespondRequest = async (requestId: number, action: 'accept' | 'decline') => {
+        setIsActionLoading(requestId);
+        try {
+            const res = await apiFetch(`settlement-requests/${requestId}/respond/`, {
+                method: 'POST',
+                body: JSON.stringify({ action }),
+            });
+            if (res.ok) {
+                fetchAllData();
+            } else {
+                const data = await res.json();
+                alert(data.error || 'Failed to respond');
+            }
+        } catch (err) {
+            console.error('Error responding:', err);
+        } finally {
+            setIsActionLoading(null);
+        }
+    };
+
     useEffect(() => {
-        fetchSettlements();
+        fetchAllData();
         // Poll for updates every 10 seconds
-        const interval = setInterval(fetchSettlements, 10000);
+        const interval = setInterval(fetchAllData, 10000);
         return () => clearInterval(interval);
-    }, [fetchSettlements]);
+    }, [fetchAllData]);
 
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
@@ -128,6 +179,58 @@ export default function SettlementsPage() {
                 </div>
 
                 <div className="sp-grid">
+                    {/* Settlement Requests (Notifications) */}
+                    {(requests.received.length > 0 || requests.sent.length > 0) && (
+                        <section className="sp-section full-width">
+                            <h2>🔔 Settlement Requests</h2>
+                            <div className="sp-requests-list">
+                                {requests.received.map(req => (
+                                    <div key={req.id} className="sp-card sp-request-received">
+                                        <div className="sp-card-info">
+                                            <div className="sp-req-header">
+                                                <span className="sp-req-tag received">ACTION REQUIRED</span>
+                                                <span className="sp-group">{req.group_name}</span>
+                                            </div>
+                                            <div className="sp-req-body">
+                                                <span className="sp-username">@{req.debtor.username}</span>
+                                                <span className="sp-req-text">paid you ₹{parseFloat(req.amount).toFixed(2)}</span>
+                                            </div>
+                                        </div>
+                                        <div className="sp-req-actions">
+                                            <button 
+                                                className="sp-btn accept"
+                                                onClick={() => handleRespondRequest(req.id, 'accept')}
+                                                disabled={isActionLoading === req.id}
+                                            >
+                                                Confirm
+                                            </button>
+                                            <button 
+                                                className="sp-btn decline"
+                                                onClick={() => handleRespondRequest(req.id, 'decline')}
+                                                disabled={isActionLoading === req.id}
+                                            >
+                                                Decline
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                                {requests.sent.map(req => (
+                                    <div key={req.id} className="sp-card sp-request-sent">
+                                        <div className="sp-card-info">
+                                            <div className="sp-req-header">
+                                                <span className="sp-req-tag sent">PENDING</span>
+                                                <span className="sp-group">{req.group_name}</span>
+                                            </div>
+                                            <div className="sp-req-body">
+                                                <span className="sp-req-text">Waiting for <strong>@{req.creditor.username}</strong> to confirm your payment of ₹{parseFloat(req.amount).toFixed(2)}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </section>
+                    )}
+
                     {/* Debts Section */}
                     <section className="sp-section">
                         <h2>💸 You Owe Money</h2>
@@ -145,7 +248,7 @@ export default function SettlementsPage() {
                                             <span className="sp-amount">₹{parseFloat(s.amount).toFixed(2)}</span>
                                             <button 
                                                 className="sp-settle-btn"
-                                                onClick={() => handleSettle(s.id, s.amount)}
+                                                onClick={() => handleSettleRequest(s.id, s.amount)}
                                             >
                                                 Settle
                                             </button>
@@ -171,12 +274,7 @@ export default function SettlementsPage() {
                                         </div>
                                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}>
                                             <span className="sp-amount">₹{parseFloat(s.amount).toFixed(2)}</span>
-                                            <button 
-                                                className="sp-settle-btn credit-settle"
-                                                onClick={() => handleSettle(s.id, s.amount)}
-                                            >
-                                                Mark Received
-                                            </button>
+                                            <div className="sp-waiting-tag">Waiting for payment</div>
                                         </div>
                                     </div>
                                 ))}

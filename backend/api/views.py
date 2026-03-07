@@ -5,8 +5,8 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.contrib.auth.models import User
 from django.db import transaction
 from decimal import Decimal
-from .models import Group, Expense, ExpenseSplit, UserProfile, GroupInvitation, Settlement
-from .serializers import UserSerializer, GroupSerializer, ExpenseSerializer, GroupInvitationSerializer, SettlementSerializer
+from .models import Group, Expense, ExpenseSplit, UserProfile, GroupInvitation, Settlement, SettlementRequest
+from .serializers import UserSerializer, GroupSerializer, ExpenseSerializer, GroupInvitationSerializer, SettlementSerializer, SettlementRequestSerializer
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from dj_rest_auth.registration.views import SocialLoginView
@@ -358,7 +358,12 @@ def calculate_split(request, group_id):
         group.save()
 
     payer_index = group.current_turn_index % len(group.member_order)
-    payer_id = group.member_order[payer_index]
+    scheduled_payer_id = group.member_order[payer_index]
+    
+    # If a specific payer is provided (e.g., because scheduled payer is absent), use them.
+    # Otherwise, use the scheduled payer.
+    payer_id = data.get('payer_id', scheduled_payer_id)
+    
     try:
         payer = User.objects.get(id=payer_id)
     except User.DoesNotExist:
@@ -460,17 +465,15 @@ def list_user_settlements(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def mark_settled(request, settlement_id):
-    """Mark a settlement as paid (partially or fully)."""
+    """Instead of marking as settled immediately, create a SettlementRequest."""
     try:
-        # The creditor is usually the one who confirms they received money
-        # or the debtor marks it as paid and the creditor might need to confirm later.
-        # For simplicity, we'll allow either for now, but usually it's the creditor.
         settlement = Settlement.objects.get(id=settlement_id)
     except Settlement.DoesNotExist:
         return Response({"error": "Settlement not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    if request.user != settlement.creditor and request.user != settlement.debtor:
-        return Response({"error": "You are not part of this settlement"}, status=status.HTTP_403_FORBIDDEN)
+    # Only debtor can initiate a settlement request
+    if request.user != settlement.debtor:
+        return Response({"error": "Only the debtor can initiate a settlement request."}, status=status.HTTP_403_FORBIDDEN)
 
     amount_to_settle = Decimal(str(request.data.get('amount', settlement.amount)))
     
@@ -480,11 +483,71 @@ def mark_settled(request, settlement_id):
     if amount_to_settle > settlement.amount:
         return Response({"error": "Cannot settle more than the owed amount"}, status=status.HTTP_400_BAD_REQUEST)
 
+    # Check if there's already a pending request for this settlement
+    if SettlementRequest.objects.filter(settlement=settlement, status='pending').exists():
+        return Response({"error": "A settlement request is already pending for this debt."}, status=status.HTTP_400_BAD_REQUEST)
+
     with transaction.atomic():
-        settlement.amount -= amount_to_settle
-        settlement.save()
+        request_obj = SettlementRequest.objects.create(
+            settlement=settlement,
+            debtor=settlement.debtor,
+            creditor=settlement.creditor,
+            amount=amount_to_settle,
+            status='pending'
+        )
         
-        # Create a special Expense to record this settlement?
-        # For now, just updating the settlement object is enough for the balance.
-        
-    return Response(SettlementSerializer(settlement).data)
+    return Response(SettlementRequestSerializer(request_obj).data, status=status.HTTP_201_CREATED)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def list_settlement_requests(request):
+    """List settlement requests involving the current user."""
+    # Received requests (as creditor) - these need action
+    received = SettlementRequest.objects.filter(creditor=request.user, status='pending').order_by('-created_at')
+    # Sent requests (as debtor) - these are waiting for confirmation
+    sent = SettlementRequest.objects.filter(debtor=request.user, status='pending').order_by('-created_at')
+    
+    return Response({
+        "received": SettlementRequestSerializer(received, many=True).data,
+        "sent": SettlementRequestSerializer(sent, many=True).data
+    })
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def respond_settlement_request(request, request_id):
+    """Accept or decline a settlement request."""
+    action = request.data.get('action', '').strip().lower()
+
+    if action not in ('accept', 'decline'):
+        return Response(
+            {"error": "Action must be 'accept' or 'decline'."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    try:
+        settlement_request = SettlementRequest.objects.get(id=request_id, creditor=request.user)
+    except SettlementRequest.DoesNotExist:
+        return Response({"error": "Settlement request not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    if settlement_request.status != 'pending':
+        return Response(
+            {"error": f"Request has already been {settlement_request.status}."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    with transaction.atomic():
+        if action == 'accept':
+            settlement_request.status = 'accepted'
+            settlement_request.save()
+            
+            # Apply the settlement to the actual balance
+            settlement = settlement_request.settlement
+            settlement.amount -= settlement_request.amount
+            settlement.save()
+        else:
+            settlement_request.status = 'declined'
+            settlement_request.save()
+
+    return Response(SettlementRequestSerializer(settlement_request).data)

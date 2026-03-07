@@ -65,6 +65,23 @@ class Settlement(models.Model):
     def __str__(self):
         return f"{self.debtor.username} owes {self.creditor.username}: {self.amount} in {self.group.name}"
 
+class SettlementRequest(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('accepted', 'Accepted'),
+        ('declined', 'Declined'),
+    ]
+
+    settlement = models.ForeignKey(Settlement, on_delete=models.CASCADE, related_name='requests')
+    debtor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_settlement_requests')
+    creditor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_settlement_requests')
+    amount = models.DecimalField(max_digits=12, decimal_places=2)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.debtor.username} wants to settle {self.amount} with {self.creditor.username}"
+
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     phone_number = models.CharField(max_length=15, unique=True, null=True, blank=True)

@@ -8,7 +8,7 @@ from .views import (
     GroupViewSet, ExpenseViewSet, register_user, GoogleLogin,
     set_username, create_group, list_invitations, respond_invitation,
     update_preferences, calculate_split, get_settlements, list_user_settlements, mark_settled,
-    list_group_expenses,
+    list_group_expenses, list_settlement_requests, respond_settlement_request,
 )
 
 router = DefaultRouter()
@@ -28,6 +28,8 @@ urlpatterns = [
     path('groups/<int:group_id>/calculate-split/', calculate_split, name='calculate_split'),
     path('groups/<int:group_id>/settlements/', get_settlements, name='get_settlements'),
     path('groups/<int:group_id>/expenses/', list_group_expenses, name='list_group_expenses'),
+    path('settlement-requests/', list_settlement_requests, name='list_settlement_requests'),
+    path('settlement-requests/<int:request_id>/respond/', respond_settlement_request, name='respond_settlement_request'),
     path('settlements/', list_user_settlements, name='list_user_settlements'),
     path('settlements/<int:settlement_id>/mark-settled/', mark_settled, name='mark_settled'),
     path('', include(router.urls)),

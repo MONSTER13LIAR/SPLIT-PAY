@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import Group, Expense, ExpenseSplit, GroupInvitation, Settlement
+from .models import Group, Expense, ExpenseSplit, GroupInvitation, Settlement, SettlementRequest
 
 class UserSerializer(serializers.ModelSerializer):
     phone_number = serializers.SerializerMethodField()
@@ -97,3 +97,13 @@ class SettlementSerializer(serializers.ModelSerializer):
     class Meta:
         model = Settlement
         fields = ['id', 'debtor', 'creditor', 'amount', 'group_name']
+
+class SettlementRequestSerializer(serializers.ModelSerializer):
+    debtor = UserSerializer(read_only=True)
+    creditor = UserSerializer(read_only=True)
+    group_name = serializers.CharField(source='settlement.group.name', read_only=True)
+
+    class Meta:
+        model = SettlementRequest
+        fields = ['id', 'settlement', 'debtor', 'creditor', 'amount', 'status', 'created_at', 'group_name']
+        read_only_fields = ['created_at']

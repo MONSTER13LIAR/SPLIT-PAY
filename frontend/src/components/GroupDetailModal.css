@@ -388,6 +388,40 @@
     margin-bottom: 2rem;
 }
 
+.gdm-takeover-box {
+    margin-top: 1.5rem;
+    padding: 1.5rem;
+    background: rgba(138, 43, 226, 0.05);
+    border: 1px solid rgba(138, 43, 226, 0.2);
+    border-radius: 16px;
+    animation: fadeIn 0.4s ease;
+}
+
+.gdm-takeover-box p {
+    color: #fff;
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.gdm-takeover-btn {
+    background: #8a2be2;
+    color: #fff;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3);
+}
+
+.gdm-takeover-btn:hover {
+    background: #9d4edd;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(138, 43, 226, 0.4);
+}
+
 .gdm-settlements {
     display: flex;
     flex-direction: column;
