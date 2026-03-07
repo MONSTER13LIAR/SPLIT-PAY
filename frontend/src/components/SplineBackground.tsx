@@ -1,15 +1,13 @@
 "use client";
 
+import React, { useRef, useState } from 'react';
 import Spline from '@splinetool/react-spline';
-import { useRef } from 'react';
 
 export default function SplineBackground() {
     const containerRef = useRef<HTMLDivElement>(null);
+    const [error, setError] = useState(false);
 
     const handleLoad = () => {
-        // The Spline viewer renders its own <canvas> internally.
-        // That canvas ignores the parent's pointer-events:none, so we
-        // must set it directly on every canvas inside this container.
         if (containerRef.current) {
             const canvases = containerRef.current.querySelectorAll('canvas');
             canvases.forEach((c) => {
@@ -17,6 +15,20 @@ export default function SplineBackground() {
             });
         }
     };
+
+    if (error) {
+        return (
+            <div style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                zIndex: -1,
+                background: '#000'
+            }} />
+        );
+    }
 
     return (
         <div
@@ -30,11 +42,16 @@ export default function SplineBackground() {
                 height: '100%',
                 zIndex: -1,
                 pointerEvents: 'none',
+                background: '#000' // Fallback color
             }}
         >
             <Spline
                 scene="https://prod.spline.design/ZnOZwrkhXMWIugqB/scene.splinecode"
                 onLoad={handleLoad}
+                onError={() => {
+                    console.error("Spline failed to load");
+                    setError(true);
+                }}
             />
         </div>
     );

@@ -3,14 +3,26 @@ from django.contrib.auth.models import User
 from .models import Group, Expense, ExpenseSplit, GroupInvitation, Settlement
 
 class UserSerializer(serializers.ModelSerializer):
-    phone_number = serializers.CharField(source='profile.phone_number', read_only=True)
-    has_set_username = serializers.BooleanField(source='profile.has_set_username', read_only=True)
-    is_non_veg = serializers.BooleanField(source='profile.is_non_veg', read_only=True)
-    is_drinker = serializers.BooleanField(source='profile.is_drinker', read_only=True)
+    phone_number = serializers.SerializerMethodField()
+    has_set_username = serializers.SerializerMethodField()
+    is_non_veg = serializers.SerializerMethodField()
+    is_drinker = serializers.SerializerMethodField()
 
     class Meta:
         model = User
         fields = ['id', 'username', 'email', 'phone_number', 'has_set_username', 'is_non_veg', 'is_drinker']
+
+    def get_phone_number(self, obj):
+        return getattr(obj.profile, 'phone_number', '') if hasattr(obj, 'profile') else ''
+
+    def get_has_set_username(self, obj):
+        return getattr(obj.profile, 'has_set_username', False) if hasattr(obj, 'profile') else False
+
+    def get_is_non_veg(self, obj):
+        return getattr(obj.profile, 'is_non_veg', False) if hasattr(obj, 'profile') else False
+
+    def get_is_drinker(self, obj):
+        return getattr(obj.profile, 'is_drinker', False) if hasattr(obj, 'profile') else False
 
 
 class GroupSerializer(serializers.ModelSerializer):

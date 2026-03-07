@@ -71,53 +71,25 @@ class ExpenseViewSet(viewsets.ModelViewSet):
 
 class GoogleLogin(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
-    # If using code, the callback_url must match EXACTLY what was sent to Google
     callback_url = "http://localhost:3000/auth/callback"
     client_class = OAuth2Client
     permission_classes = [AllowAny]
-
-    def post(self, request, *args, **kwargs):
-        print(f"DEBUG: --- GoogleLogin.post START ---")
-        print(f"DEBUG: Request Data: {request.data}")
-        print(f"DEBUG: Callback URL: {self.callback_url}")
-        try:
-            # Check if we have the right model instances
-            from allauth.socialaccount.models import SocialApp
-            app = SocialApp.objects.get(provider='google')
-            print(f"DEBUG: SocialApp found: ID={app.client_id[:10]}... Secret={app.secret[:5]}...")
-            
-            if not app.secret or app.secret == 'REPLACE_ME':
-                print("DEBUG: Google SocialApp secret is missing or not configured!")
-                return Response({"error": "Google SocialApp secret is not configured in backend"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-            print("DEBUG: Calling super().post...")
-            response = super().post(request, *args, **kwargs)
-            print(f"DEBUG: super().post returned status: {response.status_code}")
-            
-            if response.status_code >= 400:
-                print(f"DEBUG: GoogleLogin ERROR response status: {response.status_code}")
-                print(f"DEBUG: GoogleLogin ERROR response data: {response.data}")
-            else:
-                print(f"DEBUG: GoogleLogin success response status: {response.status_code}")
-            return response
-        except SocialApp.DoesNotExist:
-            print("DEBUG: Google SocialApp not found in database!")
-            return Response({"error": "Google SocialApp not configured"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        except Exception as e:
-            print(f"DEBUG: GoogleLogin EXCEPTION: {type(e).__name__}: {str(e)}")
-            import traceback
-            traceback.print_exc()
-            return Response({"error": f"Internal Error: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
+    
+    def login(self):
+        # Call the parent login() to authenticate the user
+        super().login()
+        # Ensure UserProfile exists for this user immediately after they are logged in
+        if not hasattr(self.user, 'profile'):
+            from .models import UserProfile
+            UserProfile.objects.get_or_create(user=self.user)
 
     def get_response(self):
-        # Additional logic to ensure user profile exists after social login
+        # Now it's safe to call super().get_response() because the profile exists
         response = super().get_response()
         user = self.user
-        if not hasattr(user, 'profile'):
-            UserProfile.objects.get_or_create(user=user)
-        # Include user details in the response
-        user_data = UserSerializer(user).data
-        response.data['user'] = user_data
+        # Ensure user data is in the response with our custom serializer fields
+        from .serializers import UserSerializer
+        response.data['user'] = UserSerializer(user).data
         return response
 
 

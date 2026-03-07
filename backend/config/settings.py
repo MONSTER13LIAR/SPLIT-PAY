@@ -157,8 +157,10 @@ STATIC_URL = 'static/'
 # REST Framework settings
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
+        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
@@ -180,9 +182,11 @@ REST_AUTH = {
     'JWT_AUTH_REFRESH_COOKIE': 'refresh-token',
     'JWT_AUTH_HTTPONLY': True,
     'JWT_AUTH_SAMESITE': 'Lax',
-    'JWT_AUTH_SECURE': not DEBUG,
+    'JWT_AUTH_SECURE': False, # Changed to False to ensure it works on http://localhost
     'USER_DETAILS_SERIALIZER': 'api.serializers.UserSerializer',
 }
+
+REST_USE_JWT = True # Explicitly set this as well
 
 from datetime import timedelta
 SIMPLE_JWT = {

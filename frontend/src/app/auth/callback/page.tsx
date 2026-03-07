@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, Suspense } from 'react';
+import React, { useEffect, Suspense, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { apiFetch } from '@/utils/api';
@@ -9,10 +9,14 @@ function AuthCallbackContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const { login } = useAuth();
+    const loginAttempted = useRef(false);
 
     useEffect(() => {
         const code = searchParams.get('code');
-        if (code) {
+        if (code && !loginAttempted.current) {
+            loginAttempted.current = true;
+            console.log('DEBUG: Auth callback code found, attempting login...');
+
             // Send the code to our backend to exchange it for a JWT (now in HttpOnly cookie)
             apiFetch('api/google/', {
                 method: 'POST',
@@ -26,11 +30,18 @@ function AuthCallbackContent() {
                     }
                     return res.json();
                 })
-                .then(data => {
-                    console.log('Google login response:', data);
-                    // Cookies are set by the backend, we just need the user object
-                    login(data.user);
-                    router.push('/dashboard');
+                .then(async data => {
+                    console.log('DEBUG: Google login SUCCESS, response data:', data);
+                    // Cookies are set by the backend, we just need to update the frontend state
+                    // We await login() now because it calls checkAuth() which is async
+                    if (data.user) {
+                        await login(data.user);
+                        console.log('DEBUG: Frontend login state updated, redirecting to dashboard');
+                        router.push('/dashboard');
+                    } else {
+                        console.error('DEBUG: No user object in login response', data);
+                        throw new Error('User data missing from login response');
+                    }
                 })
                 .catch(err => {
                     console.error('OAuth Error:', err);

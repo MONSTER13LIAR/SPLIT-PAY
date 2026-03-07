@@ -91,6 +91,27 @@ export default function Dashboard() {
         }
     }, [isLoading, user, fetchGroups, fetchInvitations, fetchSettlements]);
 
+    useEffect(() => {
+        console.log("DEBUG: Dashboard state - isLoading:", isLoading, "user:", user);
+        if (!isLoading && !user) {
+            console.log("DEBUG: Dashboard - No user found, redirecting to login");
+            window.location.href = '/login';
+        }
+    }, [isLoading, user]);
+
+    useEffect(() => {
+        const handleMouseMove = (e: MouseEvent) => {
+            if (dashboardRef.current) {
+                const { clientX, clientY } = e;
+                dashboardRef.current.style.setProperty('--x', `${clientX}px`);
+                dashboardRef.current.style.setProperty('--y', `${clientY}px`);
+            }
+        };
+
+        window.addEventListener('mousemove', handleMouseMove);
+        return () => window.removeEventListener('mousemove', handleMouseMove);
+    }, []);
+
     if (isLoading) {
         return (
             <div style={{
@@ -116,10 +137,14 @@ export default function Dashboard() {
     }
 
     if (!user) {
-        // This case should be handled by middleware, but adding a fallback
-        return null;
+        return (
+            <div style={{ background: '#000', height: '100vh', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <p>Redirecting to login...</p>
+            </div>
+        );
     }
 
+    // Calculations based on data
     const totalDebts = settlements.debts.reduce((acc, curr) => acc + parseFloat(curr.amount), 0);
     const totalCredits = settlements.credits.reduce((acc, curr) => acc + parseFloat(curr.amount), 0);
     const netBalance = totalCredits - totalDebts;
@@ -141,19 +166,6 @@ export default function Dashboard() {
         }
         setRespondingId(null);
     };
-
-    useEffect(() => {
-        const handleMouseMove = (e: MouseEvent) => {
-            if (dashboardRef.current) {
-                const { clientX, clientY } = e;
-                dashboardRef.current.style.setProperty('--x', `${clientX}px`);
-                dashboardRef.current.style.setProperty('--y', `${clientY}px`);
-            }
-        };
-
-        window.addEventListener('mousemove', handleMouseMove);
-        return () => window.removeEventListener('mousemove', handleMouseMove);
-    }, []);
 
     return (
         <div className="dashboard-container" ref={dashboardRef}>

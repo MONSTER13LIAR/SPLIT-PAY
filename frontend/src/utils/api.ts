@@ -21,6 +21,9 @@ export const apiFetch = async (endpoint: string, options: RequestOptions = {}) =
         'Content-Type': 'application/json',
     };
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+
     const config: RequestOptions = {
         ...options,
         headers: {
@@ -28,13 +31,20 @@ export const apiFetch = async (endpoint: string, options: RequestOptions = {}) =
             ...options.headers,
         },
         credentials: 'include',
+        signal: controller.signal,
     };
 
     try {
         const response = await fetch(url, config);
+        clearTimeout(timeoutId);
         return response;
-    } catch (error) {
-        console.error(`API Fetch Error [${url}]:`, error);
+    } catch (error: any) {
+        clearTimeout(timeoutId);
+        if (error.name === 'AbortError') {
+            console.error(`API Fetch TIMEOUT [${url}]`);
+        } else {
+            console.error(`API Fetch Error [${url}]:`, error);
+        }
         throw error;
     }
 };
