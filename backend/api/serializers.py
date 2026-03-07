@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import Group, Expense, ExpenseSplit, GroupInvitation, Settlement, SettlementRequest
+from .models import Group, Expense, ExpenseSplit, GroupInvitation, Settlement, SettlementRequest, Vote
 
 class UserSerializer(serializers.ModelSerializer):
     phone_number = serializers.SerializerMethodField()
@@ -107,3 +107,11 @@ class SettlementRequestSerializer(serializers.ModelSerializer):
         model = SettlementRequest
         fields = ['id', 'settlement', 'debtor', 'creditor', 'amount', 'status', 'created_at', 'group_name']
         read_only_fields = ['created_at']
+
+class VoteSerializer(serializers.ModelSerializer):
+    voter = UserSerializer(read_only=True)
+    suspect = UserSerializer(read_only=True)
+
+    class Meta:
+        model = Vote
+        fields = ['id', 'group', 'voter', 'suspect', 'created_at']

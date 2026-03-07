@@ -9,6 +9,7 @@ from .views import (
     set_username, create_group, list_invitations, respond_invitation,
     update_preferences, calculate_split, get_settlements, list_user_settlements, mark_settled,
     list_group_expenses, list_settlement_requests, respond_settlement_request,
+    vote_member, list_group_votes, invite_member, exit_group,
 )
 
 router = DefaultRouter()
@@ -30,6 +31,10 @@ urlpatterns = [
     path('groups/<int:group_id>/expenses/', list_group_expenses, name='list_group_expenses'),
     path('settlement-requests/', list_settlement_requests, name='list_settlement_requests'),
     path('settlement-requests/<int:request_id>/respond/', respond_settlement_request, name='respond_settlement_request'),
+    path('groups/<int:group_id>/vote-member/<int:member_id>/', vote_member, name='vote_member'),
+    path('groups/<int:group_id>/invite-member/', invite_member, name='invite_member'),
+    path('groups/<int:group_id>/exit/', exit_group, name='exit_group'),
+    path('groups/<int:group_id>/votes/', list_group_votes, name='list_group_votes'),
     path('settlements/', list_user_settlements, name='list_user_settlements'),
     path('settlements/<int:settlement_id>/mark-settled/', mark_settled, name='mark_settled'),
     path('', include(router.urls)),

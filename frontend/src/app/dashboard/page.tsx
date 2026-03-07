@@ -48,6 +48,10 @@ export default function Dashboard() {
     const [invitations, setInvitations] = useState<InvitationData[]>([]);
     const [settlements, setSettlements] = useState<SettlementResponse>({ debts: [], credits: [] });
     const [respondingId, setRespondingId] = useState<number | null>(null);
+    const [showInviteModal, setShowInviteModal] = useState<number | null>(null);
+    const [inviteUsername, setInviteUsername] = useState('');
+    const [inviteError, setInviteError] = useState('');
+    const [inviteLoading, setInviteLoading] = useState(false);
 
     const fetchGroups = useCallback(async () => {
         try {
@@ -204,7 +208,7 @@ export default function Dashboard() {
                     <a href="/groups" className="nav-item">
                         <span>My Groups</span>
                     </a>
-                    <a href="#" className="nav-item">
+                    <a href="/activities" className="nav-item">
                         <span>Activities</span>
                     </a>
                     <a href="/settlements" className="nav-item">

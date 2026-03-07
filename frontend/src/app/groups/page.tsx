@@ -36,6 +36,10 @@ export default function GroupsPage() {
     const [showCreateGroup, setShowCreateGroup] = useState(false);
     const [selectedGroupId, setSelectedGroupId] = useState<number | null>(null);
     const [respondingId, setRespondingId] = useState<number | null>(null);
+    const [showInviteModal, setShowInviteModal] = useState<number | null>(null);
+    const [inviteUsername, setInviteUsername] = useState('');
+    const [inviteError, setInviteError] = useState('');
+    const [inviteLoading, setInviteLoading] = useState(false);
 
     const fetchGroups = useCallback(async () => {
         try {
@@ -83,6 +87,44 @@ export default function GroupsPage() {
         setRespondingId(null);
     };
 
+    const handleExitGroup = async (groupId: number) => {
+        if (!confirm("Are you sure you want to leave this group? You can rejoin later via invitation, but only if you have no outstanding debts.")) return;
+        
+        try {
+            const res = await apiFetch(`groups/${groupId}/exit/`, { method: 'POST' });
+            const data = await res.json();
+            if (res.ok) {
+                alert("Successfully left the group.");
+                fetchGroups();
+            } else {
+                alert(data.error || "Failed to leave group.");
+            }
+        } catch (err) { console.error(err); }
+    };
+
+    const handleInviteMember = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!showInviteModal || !inviteUsername.trim()) return;
+        
+        setInviteLoading(true);
+        setInviteError('');
+        try {
+            const res = await apiFetch(`groups/${showInviteModal}/invite-member/`, {
+                method: 'POST',
+                body: JSON.stringify({ username: inviteUsername.trim() })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                alert(data.message);
+                setShowInviteModal(null);
+                setInviteUsername('');
+            } else {
+                setInviteError(data.error || "Failed to send invitation.");
+            }
+        } catch (err) { setInviteError("Network error."); }
+        finally { setInviteLoading(false); }
+    };
+
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
             if (containerRef.current) {
@@ -114,10 +156,40 @@ export default function GroupsPage() {
                     onClose={() => setSelectedGroupId(null)}
                     onUpdate={fetchGroups}
                 />
-            )}
+                )}
 
+                {showInviteModal && (
+                <div className="invite-modal-overlay" onClick={() => setShowInviteModal(null)}>
+                    <div className="invite-modal" onClick={e => e.stopPropagation()}>
+                        <button className="v-close" onClick={() => setShowInviteModal(null)}>&times;</button>
+                        <h3>Invite Member</h3>
+                        <p style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.5)', marginBottom: '1.5rem' }}>
+                            Invite to <strong>{groups.find(g => g.id === showInviteModal)?.name}</strong>
+                        </p>
+                        <form onSubmit={handleInviteMember}>
+                            <div className="v-group-list" style={{ marginTop: 0 }}>
+                                <input 
+                                    type="text" 
+                                    placeholder="Enter username" 
+                                    value={inviteUsername}
+                                    onChange={e => setInviteUsername(e.target.value)}
+                                    autoFocus
+                                    className="v-group-btn"
+                                    style={{ background: 'rgba(0,0,0,0.3)', cursor: 'text' }}
+                                />
+                            </div>
+                            {inviteError && <p className="v-error" style={{ marginBottom: '1rem' }}>{inviteError}</p>}
+                            <button type="submit" disabled={inviteLoading} className="v-confirm-btn" style={{ background: '#8a2be2' }}>
+                                {inviteLoading ? 'Sending...' : 'Send Invitation'}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                )}
+                </div>
+                );
+                }
 
-            {/* Sidebar Trigger */}
             <div className="sidebar-trigger"></div>
             <aside className="sidebar">
                 <div className="sidebar-logo">
@@ -127,7 +199,7 @@ export default function GroupsPage() {
                 <nav className="nav-menu">
                     <a href="/dashboard" className="nav-item"><span>Dashboard</span></a>
                     <a href="/groups" className="nav-item active"><span>My Groups</span></a>
-                    <a href="#" className="nav-item"><span>Activities</span></a>
+                    <a href="/activities" className="nav-item"><span>Activities</span></a>
                     <a href="/settlements" className="nav-item"><span>Settlements</span></a>
                     <a href="/settings" className="nav-item"><span>Settings</span></a>
                 </nav>
@@ -196,8 +268,24 @@ export default function GroupsPage() {
                                     key={group.id} 
                                     className="gp-card"
                                     onClick={() => setSelectedGroupId(group.id)}
-                                    style={{ cursor: 'pointer' }}
+                                    style={{ cursor: 'pointer', position: 'relative' }}
                                 >
+                                    <div className="gp-card-actions" onClick={e => e.stopPropagation()}>
+                                        <button 
+                                            className="gp-action-btn invite" 
+                                            title="Add Member"
+                                            onClick={() => setShowInviteModal(group.id)}
+                                        >
+                                            +
+                                        </button>
+                                        <button 
+                                            className="gp-action-btn exit" 
+                                            title="Exit Group"
+                                            onClick={() => handleExitGroup(group.id)}
+                                        >
+                                            &times;
+                                        </button>
+                                    </div>
                                     <div className="gp-card-top">
                                         <h3>{group.name}</h3>
                                         {group.created_by && (

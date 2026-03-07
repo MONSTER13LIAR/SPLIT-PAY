@@ -82,6 +82,18 @@ class SettlementRequest(models.Model):
     def __str__(self):
         return f"{self.debtor.username} wants to settle {self.amount} with {self.creditor.username}"
 
+class Vote(models.Model):
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='votes')
+    voter = models.ForeignKey(User, on_delete=models.CASCADE, related_name='votes_cast')
+    suspect = models.ForeignKey(User, on_delete=models.CASCADE, related_name='votes_received')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('group', 'voter', 'suspect')
+
+    def __str__(self):
+        return f"{self.voter.username} voted to remove {self.suspect.username} from {self.group.name}"
+
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     phone_number = models.CharField(max_length=15, unique=True, null=True, blank=True)

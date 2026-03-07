@@ -146,7 +146,7 @@ export default function SettlementsPage() {
                 <nav className="nav-menu">
                     <a href="/dashboard" className="nav-item"><span>Dashboard</span></a>
                     <a href="/groups" className="nav-item"><span>My Groups</span></a>
-                    <a href="#" className="nav-item"><span>Activities</span></a>
+                    <a href="/activities" className="nav-item"><span>Activities</span></a>
                     <a href="/settlements" className="nav-item active"><span>Settlements</span></a>
                     <a href="/settings" className="nav-item"><span>Settings</span></a>
                 </nav>

@@ -5,8 +5,8 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.contrib.auth.models import User
 from django.db import transaction
 from decimal import Decimal
-from .models import Group, Expense, ExpenseSplit, UserProfile, GroupInvitation, Settlement, SettlementRequest
-from .serializers import UserSerializer, GroupSerializer, ExpenseSerializer, GroupInvitationSerializer, SettlementSerializer, SettlementRequestSerializer
+from .models import Group, Expense, ExpenseSplit, UserProfile, GroupInvitation, Settlement, SettlementRequest, Vote
+from .serializers import UserSerializer, GroupSerializer, ExpenseSerializer, GroupInvitationSerializer, SettlementSerializer, SettlementRequestSerializer, VoteSerializer
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from dj_rest_auth.registration.views import SocialLoginView
@@ -248,6 +248,67 @@ def create_group(request):
 
     print(f"DEBUG: Total invitations created: {inv_count}")
     return Response(GroupSerializer(group).data, status=status.HTTP_201_CREATED)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def invite_member(request, group_id):
+    """Invite a member to an existing group."""
+    username = request.data.get('username', '').strip()
+    if not username:
+        return Response({"error": "Username is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        group = Group.objects.get(id=group_id, members=request.user)
+        user_to_invite = User.objects.get(username__iexact=username)
+    except Group.DoesNotExist:
+        return Response({"error": "Group not found"}, status=status.HTTP_404_NOT_FOUND)
+    except User.DoesNotExist:
+        return Response({"error": f"User '{username}' not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    if user_to_invite in group.members.all():
+        return Response({"error": "User is already a member."}, status=status.HTTP_400_BAD_REQUEST)
+
+    GroupInvitation.objects.get_or_create(
+        group=group,
+        invited_by=request.user,
+        invited_user=user_to_invite,
+        defaults={'status': 'pending'}
+    )
+    
+    return Response({"message": f"Invitation sent to @{user_to_invite.username}"})
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def exit_group(request, group_id):
+    """Allow a user to leave a group if they have no debts."""
+    try:
+        group = Group.objects.get(id=group_id, members=request.user)
+    except Group.DoesNotExist:
+        return Response({"error": "Group not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    # Check if user owes money in this group
+    debt = Settlement.objects.filter(group=group, debtor=request.user, amount__gt=0).exists()
+    if debt:
+        return Response({"error": "You cannot leave the group until you settle your debts."}, status=status.HTTP_400_BAD_REQUEST)
+
+    with transaction.atomic():
+        group.members.remove(request.user)
+        # Update member_order
+        if request.user.id in group.member_order:
+            new_order = [uid for uid in group.member_order if uid != request.user.id]
+            group.member_order = new_order
+            if len(new_order) > 0:
+                group.current_turn_index = group.current_turn_index % len(new_order)
+            else:
+                group.current_turn_index = 0
+            group.save()
+        
+        # Clean up any pending invitations sent to this user for this group
+        GroupInvitation.objects.filter(group=group, invited_user=request.user).delete()
+        
+    return Response({"message": "Successfully left the group."}, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])
@@ -551,3 +612,73 @@ def respond_settlement_request(request, request_id):
             settlement_request.save()
 
     return Response(SettlementRequestSerializer(settlement_request).data)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def vote_member(request, group_id, member_id):
+    """Vote to remove a member from a group."""
+    try:
+        group = Group.objects.get(id=group_id, members=request.user)
+        suspect = User.objects.get(id=member_id)
+    except (Group.DoesNotExist, User.DoesNotExist):
+        return Response({"error": "Group or Member not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    if suspect == request.user:
+        return Response({"error": "You cannot vote yourself out."}, status=status.HTTP_400_BAD_REQUEST)
+
+    if suspect not in group.members.all():
+        return Response({"error": "User is not a member of this group."}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Check for existing vote
+    existing_vote = Vote.objects.filter(group=group, voter=request.user, suspect=suspect).first()
+    
+    # Check if suspect owes money to voter
+    settlement = Settlement.objects.filter(group=group, debtor=suspect, creditor=request.user, amount__gt=0).first()
+    
+    confirm = request.data.get('confirm', False)
+    if settlement and not confirm and not existing_vote:
+        return Response({
+            "warning": "if you vote him you will lose your money you gave to him , if you dont care then go ahead",
+            "needs_confirmation": True
+        }, status=status.HTTP_200_OK)
+
+    with transaction.atomic():
+        vote, created = Vote.objects.get_or_create(group=group, voter=request.user, suspect=suspect)
+        
+        # Check if everyone (except suspect) has voted
+        other_members = group.members.exclude(id=suspect.id)
+        total_votes = Vote.objects.filter(group=group, suspect=suspect).count()
+        
+        if total_votes >= other_members.count():
+            # DISCARD MEMBER
+            group.members.remove(suspect)
+            # Remove from member_order
+            if suspect.id in group.member_order:
+                new_order = [uid for uid in group.member_order if uid != suspect.id]
+                group.member_order = new_order
+                # Adjust current_turn_index if needed (simple approach: reset if it breaks)
+                if group.current_turn_index >= len(new_order) and len(new_order) > 0:
+                    group.current_turn_index = group.current_turn_index % len(new_order)
+                group.save()
+            
+            # Delete related settlements
+            Settlement.objects.filter(group=group, debtor=suspect).delete()
+            Settlement.objects.filter(group=group, creditor=suspect).delete()
+            # Delete related settlement requests
+            SettlementRequest.objects.filter(settlement__group=group, debtor=suspect).delete()
+            SettlementRequest.objects.filter(settlement__group=group, creditor=suspect).delete()
+            # Delete votes for this suspect
+            Vote.objects.filter(group=group, suspect=suspect).delete()
+            
+            return Response({"message": f"{suspect.username} has been voted out of the group."}, status=status.HTTP_200_OK)
+
+    return Response(VoteSerializer(vote).data, status=status.HTTP_201_CREATED)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def list_group_votes(request, group_id):
+    """List all votes in a group."""
+    votes = Vote.objects.filter(group_id=group_id)
+    return Response(VoteSerializer(votes, many=True).data)

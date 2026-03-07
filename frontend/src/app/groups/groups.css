@@ -329,6 +329,79 @@
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(138, 43, 226, 0.15);
 }
 
+.gp-card-actions {
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+    display: flex;
+    gap: 0.5rem;
+    z-index: 10;
+}
+
+.gp-action-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.3);
+    color: rgba(255, 255, 255, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: all 0.2s ease;
+}
+
+.gp-action-btn:hover {
+    background: #fff;
+    color: #000;
+    transform: scale(1.1);
+}
+
+.gp-action-btn.invite:hover {
+    background: #8a2be2;
+    color: #fff;
+    border-color: #8a2be2;
+}
+
+.gp-action-btn.exit:hover {
+    background: #ff3d00;
+    color: #fff;
+    border-color: #ff3d00;
+}
+
+.invite-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+.invite-modal {
+    background: #111;
+    border: 1px solid rgba(138, 43, 226, 0.3);
+    padding: 3rem;
+    border-radius: 32px;
+    width: 450px;
+    max-width: 90vw;
+    position: relative;
+    box-shadow: 0 0 50px rgba(138, 43, 226, 0.1);
+}
+
+.invite-error {
+    color: #ff3d00;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+}
+
 .gp-card-top {
     display: flex;
     justify-content: space-between;
