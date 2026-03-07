@@ -74,6 +74,7 @@ class GoogleLogin(SocialLoginView):
     # If using code, the callback_url must match EXACTLY what was sent to Google
     callback_url = "http://localhost:3000/auth/callback"
     client_class = OAuth2Client
+    permission_classes = [AllowAny]
 
     def post(self, request, *args, **kwargs):
         print(f"DEBUG: GoogleLogin callback_url: {self.callback_url}")
@@ -84,6 +85,10 @@ class GoogleLogin(SocialLoginView):
             app = SocialApp.objects.get(provider='google')
             print(f"DEBUG: SocialApp found: ID={app.client_id[:10]}... Secret={app.secret[:5]}...")
             
+            if not app.secret or app.secret == 'REPLACE_ME':
+                print("DEBUG: Google SocialApp secret is missing or not configured!")
+                return Response({"error": "Google SocialApp secret is not configured in backend"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
             response = super().post(request, *args, **kwargs)
             if response.status_code >= 400:
                 print(f"DEBUG: GoogleLogin ERROR response status: {response.status_code}")
@@ -91,6 +96,9 @@ class GoogleLogin(SocialLoginView):
             else:
                 print(f"DEBUG: GoogleLogin success response status: {response.status_code}")
             return response
+        except SocialApp.DoesNotExist:
+            print("DEBUG: Google SocialApp not found in database!")
+            return Response({"error": "Google SocialApp not configured"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         except Exception as e:
             print(f"DEBUG: GoogleLogin EXCEPTION: {str(e)}")
             import traceback

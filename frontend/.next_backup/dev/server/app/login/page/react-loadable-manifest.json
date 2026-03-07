@@ -1,0 +1,11 @@
+{
+  "[project]/node_modules/@splinetool/react-spline/dist/react-spline.js [app-client] (ecmascript, next/dynamic entry)": {
+    "id": "[project]/node_modules/@splinetool/react-spline/dist/react-spline.js [app-client] (ecmascript, next/dynamic entry)",
+    "files": [
+      "static/chunks/node_modules_@splinetool_runtime_build_9c7df083._.js",
+      "static/chunks/node_modules_@splinetool_runtime_build_runtime_5cafa62e.js",
+      "static/chunks/node_modules_fc5c44c2._.js",
+      "static/chunks/node_modules_@splinetool_react-spline_dist_react-spline_b90ddd5c.js"
+    ]
+  }
+}

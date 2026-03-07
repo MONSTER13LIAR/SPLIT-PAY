@@ -1,0 +1,288 @@
+/* [project]/src/app/settlements/settlements.css [app-client] (css) */
+.settlements-container {
+  color: #fff;
+  z-index: 1;
+  background: none;
+  min-height: 100vh;
+  display: flex;
+  position: relative;
+  overflow: hidden;
+}
+
+.torch-overlay {
+  pointer-events: none;
+  z-index: 1;
+  background: radial-gradient(500px circle at var(--x, 50%) var(--y, 50%), #8a2be21f, transparent 80%);
+  mix-blend-mode: screen;
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+.sidebar {
+  -webkit-backdrop-filter: blur(25px);
+  backdrop-filter: blur(25px);
+  z-index: 100;
+  background: #0f0f0f66;
+  border-right: 1px solid #ffffff1a;
+  flex-direction: column;
+  width: 280px;
+  height: 100vh;
+  padding: 2.5rem 1.5rem;
+  transition: transform .4s cubic-bezier(.4, 0, .2, 1);
+  display: flex;
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translateX(-100%);
+}
+
+.sidebar-trigger {
+  z-index: 99;
+  width: 30px;
+  height: 100vh;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.sidebar-trigger:hover ~ .sidebar, .sidebar:hover {
+  transform: translateX(0);
+}
+
+.sidebar-logo {
+  align-items: center;
+  gap: 1.25rem;
+  margin-bottom: 3.5rem;
+  padding: 0 .5rem;
+  display: flex;
+}
+
+.sidebar-logo span {
+  background: linear-gradient(135deg, #fff 0%, #8a2be2 100%);
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -1px;
+  -webkit-background-clip: text;
+  background-clip: text;
+  font-family: Outfit, sans-serif;
+  font-size: 1.4rem;
+  font-weight: 800;
+}
+
+.nav-menu {
+  flex-direction: column;
+  gap: .75rem;
+  display: flex;
+}
+
+.nav-item {
+  color: #fff9;
+  border-radius: 16px;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all .4s cubic-bezier(.4, 0, .2, 1);
+  display: flex;
+}
+
+.nav-item:hover {
+  color: #fff;
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
+  background: #ffffff14;
+  transform: translateX(5px);
+}
+
+.nav-item.active {
+  color: #fff;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  background: #8a2be226;
+  border: 1px solid #8a2be24d;
+  box-shadow: 0 0 25px #8a2be233;
+}
+
+.sp-main {
+  z-index: 5;
+  background: radial-gradient(circle at 100% 0, #8a2be21a 0%, #0000 50%);
+  flex: 1;
+  width: 100%;
+  padding: 3.5rem;
+  overflow-y: auto;
+}
+
+.sp-header {
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 4rem;
+  display: flex;
+}
+
+.sp-balance-card {
+  -webkit-backdrop-filter: blur(30px);
+  backdrop-filter: blur(30px);
+  background: #ffffff08;
+  border: 1px solid #ffffff1a;
+  border-radius: 32px;
+  padding: 2rem 3rem;
+  transition: all .5s;
+  box-shadow: 0 30px 60px #00000080;
+}
+
+.sp-balance-card:hover {
+  border-color: #fff3;
+  transform: translateY(-5px);
+}
+
+.sp-balance-item label {
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #fff6;
+  margin-bottom: .5rem;
+  font-size: .8rem;
+  font-weight: 700;
+  display: block;
+}
+
+.sp-balance-value {
+  letter-spacing: -1px;
+  font-family: Outfit, sans-serif;
+  font-size: 2.8rem;
+  font-weight: 800;
+}
+
+.sp-balance-value.positive {
+  color: #00e676;
+}
+
+.sp-balance-value.negative {
+  color: #ff3d00;
+}
+
+.sp-grid {
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 2.5rem;
+  display: grid;
+}
+
+.sp-section {
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  background: #ffffff05;
+  border: 1px solid #ffffff14;
+  border-radius: 40px;
+  padding: 2.5rem;
+}
+
+.sp-section h2 {
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #ffffff4d;
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.sp-list {
+  flex-direction: column;
+  gap: 1rem;
+  display: flex;
+}
+
+.sp-card {
+  background: #ffffff08;
+  border: 1px solid #ffffff0f;
+  border-radius: 24px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  transition: all .4s cubic-bezier(.4, 0, .2, 1);
+  display: flex;
+}
+
+.sp-card:hover {
+  background: #ffffff0f;
+  border-color: #ffffff26;
+  transform: translateX(10px);
+}
+
+.sp-card-info {
+  flex-direction: column;
+  gap: .25rem;
+  display: flex;
+}
+
+.sp-username {
+  color: #fff;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.sp-group {
+  color: #fff6;
+  font-size: .9rem;
+}
+
+.sp-amount {
+  letter-spacing: -1px;
+  font-family: Outfit, sans-serif;
+  font-size: 1.8rem;
+  font-weight: 800;
+}
+
+.sp-debt .sp-amount {
+  color: #ff3d00;
+}
+
+.sp-credit .sp-amount {
+  color: #00e676;
+}
+
+.sp-empty-card {
+  text-align: center;
+  color: #fff3;
+  background: #ffffff03;
+  border: 2px dashed #ffffff0d;
+  border-radius: 32px;
+  padding: 4rem 2rem;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+@media (max-width: 1400px) {
+  .sp-header {
+    flex-direction: column;
+    gap: 2.5rem;
+  }
+}
+
+@media (max-width: 1024px) {
+  .sidebar {
+    width: 90px;
+    padding: 2rem 1rem;
+  }
+
+  .sidebar-logo span, .nav-item span {
+    display: none;
+  }
+
+  .sp-main {
+    padding: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .sp-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sp-main {
+    padding: 6rem 1.5rem 1.5rem;
+  }
+}
+
+/*# sourceMappingURL=src_app_settlements_settlements_346c9551.css.map*/
