@@ -41,7 +41,6 @@ interface SettlementResponse {
 
 export default function Dashboard() {
     const { user, logout, updateUser, isLoading } = useAuth();
-    console.log("DEBUG: Dashboard current user:", user);
     const dashboardRef = useRef<HTMLDivElement>(null);
     const [showCreateGroup, setShowCreateGroup] = useState(false);
     const [groups, setGroups] = useState<GroupData[]>([]);
@@ -49,6 +48,7 @@ export default function Dashboard() {
     const [settlements, setSettlements] = useState<SettlementResponse>({ debts: [], credits: [] });
     const [respondingId, setRespondingId] = useState<number | null>(null);
     const [showInviteModal, setShowInviteModal] = useState<number | null>(null);
+    const [showExitModal, setShowExitModal] = useState<number | null>(null);
     const [inviteUsername, setInviteUsername] = useState('');
     const [inviteError, setInviteError] = useState('');
     const [inviteLoading, setInviteLoading] = useState(false);
@@ -96,9 +96,7 @@ export default function Dashboard() {
     }, [isLoading, user, fetchGroups, fetchInvitations, fetchSettlements]);
 
     useEffect(() => {
-        console.log("DEBUG: Dashboard state - isLoading:", isLoading, "user:", user);
         if (!isLoading && !user) {
-            console.log("DEBUG: Dashboard - No user found, redirecting to login");
             window.location.href = '/login';
         }
     }, [isLoading, user]);
@@ -115,6 +113,60 @@ export default function Dashboard() {
         window.addEventListener('mousemove', handleMouseMove);
         return () => window.removeEventListener('mousemove', handleMouseMove);
     }, []);
+
+    const handleRespondInvitation = async (invitationId: number, action: 'accept' | 'decline') => {
+        setRespondingId(invitationId);
+        try {
+            const res = await apiFetch(`invitations/${invitationId}/respond/`, {
+                method: 'POST',
+                body: JSON.stringify({ action }),
+            });
+            if (res.ok) {
+                fetchGroups();
+                fetchInvitations();
+            }
+        } catch (err) {
+            console.error('Failed to respond to invitation:', err);
+        }
+        setRespondingId(null);
+    };
+
+    const handleExitGroup = async () => {
+        if (!showExitModal) return;
+        try {
+            const res = await apiFetch(`groups/${showExitModal}/exit/`, { method: 'POST' });
+            const data = await res.json();
+            if (res.ok) {
+                alert("Successfully left the group.");
+                fetchGroups();
+                setShowExitModal(null);
+            } else {
+                alert(data.error || "Failed to leave group.");
+            }
+        } catch (err) { console.error(err); }
+    };
+
+    const handleInviteMember = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!showInviteModal || !inviteUsername.trim()) return;
+        setInviteLoading(true);
+        setInviteError('');
+        try {
+            const res = await apiFetch(`groups/${showInviteModal}/invite-member/`, {
+                method: 'POST',
+                body: JSON.stringify({ username: inviteUsername.trim() })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                alert(data.message);
+                setShowInviteModal(null);
+                setInviteUsername('');
+            } else {
+                setInviteError(data.error || "Failed to send invitation.");
+            }
+        } catch (err) { setInviteError("Network error."); }
+        finally { setInviteLoading(false); }
+    };
 
     if (isLoading) {
         return (
@@ -133,43 +185,15 @@ export default function Dashboard() {
                     borderRadius: '50%',
                     animation: 'spin 1s linear infinite'
                 }}></div>
-                <style jsx>{`
-                    @keyframes spin { to { transform: rotate(360deg); } }
-                `}</style>
             </div>
         );
     }
 
-    if (!user) {
-        return (
-            <div style={{ background: '#000', height: '100vh', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <p>Redirecting to login...</p>
-            </div>
-        );
-    }
+    if (!user) return null;
 
-    // Calculations based on data
     const totalDebts = settlements.debts.reduce((acc, curr) => acc + parseFloat(curr.amount), 0);
     const totalCredits = settlements.credits.reduce((acc, curr) => acc + parseFloat(curr.amount), 0);
     const netBalance = totalCredits - totalDebts;
-
-    const handleRespondInvitation = async (invitationId: number, action: 'accept' | 'decline') => {
-        setRespondingId(invitationId);
-        try {
-            const res = await apiFetch(`invitations/${invitationId}/respond/`, {
-                method: 'POST',
-                body: JSON.stringify({ action }),
-            });
-            if (res.ok) {
-                // Refresh both groups and invitations
-                fetchGroups();
-                fetchInvitations();
-            }
-        } catch (err) {
-            console.error('Failed to respond to invitation:', err);
-        }
-        setRespondingId(null);
-    };
 
     return (
         <div className="dashboard-container" ref={dashboardRef}>
@@ -177,60 +201,82 @@ export default function Dashboard() {
             <BackgroundParticles />
             <div className="torch-overlay"></div>
 
-            {/* Username Setup Modal */}
             {user && !user.has_set_username && (
-                <SetUsernameModal
-                    onUsernameSet={(updatedUser) => updateUser(updatedUser)}
-                />
+                <SetUsernameModal onUsernameSet={(updatedUser) => updateUser(updatedUser)} />
             )}
 
-            {/* Create Group Modal */}
             {showCreateGroup && (
-                <CreateGroupModal
-                    onClose={() => setShowCreateGroup(false)}
-                    onGroupCreated={() => { fetchGroups(); }}
-                />
+                <CreateGroupModal onClose={() => setShowCreateGroup(false)} onGroupCreated={() => { fetchGroups(); }} />
             )}
 
-            {/* Sidebar Trigger Area */}
+            {showInviteModal && (
+                <div className="invite-modal-overlay" onClick={() => setShowInviteModal(null)}>
+                    <div className="invite-modal" onClick={e => e.stopPropagation()}>
+                        <button className="v-close" onClick={() => setShowInviteModal(null)}>&times;</button>
+                        <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+                            <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>👤</div>
+                            <h3 style={{ fontFamily: 'Outfit', fontSize: '1.5rem' }}>Invite Member</h3>
+                            <p style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.5)' }}>
+                                to <strong>{groups.find(g => g.id === showInviteModal)?.name}</strong>
+                            </p>
+                        </div>
+                        <form onSubmit={handleInviteMember}>
+                            <input 
+                                type="text" 
+                                placeholder="Enter username" 
+                                value={inviteUsername}
+                                onChange={e => setInviteUsername(e.target.value)}
+                                autoFocus
+                                style={{ width: '100%', padding: '1rem', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', color: '#fff', marginBottom: '1rem' }}
+                            />
+                            {inviteError && <p style={{ color: '#ff3d00', fontSize: '0.85rem', marginBottom: '1rem' }}>{inviteError}</p>}
+                            <button type="submit" disabled={inviteLoading} style={{ width: '100%', padding: '1rem', background: '#8a2be2', border: 'none', borderRadius: '12px', color: '#fff', fontWeight: '800', cursor: 'pointer' }}>
+                                {inviteLoading ? 'Sending...' : 'Send Invitation'}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {showExitModal && (
+                <div className="invite-modal-overlay" onClick={() => setShowExitModal(null)}>
+                    <div className="invite-modal" onClick={e => e.stopPropagation()}>
+                        <div style={{ textAlign: 'center' }}>
+                            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🚪</div>
+                            <h3 style={{ fontFamily: 'Outfit', fontSize: '1.5rem', marginBottom: '1rem' }}>Exit Group?</h3>
+                            <p style={{ color: 'rgba(255,255,255,0.6)', marginBottom: '2rem', lineHeight: '1.5', fontSize: '0.95rem' }}>
+                                Are you sure you want to leave <strong>{groups.find(g => g.id === showExitModal)?.name}</strong>?<br/>
+                                You can rejoin later via invitation, but only if you have no outstanding debts.
+                            </p>
+                            <div style={{ display: 'flex', gap: '1rem' }}>
+                                <button onClick={() => setShowExitModal(null)} style={{ flex: 1, padding: '1rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', color: '#fff', cursor: 'pointer', fontWeight: '600' }}>Cancel</button>
+                                <button onClick={handleExitGroup} style={{ flex: 1, padding: '1rem', background: '#ff3d00', border: 'none', borderRadius: '12px', color: '#fff', cursor: 'pointer', fontWeight: '800' }}>Exit</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <div className="sidebar-trigger"></div>
-            {/* Sidebar */}
             <aside className="sidebar">
                 <div className="sidebar-logo">
                     <img src="/logo.jpg" alt="SplitPay" width="64" height="64" style={{ borderRadius: '12px' }} />
                     <span style={{ fontWeight: 800, fontSize: '2rem', letterSpacing: '-1px' }}>SplitPay</span>
                 </div>
-
                 <nav className="nav-menu">
-                    <a href="/dashboard" className="nav-item active">
-                        <span>Dashboard</span>
-                    </a>
-                    <a href="/groups" className="nav-item">
-                        <span>My Groups</span>
-                    </a>
-                    <a href="/activities" className="nav-item">
-                        <span>Activities</span>
-                    </a>
-                    <a href="/settlements" className="nav-item">
-                        <span>Settlements</span>
-                    </a>
-                    <a href="/settings" className="nav-item">
-                        <span>Settings</span>
-                    </a>
+                    <a href="/dashboard" className="nav-item active"><span>Dashboard</span></a>
+                    <a href="/groups" className="nav-item"><span>My Groups</span></a>
+                    <a href="/activities" className="nav-item"><span>Activities</span></a>
+                    <a href="/settlements" className="nav-item"><span>Settlements</span></a>
+                    <a href="/settings" className="nav-item"><span>Settings</span></a>
                 </nav>
-
                 <div style={{ marginTop: 'auto' }}>
-                    <button
-                        onClick={logout}
-                        className="nav-item"
-                        style={{ width: '100%', background: 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left' }}
-                    >
+                    <button onClick={logout} className="nav-item" style={{ width: '100%', background: 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left' }}>
                         <span>Logout</span>
                     </button>
                 </div>
             </aside>
 
-            {/* Main Content */}
             <main className="main-content">
                 <header className="dashboard-header">
                     <div className="welcome-text">
@@ -259,36 +305,19 @@ export default function Dashboard() {
                     </div>
                 </div>
 
-                {/* Pending Invitations */}
                 {invitations.length > 0 && (
                     <section className="invitations-section">
-                        <h2 style={{ fontFamily: 'Outfit', fontSize: '1.5rem', marginBottom: '1.25rem' }}>
-                            Pending Invitations
-                        </h2>
+                        <h2 style={{ fontFamily: 'Outfit', fontSize: '1.5rem', marginBottom: '1.25rem' }}>Pending Invitations</h2>
                         <div className="invitations-list">
                             {invitations.map(inv => (
                                 <div key={inv.id} className="invitation-card">
                                     <div className="invitation-info">
                                         <span className="invitation-group-name">{inv.group.name}</span>
-                                        <span className="invitation-from">
-                                            invited by <strong>@{inv.invited_by.username}</strong>
-                                        </span>
+                                        <span className="invitation-from">invited by <strong>@{inv.invited_by.username}</strong></span>
                                     </div>
                                     <div className="invitation-actions">
-                                        <button
-                                            className="inv-btn inv-accept"
-                                            disabled={respondingId === inv.id}
-                                            onClick={() => handleRespondInvitation(inv.id, 'accept')}
-                                        >
-                                            Accept
-                                        </button>
-                                        <button
-                                            className="inv-btn inv-decline"
-                                            disabled={respondingId === inv.id}
-                                            onClick={() => handleRespondInvitation(inv.id, 'decline')}
-                                        >
-                                            Decline
-                                        </button>
+                                        <button className="inv-btn inv-accept" disabled={respondingId === inv.id} onClick={() => handleRespondInvitation(inv.id, 'accept')}>Accept</button>
+                                        <button className="inv-btn inv-decline" disabled={respondingId === inv.id} onClick={() => handleRespondInvitation(inv.id, 'decline')}>Decline</button>
                                     </div>
                                 </div>
                             ))}
@@ -296,7 +325,6 @@ export default function Dashboard() {
                     </section>
                 )}
 
-                {/* Groups Section */}
                 <section className="groups-section">
                     <div className="section-top">
                         <h2 style={{ fontFamily: 'Outfit', fontSize: '1.5rem' }}>Your Groups</h2>
@@ -310,22 +338,22 @@ export default function Dashboard() {
                     ) : (
                         <div className="groups-grid">
                             {groups.map(group => (
-                                <div key={group.id} className="group-card">
+                                <div key={group.id} className="group-card" style={{ position: 'relative' }} onClick={() => window.location.href = '/groups'}>
+                                    <div className="gp-card-actions" onClick={e => e.stopPropagation()}>
+                                        <button className="gp-action-btn invite" title="Add Member" onClick={() => setShowInviteModal(group.id)}>
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                        </button>
+                                        <button className="gp-action-btn exit" title="Exit Group" onClick={() => setShowExitModal(group.id)}>
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                                        </button>
+                                    </div>
                                     <h3 className="group-card-name">{group.name}</h3>
-                                    <p className="group-card-members">
-                                        {group.members.length} member{group.members.length !== 1 ? 's' : ''}
-                                    </p>
+                                    <p className="group-card-members">{group.members.length} member{group.members.length !== 1 ? 's' : ''}</p>
                                     <div className="group-card-avatars">
                                         {group.members.slice(0, 5).map(m => (
-                                            <span key={m.id} className="group-avatar" title={m.username}>
-                                                {m.username[0].toUpperCase()}
-                                            </span>
+                                            <span key={m.id} className="group-avatar" title={m.username}>{m.username[0].toUpperCase()}</span>
                                         ))}
-                                        {group.members.length > 5 && (
-                                            <span className="group-avatar group-avatar-more">
-                                                +{group.members.length - 5}
-                                            </span>
-                                        )}
+                                        {group.members.length > 5 && <span className="group-avatar group-avatar-more">+{group.members.length - 5}</span>}
                                     </div>
                                 </div>
                             ))}

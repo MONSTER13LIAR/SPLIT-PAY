@@ -9,27 +9,32 @@ import SplineBackground from '@/components/SplineBackground';
 import CreateGroupModal from '@/components/CreateGroupModal';
 import GroupDetailModal from '@/components/GroupDetailModal';
 
+interface User {
+    id: number;
+    username: string;
+}
+
 interface GroupData {
     id: number;
     name: string;
     description: string;
-    members: { id: number; username: string; is_non_veg: boolean; is_drinker: boolean }[];
+    members: User[];
+    created_by: User | null;
     member_order: number[];
     current_turn_index: number;
-    created_by: { id: number; username: string } | null;
     created_at: string;
 }
 
 interface InvitationData {
     id: number;
     group: GroupData;
-    invited_by: { id: number; username: string };
+    invited_by: User;
     status: string;
     created_at: string;
 }
 
 export default function GroupsPage() {
-    const { user, logout, updateUser } = useAuth();
+    const { user, logout } = useAuth();
     const containerRef = useRef<HTMLDivElement>(null);
     const [groups, setGroups] = useState<GroupData[]>([]);
     const [invitations, setInvitations] = useState<InvitationData[]>([]);
@@ -37,6 +42,7 @@ export default function GroupsPage() {
     const [selectedGroupId, setSelectedGroupId] = useState<number | null>(null);
     const [respondingId, setRespondingId] = useState<number | null>(null);
     const [showInviteModal, setShowInviteModal] = useState<number | null>(null);
+    const [showExitModal, setShowExitModal] = useState<number | null>(null);
     const [inviteUsername, setInviteUsername] = useState('');
     const [inviteError, setInviteError] = useState('');
     const [inviteLoading, setInviteLoading] = useState(false);
@@ -51,26 +57,15 @@ export default function GroupsPage() {
         } catch (err) { console.error('Failed to fetch groups:', err); }
     }, []);
 
-    const selectedGroup = groups.find(g => g.id === selectedGroupId);
-
     const fetchInvitations = useCallback(async () => {
         try {
             const res = await apiFetch('invitations/');
-            if (res.ok) setInvitations(await res.json());
+            if (res.ok) {
+                const data = await res.json();
+                setInvitations(data);
+            }
         } catch (err) { console.error('Failed to fetch invitations:', err); }
     }, []);
-
-    const fetchAllData = useCallback(() => {
-        fetchGroups();
-        fetchInvitations();
-    }, [fetchGroups, fetchInvitations]);
-
-    useEffect(() => {
-        fetchAllData();
-        // Poll for invitations every 5 seconds
-        const interval = setInterval(fetchInvitations, 5000);
-        return () => clearInterval(interval);
-    }, [fetchAllData, fetchInvitations]);
 
     const handleRespond = async (invId: number, action: 'accept' | 'decline') => {
         setRespondingId(invId);
@@ -87,15 +82,16 @@ export default function GroupsPage() {
         setRespondingId(null);
     };
 
-    const handleExitGroup = async (groupId: number) => {
-        if (!confirm("Are you sure you want to leave this group? You can rejoin later via invitation, but only if you have no outstanding debts.")) return;
+    const handleExitGroup = async () => {
+        if (!showExitModal) return;
         
         try {
-            const res = await apiFetch(`groups/${groupId}/exit/`, { method: 'POST' });
+            const res = await apiFetch(`groups/${showExitModal}/exit/`, { method: 'POST' });
             const data = await res.json();
             if (res.ok) {
                 alert("Successfully left the group.");
                 fetchGroups();
+                setShowExitModal(null);
             } else {
                 alert(data.error || "Failed to leave group.");
             }
@@ -126,6 +122,11 @@ export default function GroupsPage() {
     };
 
     useEffect(() => {
+        fetchGroups();
+        fetchInvitations();
+    }, [fetchGroups, fetchInvitations]);
+
+    useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
             if (containerRef.current) {
                 containerRef.current.style.setProperty('--x', `${e.clientX}px`);
@@ -136,36 +137,43 @@ export default function GroupsPage() {
         return () => window.removeEventListener('mousemove', handleMouseMove);
     }, []);
 
+    const selectedGroup = groups.find(g => g.id === selectedGroupId);
+
     return (
         <div className="groups-page" ref={containerRef}>
             <SplineBackground />
             <BackgroundParticles />
             <div className="torch-overlay"></div>
 
+            {/* Create Group Modal */}
             {showCreateGroup && (
-                <CreateGroupModal 
-                    onClose={() => setShowCreateGroup(false)} 
-                    onGroupCreated={fetchGroups} 
+                <CreateGroupModal
+                    onClose={() => setShowCreateGroup(false)}
+                    onGroupCreated={fetchGroups}
                 />
             )}
 
             {selectedGroup && (
                 <GroupDetailModal
-                    group={selectedGroup}
+                    group={selectedGroup as any}
                     currentUserId={user?.id || 0}
                     onClose={() => setSelectedGroupId(null)}
                     onUpdate={fetchGroups}
                 />
-                )}
+            )}
 
-                {showInviteModal && (
+            {/* Invite Modal */}
+            {showInviteModal && (
                 <div className="invite-modal-overlay" onClick={() => setShowInviteModal(null)}>
                     <div className="invite-modal" onClick={e => e.stopPropagation()}>
                         <button className="v-close" onClick={() => setShowInviteModal(null)}>&times;</button>
-                        <h3>Invite Member</h3>
-                        <p style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.5)', marginBottom: '1.5rem' }}>
-                            Invite to <strong>{groups.find(g => g.id === showInviteModal)?.name}</strong>
-                        </p>
+                        <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+                            <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>👤</div>
+                            <h3 style={{ fontFamily: 'Outfit', fontSize: '1.5rem' }}>Invite Member</h3>
+                            <p style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.5)' }}>
+                                to <strong>{groups.find(g => g.id === showInviteModal)?.name}</strong>
+                            </p>
+                        </div>
                         <form onSubmit={handleInviteMember}>
                             <div className="v-group-list" style={{ marginTop: 0 }}>
                                 <input 
@@ -185,10 +193,39 @@ export default function GroupsPage() {
                         </form>
                     </div>
                 </div>
-                )}
+            )}
+
+            {/* Exit Modal */}
+            {showExitModal && (
+                <div className="invite-modal-overlay" onClick={() => setShowExitModal(null)}>
+                    <div className="invite-modal" onClick={e => e.stopPropagation()}>
+                        <div style={{ textAlign: 'center' }}>
+                            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🚪</div>
+                            <h3 style={{ fontFamily: 'Outfit', fontSize: '1.5rem', marginBottom: '1rem' }}>Exit Group?</h3>
+                            <p style={{ color: 'rgba(255,255,255,0.6)', marginBottom: '2rem', lineHeight: '1.5', fontSize: '0.95rem' }}>
+                                Are you sure you want to leave <strong>{groups.find(g => g.id === showExitModal)?.name}</strong>?<br/>
+                                You can rejoin later via invitation, but only if you have no outstanding debts.
+                            </p>
+                            <div style={{ display: 'flex', gap: '1rem' }}>
+                                <button 
+                                    onClick={() => setShowExitModal(null)}
+                                    className="v-group-btn"
+                                    style={{ flex: 1, textAlign: 'center', background: 'rgba(255,255,255,0.05)' }}
+                                >
+                                    Cancel
+                                </button>
+                                <button 
+                                    onClick={handleExitGroup}
+                                    className="v-confirm-btn"
+                                    style={{ flex: 1, marginTop: 0, background: '#ff3d00' }}
+                                >
+                                    Exit
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                );
-                }
+            )}
 
             <div className="sidebar-trigger"></div>
             <aside className="sidebar">
@@ -276,14 +313,14 @@ export default function GroupsPage() {
                                             title="Add Member"
                                             onClick={() => setShowInviteModal(group.id)}
                                         >
-                                            +
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                                         </button>
                                         <button 
                                             className="gp-action-btn exit" 
                                             title="Exit Group"
-                                            onClick={() => handleExitGroup(group.id)}
+                                            onClick={() => setShowExitModal(group.id)}
                                         >
-                                            &times;
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
                                         </button>
                                     </div>
                                     <div className="gp-card-top">
