@@ -59,3 +59,9 @@ Thumbs.db
 local_settings.py
 media/
 staticfiles/
+
+# Sensitive scripts
+repair_db.py
+create_social_app.py
+setup_google_auth.py
+backend/db.sqlite3

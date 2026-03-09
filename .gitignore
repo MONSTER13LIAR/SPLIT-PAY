@@ -29,6 +29,7 @@ desktop.ini
 # Specific temporary files at root
 *.txt
 *_nohup.log
+docker-compose.yml
 
 # env files
 .env
@@ -70,3 +71,6 @@ wheels/
 
 # Databases
 *.sqlite3
+frontend/.next_root_backup/
+auth_diag.log
+backend/db_check.txt
