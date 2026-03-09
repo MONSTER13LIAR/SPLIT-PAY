@@ -8,5 +8,5 @@ echo "Backend started on port 8001"
 
 cd ../frontend
 rm -rf .next
-npm run dev -- -p 3000 --no-turbo > frontend.log 2>&1 &
+npm run dev -- -p 3000 > frontend.log 2>&1 &
 echo "Frontend started on port 3000"
