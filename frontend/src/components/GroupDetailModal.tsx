@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import './GroupDetailModal.css';
 import { apiFetch } from '@/utils/api';
+import { createWorker } from 'tesseract.js';
 
 interface User {
     id: number;
@@ -45,6 +46,7 @@ interface GroupDetailModalProps {
 
 export default function GroupDetailModal({ group, currentUserId, onClose, onUpdate }: GroupDetailModalProps) {
     const [loading, setLoading] = useState(false);
+    const [isScanning, setIsScanning] = useState(false);
     const [settlements, setSettlements] = useState<Settlement[]>([]);
     const [expenses, setExpenses] = useState<Expense[]>([]);
     const [activeTab, setActiveTab] = useState<'pay' | 'balances' | 'history'>('pay');
@@ -54,6 +56,62 @@ export default function GroupDetailModal({ group, currentUserId, onClose, onUpda
     const [presentMemberIds, setPresentMemberIds] = useState<number[]>(group.members.map(m => m.id));
     const [error, setError] = useState('');
     const [successMsg, setSuccessMsg] = useState('');
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const handleScan = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        setIsScanning(true);
+        setError('');
+        setSuccessMsg('');
+        try {
+            const worker = await createWorker('eng');
+            const { data: { text } } = await worker.recognize(file);
+            await worker.terminate();
+
+            console.log("OCR Result:", text);
+
+            // Improved regex for total amount detection
+            const lines = text.split('\n');
+            let foundAmount = 0;
+
+            // Look for patterns like "Total: 123.45" or "TOTAL ₹ 500"
+            // We search from bottom to top as the grand total is usually at the bottom
+            for (let i = lines.length - 1; i >= 0; i--) {
+                const line = lines[i].toLowerCase();
+                if (line.includes('total') || line.includes('amount') || line.includes('sum')) {
+                    const match = line.match(/(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)/);
+                    if (match) {
+                        foundAmount = parseFloat(match[1].replace(/,/g, ''));
+                        break;
+                    }
+                }
+            }
+
+            // Fallback: look for the largest number in the text if no "total" label is found
+            if (foundAmount === 0) {
+                const allNumbers = text.match(/(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)/g);
+                if (allNumbers) {
+                    const parsedNumbers = allNumbers.map(n => parseFloat(n.replace(/,/g, '')));
+                    foundAmount = Math.max(...parsedNumbers);
+                }
+            }
+
+            if (foundAmount > 0) {
+                setTotalBill(foundAmount.toString());
+                setSuccessMsg(`Successfully scanned total: ₹${foundAmount}`);
+            } else {
+                setError("Could not clearly identify the total amount. Please enter manually.");
+            }
+        } catch (err) {
+            console.error("OCR Error:", err);
+            setError("Failed to scan receipt. Please try again or enter manually.");
+        } finally {
+            setIsScanning(false);
+            if (fileInputRef.current) fileInputRef.current.value = '';
+        }
+    };
 
     const fetchSettlements = useCallback(async () => {
         try {
@@ -235,6 +293,24 @@ export default function GroupDetailModal({ group, currentUserId, onClose, onUpda
                             {isMyTurnToPay ? (
                                 <section className="gdm-section gdm-bill-section">
                                     <h3>💸 Your Turn to Pay!</h3>
+
+                                    <div className="gdm-scanner-prompt">
+                                        <input 
+                                            type="file" 
+                                            accept="image/*" 
+                                            capture="environment" 
+                                            style={{ display: 'none' }} 
+                                            ref={fileInputRef}
+                                            onChange={handleScan}
+                                        />
+                                        <button 
+                                            className="gdm-scanner-btn" 
+                                            onClick={() => fileInputRef.current?.click()}
+                                            disabled={isScanning}
+                                        >
+                                            {isScanning ? '⌛ Scanning Receipt...' : '📷 Scan Receipt (Auto-Total)'}
+                                        </button>
+                                    </div>
                                     
                                     <div className="gdm-bill-form">
                                         <div className="gdm-input-group">

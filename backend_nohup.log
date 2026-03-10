@@ -1,70 +1,15 @@
-nohup: ignoring input
 Watching for file changes with StatReloader
-/home/monster13liar/SPLIT-PAY/backend/.venv/lib64/python3.14/site-packages/dj_rest_auth/registration/serializers.py:225: UserWarning: app_settings.USERNAME_REQUIRED is deprecated, use: app_settings.SIGNUP_FIELDS['username']['required']
+/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/dj_rest_auth/registration/serializers.py:225: UserWarning: app_settings.USERNAME_REQUIRED is deprecated, use: app_settings.SIGNUP_FIELDS['username']['required']
   required=allauth_account_settings.USERNAME_REQUIRED,
-/home/monster13liar/SPLIT-PAY/backend/.venv/lib64/python3.14/site-packages/dj_rest_auth/registration/serializers.py:227: UserWarning: app_settings.EMAIL_REQUIRED is deprecated, use: app_settings.SIGNUP_FIELDS['email']['required']
+/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/dj_rest_auth/registration/serializers.py:227: UserWarning: app_settings.EMAIL_REQUIRED is deprecated, use: app_settings.SIGNUP_FIELDS['email']['required']
   email = serializers.EmailField(required=allauth_account_settings.EMAIL_REQUIRED)
-/home/monster13liar/SPLIT-PAY/backend/.venv/lib64/python3.14/site-packages/dj_rest_auth/registration/serializers.py:285: UserWarning: app_settings.EMAIL_REQUIRED is deprecated, use: app_settings.SIGNUP_FIELDS['email']['required']
+/home/monster13liar/SPLIT-PAY/backend/venv/lib64/python3.14/site-packages/dj_rest_auth/registration/serializers.py:285: UserWarning: app_settings.EMAIL_REQUIRED is deprecated, use: app_settings.SIGNUP_FIELDS['email']['required']
   email = serializers.EmailField(required=allauth_account_settings.EMAIL_REQUIRED)
 System check identified some issues:
 
 WARNINGS:
-?: settings.ACCOUNT_AUTHENTICATION_METHOD is deprecated, use: settings.ACCOUNT_LOGIN_METHODS = {'email', 'username'}
 ?: settings.ACCOUNT_EMAIL_REQUIRED is deprecated, use: settings.ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
 
-System check identified 2 issues (0 silenced).
-Not Found: /
-[01/Mar/2026 07:47:40] "GET / HTTP/1.1" 404 2511
-Not Found: /favicon.ico
-[01/Mar/2026 07:47:41] "GET /favicon.ico HTTP/1.1" 404 2562
-Internal Server Error: /api/google/
-Traceback (most recent call last):
-  File "/home/monster13liar/SPLIT-PAY/backend/.venv/lib64/python3.14/site-packages/django/core/handlers/exception.py", line 55, in inner
-    response = get_response(request)
-  File "/home/monster13liar/SPLIT-PAY/backend/.venv/lib64/python3.14/site-packages/django/core/handlers/base.py", line 197, in _get_response
-    response = wrapped_callback(request, *callback_args, **callback_kwargs)
-  File "/home/monster13liar/SPLIT-PAY/backend/.venv/lib64/python3.14/site-packages/django/views/decorators/csrf.py", line 65, in _view_wrapper
-    return view_func(request, *args, **kwargs)
-  File "/home/monster13liar/SPLIT-PAY/backend/.venv/lib64/python3.14/site-packages/django/views/generic/base.py", line 104, in view
-    return self.dispatch(request, *args, **kwargs)
-           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/monster13liar/SPLIT-PAY/backend/.venv/lib64/python3.14/site-packages/django/utils/decorators.py", line 48, in _wrapper
-    return bound_method(*args, **kwargs)
-  File "/home/monster13liar/SPLIT-PAY/backend/.venv/lib64/python3.14/site-packages/django/views/decorators/debug.py", line 141, in sensitive_post_parameters_wrapper
-    return view(request, *args, **kwargs)
-  File "/home/monster13liar/SPLIT-PAY/backend/.venv/lib64/python3.14/site-packages/dj_rest_auth/views.py", line 48, in dispatch
-    return super().dispatch(*args, **kwargs)
-           ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
-  File "/home/monster13liar/SPLIT-PAY/backend/.venv/lib64/python3.14/site-packages/rest_framework/views.py", line 509, in dispatch
-    response = self.handle_exception(exc)
-  File "/home/monster13liar/SPLIT-PAY/backend/.venv/lib64/python3.14/site-packages/rest_framework/views.py", line 469, in handle_exception
-    self.raise_uncaught_exception(exc)
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
-  File "/home/monster13liar/SPLIT-PAY/backend/.venv/lib64/python3.14/site-packages/rest_framework/views.py", line 480, in raise_uncaught_exception
-    raise exc
-  File "/home/monster13liar/SPLIT-PAY/backend/.venv/lib64/python3.14/site-packages/rest_framework/views.py", line 506, in dispatch
-    response = handler(request, *args, **kwargs)
-  File "/home/monster13liar/SPLIT-PAY/backend/.venv/lib64/python3.14/site-packages/dj_rest_auth/views.py", line 125, in post
-    self.serializer.is_valid(raise_exception=True)
-    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/monster13liar/SPLIT-PAY/backend/.venv/lib64/python3.14/site-packages/rest_framework/serializers.py", line 227, in is_valid
-    self._validated_data = self.run_validation(self.initial_data)
-                           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
-  File "/home/monster13liar/SPLIT-PAY/backend/.venv/lib64/python3.14/site-packages/rest_framework/serializers.py", line 429, in run_validation
-    value = self.validate(value)
-  File "/home/monster13liar/SPLIT-PAY/backend/.venv/lib64/python3.14/site-packages/dj_rest_auth/registration/serializers.py", line 95, in validate
-    app = adapter.get_provider().app
-          ~~~~~~~~~~~~~~~~~~~~^^
-  File "/home/monster13liar/SPLIT-PAY/backend/.venv/lib64/python3.14/site-packages/allauth/socialaccount/providers/oauth2/views.py", line 45, in get_provider
-    return get_adapter(self.request).get_provider(
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
-        self.request, provider=self.provider_id
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/home/monster13liar/SPLIT-PAY/backend/.venv/lib64/python3.14/site-packages/allauth/socialaccount/adapter.py", line 212, in get_provider
-    app = self.get_app(request, provider=provider, client_id=client_id)
-  File "/home/monster13liar/SPLIT-PAY/backend/.venv/lib64/python3.14/site-packages/allauth/socialaccount/adapter.py", line 302, in get_app
-    raise SocialApp.DoesNotExist()
-allauth.socialaccount.models.SocialApp.DoesNotExist
-[01/Mar/2026 08:19:20] "POST /api/google/ HTTP/1.1" 500 142962
+System check identified 1 issue (0 silenced).
+Unauthorized: /api/
+[09/Mar/2026 15:28:53] "HEAD /api/ HTTP/1.1" 401 0

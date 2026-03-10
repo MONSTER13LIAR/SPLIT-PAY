@@ -353,6 +353,10 @@
     transition: all 0.2s ease;
 }
 
+.gp-action-btn svg {
+    pointer-events: none;
+}
+
 .gp-action-btn:hover {
     background: #fff;
     color: #000;

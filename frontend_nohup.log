@@ -1,22 +1,7 @@
-nohup: ignoring input
-
-> temp-next-app@0.1.0 dev
-> next dev
-
-⚠ Port 3000 is in use by an unknown process, using available port 3001 instead.
 ▲ Next.js 16.1.6 (Turbopack)
-- Local:         http://localhost:3001
-- Network:       http://192.168.29.78:3001
+- Local:         http://localhost:3000
+- Network:       http://192.168.0.177:3000
+- Environments: .env.local
 
 ✓ Starting...
-⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
-✓ Ready in 3.7s
-○ Compiling / ...
- GET / 307 in 11.9s (compile: 11.3s, render: 577ms)
-○ Compiling /dashboard ...
- GET /dashboard 200 in 9.4s (compile: 8.5s, proxy.ts: 8ms, render: 894ms)
- GET / 307 in 535ms (compile: 279ms, render: 256ms)
- GET /dashboard 200 in 231ms (compile: 17ms, proxy.ts: 9ms, render: 205ms)
-✓ Compiled in 295ms
-✓ Compiled in 126ms
-✓ Compiled in 344ms
+✓ Ready in 2.4s

@@ -49,6 +49,7 @@ export default function Dashboard() {
     const [respondingId, setRespondingId] = useState<number | null>(null);
     const [showInviteModal, setShowInviteModal] = useState<number | null>(null);
     const [showExitModal, setShowExitModal] = useState<number | null>(null);
+    const [statusModal, setStatusModal] = useState<{ type: 'success' | 'error', message: string } | null>(null);
     const [inviteUsername, setInviteUsername] = useState('');
     const [inviteError, setInviteError] = useState('');
     const [inviteLoading, setInviteLoading] = useState(false);
@@ -137,11 +138,11 @@ export default function Dashboard() {
             const res = await apiFetch(`groups/${showExitModal}/exit/`, { method: 'POST' });
             const data = await res.json();
             if (res.ok) {
-                alert("Successfully left the group.");
+                setStatusModal({ type: 'success', message: "Successfully left the group. You can rejoin later via invitation if you have no debts." });
                 fetchGroups();
                 setShowExitModal(null);
             } else {
-                alert(data.error || "Failed to leave group.");
+                setStatusModal({ type: 'error', message: data.error || "Failed to leave group." });
             }
         } catch (err) { console.error(err); }
     };
@@ -158,7 +159,7 @@ export default function Dashboard() {
             });
             const data = await res.json();
             if (res.ok) {
-                alert(data.message);
+                setStatusModal({ type: 'success', message: data.message || "Invitation sent successfully!" });
                 setShowInviteModal(null);
                 setInviteUsername('');
             } else {
@@ -242,17 +243,50 @@ export default function Dashboard() {
                 <div className="invite-modal-overlay" onClick={() => setShowExitModal(null)}>
                     <div className="invite-modal" onClick={e => e.stopPropagation()}>
                         <div style={{ textAlign: 'center' }}>
-                            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🚪</div>
-                            <h3 style={{ fontFamily: 'Outfit', fontSize: '1.5rem', marginBottom: '1rem' }}>Exit Group?</h3>
-                            <p style={{ color: 'rgba(255,255,255,0.6)', marginBottom: '2rem', lineHeight: '1.5', fontSize: '0.95rem' }}>
-                                Are you sure you want to leave <strong>{groups.find(g => g.id === showExitModal)?.name}</strong>?<br/>
-                                You can rejoin later via invitation, but only if you have no outstanding debts.
-                            </p>
+                            <div style={{ fontSize: '3.5rem', marginBottom: '1.25rem' }}>⚠️</div>
+                            <h3 style={{ fontFamily: 'Outfit', fontSize: '1.8rem', marginBottom: '0.75rem', color: '#ff3d00' }}>Wait! Are you sure?</h3>
+                            <div style={{ background: 'rgba(255, 61, 0, 0.1)', border: '1px solid rgba(255, 61, 0, 0.2)', borderRadius: '16px', padding: '1.25rem', marginBottom: '2rem' }}>
+                                <p style={{ color: '#ff9d80', lineHeight: '1.6', fontSize: '0.95rem' }}>
+                                    You are about to leave <strong>{groups.find(g => g.id === showExitModal)?.name}</strong>.<br/>
+                                    <span style={{ display: 'block', marginTop: '0.5rem', opacity: 0.8 }}>
+                                        Note: You can only leave if you have <strong>no outstanding debts or credits</strong>. You can rejoin later via invitation once settled.
+                                    </span>
+                                </p>
+                            </div>
                             <div style={{ display: 'flex', gap: '1rem' }}>
-                                <button onClick={() => setShowExitModal(null)} style={{ flex: 1, padding: '1rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', color: '#fff', cursor: 'pointer', fontWeight: '600' }}>Cancel</button>
-                                <button onClick={handleExitGroup} style={{ flex: 1, padding: '1rem', background: '#ff3d00', border: 'none', borderRadius: '12px', color: '#fff', cursor: 'pointer', fontWeight: '800' }}>Exit</button>
+                                <button onClick={() => setShowExitModal(null)} style={{ flex: 1, padding: '1.1rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px', color: '#fff', cursor: 'pointer', fontWeight: '600', transition: 'all 0.2s' }}>Go Back</button>
+                                <button onClick={handleExitGroup} style={{ flex: 1, padding: '1.1rem', background: '#ff3d00', border: 'none', borderRadius: '16px', color: '#fff', cursor: 'pointer', fontWeight: '800', transition: 'all 0.2s', boxShadow: '0 10px 20px rgba(255, 61, 0, 0.2)' }}>Confirm Exit</button>
                             </div>
                         </div>
+                    </div>
+                </div>
+            )}
+
+            {statusModal && (
+                <div className="invite-modal-overlay" onClick={() => setStatusModal(null)}>
+                    <div className="invite-modal" style={{ width: '400px', textAlign: 'center' }} onClick={e => e.stopPropagation()}>
+                        <div style={{ fontSize: '3.5rem', marginBottom: '1rem' }}>
+                            {statusModal.type === 'success' ? '✅' : '❌'}
+                        </div>
+                        <h3 style={{ fontFamily: 'Outfit', fontSize: '1.6rem', marginBottom: '1rem' }}>
+                            {statusModal.type === 'success' ? 'Success!' : 'Oops!'}
+                        </h3>
+                        <p style={{ color: 'rgba(255,255,255,0.7)', marginBottom: '2rem', fontSize: '1rem' }}>{statusModal.message}</p>
+                        <button 
+                            onClick={() => setStatusModal(null)} 
+                            style={{ 
+                                width: '100%', 
+                                padding: '1rem', 
+                                background: statusModal.type === 'success' ? '#00e676' : '#ff3d00', 
+                                border: 'none', 
+                                borderRadius: '16px', 
+                                color: '#fff', 
+                                fontWeight: '800', 
+                                cursor: 'pointer' 
+                            }}
+                        >
+                            Got it
+                        </button>
                     </div>
                 </div>
             )}

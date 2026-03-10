@@ -288,10 +288,15 @@ def exit_group(request, group_id):
     except Group.DoesNotExist:
         return Response({"error": "Group not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    # Check if user owes money in this group
-    debt = Settlement.objects.filter(group=group, debtor=request.user, amount__gt=0).exists()
-    if debt:
-        return Response({"error": "You cannot leave the group until you settle your debts."}, status=status.HTTP_400_BAD_REQUEST)
+    # Check if user has any outstanding settlements (owing or owed) in this group
+    has_settlements = Settlement.objects.filter(
+        models.Q(debtor=request.user) | models.Q(creditor=request.user),
+        group=group,
+        amount__gt=0
+    ).exists()
+
+    if has_settlements:
+        return Response({"error": "You cannot leave the group until all your debts and credits are settled."}, status=status.HTTP_400_BAD_REQUEST)
 
     with transaction.atomic():
         group.members.remove(request.user)

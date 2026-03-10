@@ -227,6 +227,39 @@
     margin-bottom: 1.5rem;
 }
 
+.gdm-scanner-prompt {
+    margin-bottom: 1.5rem;
+}
+
+.gdm-scanner-btn {
+    width: 100%;
+    padding: 1.25rem;
+    background: rgba(138, 43, 226, 0.1);
+    border: 2px dashed rgba(138, 43, 226, 0.3);
+    border-radius: 18px;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    transition: all 0.3s ease;
+}
+
+.gdm-scanner-btn:hover:not(:disabled) {
+    background: rgba(138, 43, 226, 0.2);
+    border-color: rgba(138, 43, 226, 0.5);
+    transform: translateY(-2px);
+}
+
+.gdm-scanner-btn:disabled {
+    cursor: wait;
+    opacity: 0.7;
+    border-style: solid;
+}
+
 .gdm-bill-form {
     display: flex;
     flex-direction: column;
