@@ -72,35 +72,62 @@ export default function GroupDetailModal({ group, currentUserId, onClose, onUpda
 
             console.log("OCR Result:", text);
 
-            // Improved regex for total amount detection
             const lines = text.split('\n');
-            let foundAmount = 0;
+            let foundTotal = 0;
+            let detectedNonVeg = 0;
+            let detectedAlcohol = 0;
 
-            // Look for patterns like "Total: 123.45" or "TOTAL ₹ 500"
-            // We search from bottom to top as the grand total is usually at the bottom
-            for (let i = lines.length - 1; i >= 0; i--) {
-                const line = lines[i].toLowerCase();
-                if (line.includes('total') || line.includes('amount') || line.includes('sum')) {
-                    const match = line.match(/(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)/);
-                    if (match) {
-                        foundAmount = parseFloat(match[1].replace(/,/g, ''));
-                        break;
+            // Keywords for categorization
+            const nvKeywords = ['chicken', 'mutton', 'fish', 'meat', 'egg', 'prawn', 'kabab', 'biryani', 'tikka', 'pork', 'beef', 'wings', 'seekh', 'non-veg', 'nonveg'];
+            const alcKeywords = ['beer', 'whiskey', 'vodka', 'wine', 'cocktail', 'rum', 'gin', 'tequila', 'pint', 'peg', 'shot', 'alcohol', 'liquor', 'scotch', 'brandy', 'breezer', 'draught', 'tower', 'pitcher'];
+            const totalKeywords = ['total', 'amount', 'sum', 'grand', 'net', 'payable'];
+
+            lines.forEach(line => {
+                const lowerLine = line.toLowerCase();
+                // Regex to find prices (e.g., 123.45, 1,234, 500)
+                const priceMatch = lowerLine.match(/(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)/);
+                
+                if (priceMatch) {
+                    const price = parseFloat(priceMatch[1].replace(/,/g, ''));
+                    
+                    // Check for Total
+                    const isTotalLine = totalKeywords.some(kw => lowerLine.includes(kw));
+                    if (isTotalLine && price > foundTotal) {
+                        foundTotal = price;
+                    }
+
+                    // Categorize items (exclude lines that look like a total line for individual items)
+                    if (!isTotalLine) {
+                        if (nvKeywords.some(kw => lowerLine.includes(kw))) {
+                            detectedNonVeg += price;
+                            console.log(`Detected Non-Veg: ${line} -> ${price}`);
+                        } else if (alcKeywords.some(kw => lowerLine.includes(kw))) {
+                            detectedAlcohol += price;
+                            console.log(`Detected Alcohol: ${line} -> ${price}`);
+                        }
                     }
                 }
-            }
+            });
 
-            // Fallback: look for the largest number in the text if no "total" label is found
-            if (foundAmount === 0) {
+            // Fallback for total: look for the largest number if no "total" label was convincing
+            if (foundTotal === 0) {
                 const allNumbers = text.match(/(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)/g);
                 if (allNumbers) {
                     const parsedNumbers = allNumbers.map(n => parseFloat(n.replace(/,/g, '')));
-                    foundAmount = Math.max(...parsedNumbers);
+                    foundTotal = Math.max(...parsedNumbers);
                 }
             }
 
-            if (foundAmount > 0) {
-                setTotalBill(foundAmount.toString());
-                setSuccessMsg(`Successfully scanned total: ₹${foundAmount}`);
+            if (foundTotal > 0) {
+                setTotalBill(foundTotal.toString());
+                setNonVegCost(detectedNonVeg.toString());
+                setAlcoholCost(detectedAlcohol.toString());
+                
+                let msg = `Detected Total: ₹${foundTotal}`;
+                if (detectedNonVeg > 0 || detectedAlcohol > 0) {
+                    msg += ` (Incl. ₹${detectedNonVeg} Non-Veg, ₹${detectedAlcohol} Alcohol)`;
+                }
+                setSuccessMsg(msg);
             } else {
                 setError("Could not clearly identify the total amount. Please enter manually.");
             }
