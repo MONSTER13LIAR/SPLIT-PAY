@@ -170,7 +170,7 @@ REST_AUTH = {
     'JWT_AUTH_REFRESH_COOKIE': 'refresh-token',
     'JWT_AUTH_HTTPONLY': True,
     'JWT_AUTH_SAMESITE': 'Lax',
-    'JWT_AUTH_SECURE': False, # Changed to False to ensure it works on http://localhost
+    'JWT_AUTH_SECURE': config('JWT_AUTH_SECURE', default=False, cast=bool),
     'USER_DETAILS_SERIALIZER': 'api.serializers.UserSerializer',
 }
 
