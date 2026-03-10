@@ -9,3 +9,5 @@ dj-rest-auth
 requests
 gunicorn==21.2.0
 whitenoise==6.6.0
+pytesseract
+opencv-python-headless

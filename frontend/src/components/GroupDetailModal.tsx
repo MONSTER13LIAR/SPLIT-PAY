@@ -310,6 +310,11 @@ export default function GroupDetailModal({ group, currentUserId, onClose, onUpda
                                         >
                                             {isScanning ? '⌛ Scanning Receipt...' : '📷 Scan Receipt (Auto-Total)'}
                                         </button>
+                                        {successMsg.toLowerCase().includes('scanned') && (
+                                            <p className="gdm-ocr-disclaimer">
+                                                ⚠️ You may check again because ocr AI can make mistakes
+                                            </p>
+                                        )}
                                     </div>
                                     
                                     <div className="gdm-bill-form">
