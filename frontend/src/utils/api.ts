@@ -1,4 +1,6 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001/api';
+// Extract root domain for non-api endpoints like dj-rest-auth
+const ROOT_URL = API_BASE_URL.replace(/\/api$/, '');
 
 interface RequestOptions extends RequestInit {
     headers?: Record<string, string>;
@@ -11,7 +13,7 @@ export const apiFetch = async (endpoint: string, options: RequestOptions = {}) =
     if (cleanEndpoint.startsWith('http')) {
         url = cleanEndpoint;
     } else if (cleanEndpoint.startsWith('dj-rest-auth')) {
-        url = `http://localhost:8001/${cleanEndpoint}`;
+        url = `${ROOT_URL}/${cleanEndpoint}`;
     } else {
         const path = cleanEndpoint.startsWith('api/') ? cleanEndpoint.replace(/^api\//, '') : cleanEndpoint;
         url = `${API_BASE_URL}/${path}`;
