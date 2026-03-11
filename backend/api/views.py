@@ -71,7 +71,8 @@ class ExpenseViewSet(viewsets.ModelViewSet):
 
 class GoogleLogin(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
-    callback_url = "http://localhost:3000/auth/callback"
+    from decouple import config as decouple_config
+    callback_url = decouple_config('GOOGLE_CALLBACK_URL', default='http://localhost:3000/auth/callback')
     client_class = OAuth2Client
     permission_classes = [AllowAny]
     
