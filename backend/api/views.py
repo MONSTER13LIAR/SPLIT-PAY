@@ -11,7 +11,7 @@ from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from dj_rest_auth.registration.views import SocialLoginView
 from rest_framework_simplejwt.tokens import RefreshToken
-import re, json
+import re, json, os
 
 def is_strong_password(password):
     if len(password) < 8: return False
@@ -71,8 +71,7 @@ class ExpenseViewSet(viewsets.ModelViewSet):
 
 class GoogleLogin(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
-    from decouple import config as decouple_config
-    callback_url = decouple_config('GOOGLE_CALLBACK_URL', default='http://localhost:3000/auth/callback')
+    callback_url = os.environ.get('GOOGLE_CALLBACK_URL', 'http://localhost:3000/auth/callback')
     client_class = OAuth2Client
     permission_classes = [AllowAny]
     
