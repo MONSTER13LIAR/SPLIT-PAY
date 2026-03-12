@@ -26,7 +26,7 @@ interface VoteData {
 }
 
 export default function ActivitiesPage() {
-    const { user, logout } = useAuth();
+    const { user, logout, isLoading } = useAuth();
     const containerRef = useRef<HTMLDivElement>(null);
     const [groups, setGroups] = useState<Group[]>([]);
     const [showVoteModal, setShowVoteModal] = useState(false);
@@ -52,8 +52,16 @@ export default function ActivitiesPage() {
     }, []);
 
     useEffect(() => {
-        fetchGroups();
-    }, [fetchGroups]);
+        if (!isLoading && user) {
+            fetchGroups();
+        }
+    }, [isLoading, user, fetchGroups]);
+
+    useEffect(() => {
+        if (!isLoading && !user) {
+            window.location.href = '/login';
+        }
+    }, [isLoading, user]);
 
     useEffect(() => {
         if (selectedGroup) fetchVotes(selectedGroup.id);
@@ -105,6 +113,29 @@ export default function ActivitiesPage() {
         window.addEventListener('mousemove', handleMouseMove);
         return () => window.removeEventListener('mousemove', handleMouseMove);
     }, []);
+
+    if (isLoading) {
+        return (
+            <div style={{
+                height: '100vh',
+                background: '#000',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+            }}>
+                <div className="spinner" style={{
+                    width: '40px',
+                    height: '40px',
+                    border: '3px solid rgba(255,255,255,0.1)',
+                    borderTopColor: '#ff3d00',
+                    borderRadius: '50%',
+                    animation: 'spin 1s linear infinite'
+                }}></div>
+            </div>
+        );
+    }
+
+    if (!user) return null;
 
     return (
         <div className="activities-container" ref={containerRef}>

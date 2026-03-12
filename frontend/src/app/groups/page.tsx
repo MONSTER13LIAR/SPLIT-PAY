@@ -34,7 +34,7 @@ interface InvitationData {
 }
 
 export default function GroupsPage() {
-    const { user, logout } = useAuth();
+    const { user, logout, isLoading } = useAuth();
     const containerRef = useRef<HTMLDivElement>(null);
     const [groups, setGroups] = useState<GroupData[]>([]);
     const [invitations, setInvitations] = useState<InvitationData[]>([]);
@@ -123,9 +123,17 @@ export default function GroupsPage() {
     };
 
     useEffect(() => {
-        fetchGroups();
-        fetchInvitations();
-    }, [fetchGroups, fetchInvitations]);
+        if (!isLoading && user) {
+            fetchGroups();
+            fetchInvitations();
+        }
+    }, [isLoading, user, fetchGroups, fetchInvitations]);
+
+    useEffect(() => {
+        if (!isLoading && !user) {
+            window.location.href = '/login';
+        }
+    }, [isLoading, user]);
 
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
@@ -137,6 +145,29 @@ export default function GroupsPage() {
         window.addEventListener('mousemove', handleMouseMove);
         return () => window.removeEventListener('mousemove', handleMouseMove);
     }, []);
+
+    if (isLoading) {
+        return (
+            <div style={{
+                height: '100vh',
+                background: '#000',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+            }}>
+                <div className="spinner" style={{
+                    width: '40px',
+                    height: '40px',
+                    border: '3px solid rgba(255,255,255,0.1)',
+                    borderTopColor: '#8a2be2',
+                    borderRadius: '50%',
+                    animation: 'spin 1s linear infinite'
+                }}></div>
+            </div>
+        );
+    }
+
+    if (!user) return null;
 
     const selectedGroup = groups.find(g => g.id === selectedGroupId);
 

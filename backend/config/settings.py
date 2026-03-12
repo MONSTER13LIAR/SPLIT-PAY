@@ -169,8 +169,8 @@ REST_AUTH = {
     'JWT_AUTH_COOKIE': 'access-token',
     'JWT_AUTH_REFRESH_COOKIE': 'refresh-token',
     'JWT_AUTH_HTTPONLY': True,
-    'JWT_AUTH_SAMESITE': 'None',
-    'JWT_AUTH_SECURE': True,
+    'JWT_AUTH_SAMESITE': 'Lax' if DEBUG else 'None',
+    'JWT_AUTH_SECURE': not DEBUG,
     'USER_DETAILS_SERIALIZER': 'api.serializers.UserSerializer',
 }
 

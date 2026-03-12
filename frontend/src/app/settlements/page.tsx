@@ -35,11 +35,11 @@ interface SettlementRequestsResponse {
 }
 
 export default function SettlementsPage() {
-    const { user, logout } = useAuth();
+    const { user, logout, isLoading } = useAuth();
     const containerRef = useRef<HTMLDivElement>(null);
     const [settlements, setSettlements] = useState<SettlementResponse>({ debts: [], credits: [] });
     const [requests, setRequests] = useState<SettlementRequestsResponse>({ received: [], sent: [] });
-    const [isLoading, setIsLoading] = useState(true);
+    const [isPageLoading, setIsPageLoading] = useState(true);
     const [isActionLoading, setIsActionLoading] = useState<number | null>(null);
 
     const fetchSettlements = useCallback(async () => {
@@ -64,7 +64,7 @@ export default function SettlementsPage() {
 
     const fetchAllData = useCallback(async () => {
         await Promise.all([fetchSettlements(), fetchRequests()]);
-        setIsLoading(false);
+        setIsPageLoading(false);
     }, [fetchSettlements, fetchRequests]);
 
     const handleSettleRequest = async (settlementId: number, amount: string) => {
@@ -108,11 +108,19 @@ export default function SettlementsPage() {
     };
 
     useEffect(() => {
-        fetchAllData();
-        // Poll for updates every 10 seconds
-        const interval = setInterval(fetchAllData, 10000);
-        return () => clearInterval(interval);
-    }, [fetchAllData]);
+        if (!isLoading && user) {
+            fetchAllData();
+            // Poll for updates every 10 seconds
+            const interval = setInterval(fetchAllData, 10000);
+            return () => clearInterval(interval);
+        }
+    }, [isLoading, user, fetchAllData]);
+
+    useEffect(() => {
+        if (!isLoading && !user) {
+            window.location.href = '/login';
+        }
+    }, [isLoading, user]);
 
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
@@ -124,6 +132,29 @@ export default function SettlementsPage() {
         window.addEventListener('mousemove', handleMouseMove);
         return () => window.removeEventListener('mousemove', handleMouseMove);
     }, []);
+
+    if (isLoading) {
+        return (
+            <div style={{
+                height: '100vh',
+                background: '#000',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+            }}>
+                <div className="spinner" style={{
+                    width: '40px',
+                    height: '40px',
+                    border: '3px solid rgba(255,255,255,0.1)',
+                    borderTopColor: '#00e676',
+                    borderRadius: '50%',
+                    animation: 'spin 1s linear infinite'
+                }}></div>
+            </div>
+        );
+    }
+
+    if (!user) return null;
 
     const totalDebts = settlements.debts.reduce((acc, curr) => acc + parseFloat(curr.amount), 0);
     const totalCredits = settlements.credits.reduce((acc, curr) => acc + parseFloat(curr.amount), 0);
