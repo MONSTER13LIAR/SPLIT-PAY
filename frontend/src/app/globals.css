@@ -16,33 +16,3 @@ body {
 .spline-container * {
   pointer-events: none !important;
 }
-
-.app-layout {
-  display: flex;
-  min-height: 100vh;
-}
-
-.layout-content {
-  flex: 1;
-  width: 100%;
-}
-
-/* On desktop, add padding for the fixed sidebar */
-@media (min-width: 1025px) {
-  .layout-content {
-    margin-left: 280px;
-  }
-}
-
-/* On mobile, add padding for the fixed header */
-@media (max-width: 1024px) {
-  .layout-content {
-    margin-top: 70px;
-  }
-}
-
-/* Ensure no horizontal scrolling */
-html, body {
-  overflow-x: hidden;
-  width: 100%;
-}

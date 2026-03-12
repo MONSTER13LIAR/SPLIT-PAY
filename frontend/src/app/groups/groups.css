@@ -14,10 +14,12 @@
     color: #fff;
     font-family: 'Inter', sans-serif;
     display: flex;
+    overflow: hidden;
     position: relative;
     z-index: 1;
 }
 
+/* Reuse sidebar styles from dashboard */
 .groups-page .torch-overlay {
     position: fixed;
     top: 0;
@@ -29,6 +31,87 @@
     background: radial-gradient(var(--torch-size) circle at var(--x, 50%) var(--y, 50%),
             rgba(138, 43, 226, 0.12), transparent 80%);
     mix-blend-mode: screen;
+}
+
+.groups-page .sidebar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    width: 280px;
+    background: rgba(15, 15, 15, 0.4);
+    border-right: 1px solid var(--card-border);
+    display: flex;
+    flex-direction: column;
+    padding: 2.5rem 1.5rem;
+    backdrop-filter: blur(25px);
+    z-index: 100;
+    transform: translateX(-100%);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.groups-page .sidebar-trigger {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 30px;
+    height: 100vh;
+    z-index: 99;
+}
+
+.groups-page .sidebar-trigger:hover~.sidebar,
+.groups-page .sidebar:hover {
+    transform: translateX(0);
+}
+
+.groups-page .sidebar-logo {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    margin-bottom: 3.5rem;
+    padding: 0 0.5rem;
+}
+
+.groups-page .sidebar-logo span {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 800;
+    font-size: 1.4rem;
+    background: linear-gradient(135deg, #fff 0%, var(--primary) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -1px;
+}
+
+.groups-page .nav-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.groups-page .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    border-radius: 16px;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    font-weight: 500;
+}
+
+.groups-page .nav-item:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateX(5px);
+}
+
+.groups-page .nav-item.active {
+    background: rgba(138, 43, 226, 0.15);
+    color: #fff;
+    border: 1px solid rgba(138, 43, 226, 0.3);
+    box-shadow: 0 0 25px rgba(138, 43, 226, 0.2);
 }
 
 /* Main Content */
@@ -152,10 +235,6 @@
     cursor: pointer;
     transition: all 0.2s;
     font-family: 'Inter', sans-serif;
-    min-height: 44px; /* Touch target */
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
 .gp-inv-accept {
@@ -164,10 +243,25 @@
     border: 1px solid rgba(0, 230, 118, 0.3);
 }
 
+.gp-inv-accept:hover:not(:disabled) {
+    background: rgba(0, 230, 118, 0.25);
+    transform: translateY(-1px);
+}
+
 .gp-inv-decline {
     background: rgba(255, 61, 0, 0.1);
     color: #ff3d00;
     border: 1px solid rgba(255, 61, 0, 0.25);
+}
+
+.gp-inv-decline:hover:not(:disabled) {
+    background: rgba(255, 61, 0, 0.2);
+    transform: translateY(-1px);
+}
+
+.gp-inv-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
 }
 
 /* Groups Section */
@@ -200,6 +294,17 @@
     margin-bottom: 1rem;
 }
 
+.gp-empty p {
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+.gp-empty-sub {
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 0.9rem !important;
+    margin-top: 0.25rem;
+}
+
 /* Groups Grid */
 .gp-grid {
     display: grid;
@@ -215,12 +320,13 @@
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     backdrop-filter: blur(20px);
     cursor: pointer;
-    position: relative;
 }
 
 .gp-card:hover {
     transform: translateY(-5px);
     border-color: rgba(138, 43, 226, 0.3);
+    background: rgba(255, 255, 255, 0.06);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(138, 43, 226, 0.15);
 }
 
 .gp-card-actions {
@@ -233,9 +339,9 @@
 }
 
 .gp-action-btn {
-    width: 44px; /* Increased for mobile touch target */
-    height: 44px;
-    border-radius: 12px;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
     border: 1px solid rgba(255, 255, 255, 0.1);
     background: rgba(0, 0, 0, 0.3);
     color: rgba(255, 255, 255, 0.6);
@@ -243,33 +349,85 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    font-size: 1.1rem;
     transition: all 0.2s ease;
 }
 
 .gp-action-btn svg {
-    width: 20px;
-    height: 20px;
+    pointer-events: none;
+}
+
+.gp-action-btn:hover {
+    background: #fff;
+    color: #000;
+    transform: scale(1.1);
+}
+
+.gp-action-btn.invite:hover {
+    background: #8a2be2;
+    color: #fff;
+    border-color: #8a2be2;
+}
+
+.gp-action-btn.exit:hover {
+    background: #ff3d00;
+    color: #fff;
+    border-color: #ff3d00;
+}
+
+.invite-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+.invite-modal {
+    background: #111;
+    border: 1px solid rgba(138, 43, 226, 0.3);
+    padding: 3rem;
+    border-radius: 32px;
+    width: 450px;
+    max-width: 90vw;
+    position: relative;
+    box-shadow: 0 0 50px rgba(138, 43, 226, 0.1);
+}
+
+.invite-error {
+    color: #ff3d00;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+}
+
+.gp-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 0.5rem;
 }
 
 .gp-card-top h3 {
     font-family: 'Outfit', sans-serif;
     font-size: 1.3rem;
     font-weight: 700;
-    padding-right: 90px; /* Space for actions */
 }
 
 .gp-card-creator {
     color: rgba(255, 255, 255, 0.35);
     font-size: 0.8rem;
-    display: block;
-    margin-top: 2px;
 }
 
 .gp-card-count {
     color: var(--text-muted);
     font-size: 0.85rem;
     margin-bottom: 1rem;
-    margin-top: 0.5rem;
 }
 
 .gp-card-members {
@@ -290,58 +448,16 @@
 
 @media (max-width: 768px) {
     .gp-main {
-        padding: 1.5rem;
-        padding-top: 2rem;
-    }
-
-    .gp-header {
-        margin-bottom: 2rem;
+        padding: 2rem 1.5rem;
     }
 
     .gp-header h1 {
         font-size: 2rem;
     }
 
-    .gp-create-btn {
-        padding: 0.75rem 1.25rem;
-        font-size: 0.9rem;
-    }
-
-    .gp-invitations {
-        padding: 1.5rem;
-        border-radius: 24px;
-    }
-
     .gp-inv-card {
         flex-direction: column;
         align-items: flex-start;
         gap: 1rem;
-        padding: 1.25rem;
-    }
-
-    .gp-inv-actions {
-        width: 100%;
-    }
-
-    .gp-inv-btn {
-        flex: 1;
-        text-align: center;
-    }
-
-    .gp-groups {
-        padding: 1.5rem;
-        border-radius: 28px;
-    }
-
-    .gp-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .gp-card {
-        padding: 1.5rem;
-    }
-
-    .gp-card-top h3 {
-        font-size: 1.2rem;
     }
 }

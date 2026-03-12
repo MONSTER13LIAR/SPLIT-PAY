@@ -292,6 +292,26 @@ export default function GroupsPage() {
                 </div>
             )}
 
+            <div className="sidebar-trigger"></div>
+            <aside className="sidebar">
+                <div className="sidebar-logo">
+                    <img src="/logo.jpg" alt="SplitPay" width="64" height="64" style={{ borderRadius: '12px' }} />
+                    <span style={{ fontWeight: 800, fontSize: '2rem', letterSpacing: '-1px' }}>SplitPay</span>
+                </div>
+                <nav className="nav-menu">
+                    <a href="/dashboard" className="nav-item"><span>Dashboard</span></a>
+                    <a href="/groups" className="nav-item active"><span>My Groups</span></a>
+                    <a href="/activities" className="nav-item"><span>Activities</span></a>
+                    <a href="/settlements" className="nav-item"><span>Settlements</span></a>
+                    <a href="/settings" className="nav-item"><span>Settings</span></a>
+                </nav>
+                <div style={{ marginTop: 'auto' }}>
+                    <button onClick={logout} className="nav-item" style={{ width: '100%', background: 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left' }}>
+                        <span>Logout</span>
+                    </button>
+                </div>
+            </aside>
+
             {/* Main Content */}
             <main className="gp-main">
                 <div className="gp-header">

@@ -5,6 +5,7 @@
     --primary-glow: rgba(138, 43, 226, 0.4);
     --secondary: #00f2ff;
     --bg-dark: transparent;
+    /* Background complexed by particles component */
     --card-bg: rgba(255, 255, 255, 0.04);
     --card-border: rgba(255, 255, 255, 0.1);
     --text-main: #ffffff;
@@ -15,9 +16,11 @@
 .dashboard-container {
     min-height: 100vh;
     background: transparent;
+    /* Allow Spline to show through */
     color: var(--text-main);
     font-family: 'Inter', sans-serif;
     display: flex;
+    overflow: hidden;
     position: relative;
     z-index: 1;
 }
@@ -35,6 +38,107 @@
             rgba(138, 43, 226, 0.12),
             transparent 80%);
     mix-blend-mode: screen;
+}
+
+/* Sidebar */
+.sidebar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    width: 280px;
+    background: rgba(15, 15, 15, 0.4);
+    border-right: 1px solid var(--card-border);
+    display: flex;
+    flex-direction: column;
+    padding: 2.5rem 1.5rem;
+    backdrop-filter: blur(25px);
+    z-index: 100;
+    transform: translateX(-100%);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Hover trigger area */
+.sidebar-trigger {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 30px;
+    height: 100vh;
+    z-index: 99;
+}
+
+/* Show sidebar on hover over the container's left edge OR when hovering the sidebar itself */
+.sidebar-trigger:hover~.sidebar,
+.sidebar:hover {
+    transform: translateX(0);
+}
+
+.sidebar-logo {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    margin-bottom: 3.5rem;
+    padding: 0 0.5rem;
+}
+
+.sidebar-logo span {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 800;
+    font-size: 1.4rem;
+    background: linear-gradient(135deg, #fff 0%, var(--primary) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -1px;
+}
+
+.nav-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    border-radius: 16px;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    font-weight: 500;
+    position: relative;
+    overflow: hidden;
+}
+
+.nav-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--primary);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: -1;
+}
+
+.nav-item:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateX(5px);
+    backdrop-filter: blur(5px);
+}
+
+.nav-item.active {
+    background: rgba(138, 43, 226, 0.15);
+    color: #fff;
+    border: 1px solid rgba(138, 43, 226, 0.3);
+    box-shadow: 0 0 25px rgba(138, 43, 226, 0.2);
+    backdrop-filter: blur(10px);
 }
 
 /* Main Content */
@@ -127,13 +231,6 @@
     border-radius: 40px;
     padding: 3.5rem;
     backdrop-filter: blur(25px);
-}
-
-.section-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
 }
 
 .section-top h2 {
@@ -239,7 +336,6 @@
     cursor: pointer;
     transition: all 0.2s;
     font-family: 'Inter', sans-serif;
-    min-height: 44px; /* Touch target */
 }
 
 .inv-accept {
@@ -248,10 +344,23 @@
     border: 1px solid rgba(0, 230, 118, 0.3);
 }
 
+.inv-accept:hover:not(:disabled) {
+    background: rgba(0, 230, 118, 0.25);
+}
+
 .inv-decline {
     background: rgba(255, 61, 0, 0.1);
     color: #ff3d00;
     border: 1px solid rgba(255, 61, 0, 0.25);
+}
+
+.inv-decline:hover:not(:disabled) {
+    background: rgba(255, 61, 0, 0.2);
+}
+
+.inv-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
 }
 
 /* Groups Grid */
@@ -270,12 +379,14 @@
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     backdrop-filter: blur(20px);
     cursor: pointer;
-    position: relative;
+    position: relative; /* Added for absolute positioning of actions */
 }
 
 .group-card:hover {
     transform: translateY(-5px);
     border-color: rgba(138, 43, 226, 0.3);
+    background: rgba(255, 255, 255, 0.06);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(138, 43, 226, 0.15);
 }
 
 .gp-card-actions {
@@ -288,9 +399,9 @@
 }
 
 .gp-action-btn {
-    width: 44px; /* Increased for mobile touch target */
-    height: 44px;
-    border-radius: 12px;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
     border: 1px solid rgba(255, 255, 255, 0.1);
     background: rgba(0, 0, 0, 0.3);
     color: rgba(255, 255, 255, 0.6);
@@ -298,12 +409,30 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    font-size: 1rem;
     transition: all 0.2s ease;
 }
 
 .gp-action-btn svg {
-    width: 20px;
-    height: 20px;
+    pointer-events: none;
+}
+
+.gp-action-btn:hover {
+    background: #fff;
+    color: #000;
+    transform: scale(1.1);
+}
+
+.gp-action-btn.invite:hover {
+    background: #8a2be2;
+    color: #fff;
+    border-color: #8a2be2;
+}
+
+.gp-action-btn.exit:hover {
+    background: #ff3d00;
+    color: #fff;
+    border-color: #ff3d00;
 }
 
 .invite-modal-overlay {
@@ -318,29 +447,45 @@
     align-items: center;
     justify-content: center;
     z-index: 2000;
+    animation: fadeIn 0.3s ease;
 }
 
 .invite-modal {
     background: #111;
     border: 1px solid rgba(138, 43, 226, 0.3);
-    padding: 2.5rem;
+    padding: 3rem;
     border-radius: 32px;
     width: 450px;
     max-width: 90vw;
     position: relative;
     box-shadow: 0 0 50px rgba(138, 43, 226, 0.1);
+    animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .v-close {
     position: absolute;
-    top: 1rem;
-    right: 1rem;
+    top: 1.5rem;
+    right: 1.5rem;
     background: none;
     border: none;
     color: rgba(255, 255, 255, 0.3);
-    font-size: 2rem;
+    font-size: 1.5rem;
     cursor: pointer;
-    padding: 10px;
+    transition: color 0.2s;
+}
+
+.v-close:hover {
+    color: #fff;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .group-card-name {
@@ -376,85 +521,24 @@
     border: 2px solid rgba(0, 0, 0, 0.3);
 }
 
-/* Mobile Responsiveness */
-@media (max-width: 768px) {
-    .main-content {
-        padding: 1.5rem;
-        padding-top: 2rem;
-    }
-
-    .welcome-text h1 {
-        font-size: 2.2rem;
-    }
-
-    .welcome-text p {
-        font-size: 1rem;
-    }
-
-    .dashboard-header {
-        margin-bottom: 2.5rem;
-    }
-
-    .stats-grid {
-        gap: 1.25rem;
-        margin-bottom: 2.5rem;
-    }
-
-    .stat-card {
-        padding: 1.75rem;
-        border-radius: 24px;
-    }
-
-    .stat-value {
-        font-size: 2.2rem;
-    }
-
-    .groups-section {
-        padding: 1.75rem;
-        border-radius: 28px;
-    }
-
-    .section-top h2 {
-        font-size: 1.6rem;
-    }
-
-    .create-btn {
-        padding: 0.75rem 1.25rem;
-        font-size: 0.9rem;
-    }
-
-    .invitations-section {
-        padding: 1.5rem;
-        border-radius: 24px;
-    }
-
-    .invitation-card {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1rem;
-        padding: 1.25rem;
-    }
-
-    .invitation-actions {
-        width: 100%;
-    }
-
-    .inv-btn {
-        flex: 1;
-        text-align: center;
-    }
-
-    .groups-grid {
-        grid-template-columns: 1fr;
-    }
+.group-avatar-more {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-muted);
+    font-size: 0.7rem;
 }
 
-@media (max-width: 480px) {
-    .welcome-text h1 {
-        font-size: 1.8rem;
+@media (max-width: 1024px) {
+    .sidebar {
+        width: 90px;
+        padding: 2rem 1rem;
     }
 
-    .stat-value {
-        font-size: 1.8rem;
+    .sidebar-logo span,
+    .nav-item span {
+        display: none;
+    }
+
+    .main-content {
+        padding: 2rem;
     }
 }

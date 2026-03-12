@@ -6,37 +6,37 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(0, 0, 0, 0.8);
+    background: rgba(0, 0, 0, 0.75);
     backdrop-filter: blur(12px);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 9999;
+    animation: fadeIn 0.3s ease;
 }
 
 .username-modal {
-    background: rgba(20, 20, 20, 0.98);
+    background: rgba(20, 20, 20, 0.95);
     border: 1px solid rgba(138, 43, 226, 0.25);
-    border-radius: 32px;
-    padding: 3.5rem 2.5rem;
-    width: 440px;
+    border-radius: 28px;
+    padding: 3rem 2.5rem;
+    width: 420px;
     max-width: 90vw;
     text-align: center;
     box-shadow:
         0 40px 80px rgba(0, 0, 0, 0.6),
         0 0 60px rgba(138, 43, 226, 0.15);
-    max-height: 90vh;
-    overflow-y: auto;
+    animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .username-modal-icon {
-    font-size: 3rem;
+    font-size: 2.5rem;
     margin-bottom: 1rem;
 }
 
 .username-modal h2 {
     font-family: 'Outfit', sans-serif;
-    font-size: 2rem;
+    font-size: 1.8rem;
     font-weight: 800;
     color: #fff;
     margin-bottom: 0.5rem;
@@ -45,31 +45,32 @@
 
 .username-modal-subtitle {
     color: rgba(255, 255, 255, 0.5);
-    font-size: 1rem;
+    font-size: 0.95rem;
     margin-bottom: 2rem;
+    font-family: 'Inter', sans-serif;
 }
 
 .username-input-wrapper {
     display: flex;
     align-items: center;
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.06);
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 16px;
     padding: 0 1.25rem;
     transition: all 0.3s ease;
-    min-height: 44px;
 }
 
 .username-input-wrapper:focus-within {
     border-color: rgba(138, 43, 226, 0.5);
-    background: rgba(138, 43, 226, 0.05);
+    box-shadow: 0 0 20px rgba(138, 43, 226, 0.15);
 }
 
 .username-prefix {
-    color: #8a2be2;
-    font-weight: 700;
+    color: rgba(138, 43, 226, 0.8);
     font-size: 1.1rem;
+    font-weight: 700;
     margin-right: 0.25rem;
+    font-family: 'Inter', sans-serif;
 }
 
 .username-input {
@@ -81,6 +82,11 @@
     font-size: 1.1rem;
     padding: 1rem 0;
     font-family: 'Inter', sans-serif;
+    font-weight: 500;
+}
+
+.username-input::placeholder {
+    color: rgba(255, 255, 255, 0.25);
 }
 
 .preferences-wrapper {
@@ -89,6 +95,7 @@
     flex-direction: column;
     gap: 0.75rem;
     text-align: left;
+    padding-left: 0.25rem;
 }
 
 .pref-checkbox {
@@ -96,45 +103,85 @@
     align-items: center;
     gap: 0.75rem;
     color: rgba(255, 255, 255, 0.7);
-    font-size: 1rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
     cursor: pointer;
-    padding: 0.5rem 0;
-    min-height: 44px;
+    user-select: none;
+    transition: color 0.2s ease;
+}
+
+.pref-checkbox:hover {
+    color: #fff;
 }
 
 .pref-checkbox input[type="checkbox"] {
-    width: 1.25rem;
-    height: 1.25rem;
+    width: 1.1rem;
+    height: 1.1rem;
     accent-color: #8a2be2;
     cursor: pointer;
 }
 
+.username-error {
+    color: #ff3d00;
+    font-size: 0.85rem;
+    margin-top: 0.75rem;
+    font-weight: 500;
+    text-align: left;
+    padding-left: 0.25rem;
+}
+
+.username-hint {
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 0.8rem;
+    margin-top: 0.75rem;
+    text-align: left;
+    padding-left: 0.25rem;
+}
+
 .username-submit-btn {
     width: 100%;
-    margin-top: 2rem;
-    padding: 1.25rem;
+    margin-top: 1.75rem;
+    padding: 1rem;
     border: none;
-    border-radius: 18px;
+    border-radius: 16px;
     background: linear-gradient(135deg, #8a2be2, #6a1bb0);
     color: #fff;
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 700;
     cursor: pointer;
     transition: all 0.3s ease;
-    min-height: 44px;
+    font-family: 'Inter', sans-serif;
+    letter-spacing: 0.5px;
 }
 
-@media (max-width: 480px) {
-    .username-modal {
-        padding: 2.5rem 1.5rem 2rem;
-        border-radius: 28px;
+.username-submit-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(138, 43, 226, 0.4);
+}
+
+.username-submit-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
     }
 
-    .username-modal h2 {
-        font-size: 1.6rem;
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
     }
 
-    .username-modal-subtitle {
-        font-size: 0.9rem;
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
     }
 }
