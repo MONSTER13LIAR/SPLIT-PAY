@@ -143,28 +143,6 @@ export default function ActivitiesPage() {
             <BackgroundParticles />
             <div className="torch-overlay"></div>
 
-            {/* Sidebar Trigger Area */}
-            <div className="sidebar-trigger"></div>
-            
-            <aside className="sidebar">
-                <div className="sidebar-logo">
-                    <img src="/logo.jpg" alt="SplitPay" width="64" height="64" style={{ borderRadius: '12px' }} />
-                    <span>SplitPay</span>
-                </div>
-                <nav className="nav-menu">
-                    <a href="/dashboard" className="nav-item"><span>Dashboard</span></a>
-                    <a href="/groups" className="nav-item"><span>My Groups</span></a>
-                    <a href="/activities" className="nav-item active"><span>Activities</span></a>
-                    <a href="/settlements" className="nav-item"><span>Settlements</span></a>
-                    <a href="/settings" className="nav-item"><span>Settings</span></a>
-                </nav>
-                <div style={{ marginTop: 'auto' }}>
-                    <button onClick={logout} className="nav-item logout-btn">
-                        <span>Logout</span>
-                    </button>
-                </div>
-            </aside>
-
             <main className="act-main">
                 <div className="act-header">
                     <h1>Activities</h1>

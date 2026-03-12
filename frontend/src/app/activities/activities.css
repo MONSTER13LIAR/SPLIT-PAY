@@ -1,9 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap');
+
 .activities-container {
     min-height: 100vh;
     background: transparent;
     color: #ffffff;
     display: flex;
-    overflow: hidden;
     position: relative;
     z-index: 1;
 }
@@ -22,79 +23,9 @@
     mix-blend-mode: screen;
 }
 
-.sidebar {
-    position: absolute;
-    left: 0;
-    top: 0;
-    height: 100vh;
-    width: 280px;
-    background: rgba(15, 15, 15, 0.4);
-    border-right: 1px solid rgba(255, 255, 255, 0.1);
-    display: flex;
-    flex-direction: column;
-    padding: 2.5rem 1.5rem;
-    backdrop-filter: blur(25px);
-    z-index: 100;
-    transform: translateX(-100%);
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Hover trigger area */
-.sidebar-trigger {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 30px;
-    height: 100vh;
-    z-index: 99;
-}
-
-.sidebar-trigger:hover ~ .sidebar,
-.sidebar:hover {
-    transform: translateX(0);
-}
-
-.sidebar-logo {
-    display: flex;
-    align-items: center;
-    gap: 1.25rem;
-    margin-bottom: 3.5rem;
-}
-
-.sidebar-logo span {
-    font-family: 'Outfit', sans-serif;
-    font-weight: 800;
-    font-size: 1.4rem;
-    background: linear-gradient(135deg, #fff 0%, #8a2be2 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-.nav-menu {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-}
-
-.nav-item {
-    padding: 1rem 1.25rem;
-    border-radius: 16px;
-    color: rgba(255, 255, 255, 0.6);
-    text-decoration: none;
-    transition: all 0.4s ease;
-    display: flex;
-    align-items: center;
-}
-
-.nav-item:hover, .nav-item.active {
-    color: #fff;
-    background: rgba(138, 43, 226, 0.15);
-}
-
 .act-main {
     flex: 1;
-    padding: 4rem;
+    padding: 3.5rem;
     z-index: 5;
     width: 100%;
 }
@@ -104,21 +35,27 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 4rem;
+    gap: 1rem;
 }
 
 .act-header h1 {
     font-size: 3rem;
     font-weight: 800;
     font-family: 'Outfit', sans-serif;
+    letter-spacing: -1.5px;
+    background: linear-gradient(to right, #fff, rgba(255, 255, 255, 0.5));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .vote-out-btn {
-    padding: 1.2rem 2.5rem;
+    padding: 1rem 2rem;
     background: linear-gradient(135deg, #ff3d00, #b71c1c);
     border: none;
     border-radius: 20px;
     color: #fff;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     font-weight: 800;
     cursor: pointer;
     box-shadow: 0 10px 30px rgba(255, 61, 0, 0.3);
@@ -127,15 +64,15 @@
 
 .vote-out-btn:hover {
     transform: translateY(-5px) scale(1.05);
-    box-shadow: 0 15px 40px rgba(255, 61, 0, 0.5);
 }
 
 .act-empty {
     text-align: center;
-    padding: 5rem;
+    padding: 6rem 2rem;
     background: rgba(255, 255, 255, 0.02);
-    border: 1px dashed rgba(255, 255, 255, 0.1);
+    border: 2px dashed rgba(255, 255, 255, 0.05);
     border-radius: 40px;
+    color: rgba(255, 255, 255, 0.5);
 }
 
 .act-icon {
@@ -161,23 +98,27 @@
 .v-modal {
     background: #111;
     border: 1px solid rgba(255, 61, 0, 0.3);
-    padding: 3rem;
+    padding: 2.5rem;
     border-radius: 32px;
     width: 500px;
     max-width: 90vw;
     position: relative;
     box-shadow: 0 0 50px rgba(255, 61, 0, 0.1);
+    max-height: 90vh;
+    overflow-y: auto;
 }
 
 .v-close {
     position: absolute;
-    top: 1.5rem;
-    right: 1.5rem;
+    top: 1rem;
+    right: 1rem;
     background: none;
     border: none;
     color: #fff;
-    font-size: 2rem;
+    font-size: 2.5rem;
     cursor: pointer;
+    padding: 10px;
+    line-height: 1;
 }
 
 .v-group-list, .v-member-list {
@@ -197,6 +138,7 @@
     cursor: pointer;
     text-align: left;
     transition: all 0.3s ease;
+    min-height: 44px; /* Touch target */
 }
 
 .v-group-btn:hover {
@@ -211,6 +153,7 @@
     cursor: pointer;
     font-weight: 600;
     margin-bottom: 1rem;
+    padding: 10px 0;
 }
 
 .v-member-card {
@@ -220,6 +163,7 @@
     padding: 1.25rem;
     background: rgba(255,255,255,0.03);
     border-radius: 16px;
+    gap: 1rem;
 }
 
 .v-member-info {
@@ -245,6 +189,7 @@
     color: #fff;
     font-weight: 700;
     cursor: pointer;
+    min-height: 44px; /* Touch target */
 }
 
 .v-status {
@@ -270,10 +215,47 @@
     color: #fff;
     font-weight: 800;
     cursor: pointer;
+    min-height: 44px; /* Touch target */
 }
 
-.v-error {
-    color: #ff3d00;
-    margin-top: 1rem;
-    text-align: center;
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .act-main {
+        padding: 1.5rem;
+        padding-top: 2rem;
+    }
+
+    .act-header {
+        flex-direction: column;
+        align-items: flex-start;
+        margin-bottom: 2.5rem;
+    }
+
+    .act-header h1 {
+        font-size: 2.2rem;
+    }
+
+    .vote-out-btn {
+        width: 100%;
+        padding: 1rem;
+        font-size: 1rem;
+    }
+
+    .act-empty {
+        padding: 4rem 1.5rem;
+        border-radius: 28px;
+    }
+
+    .v-modal {
+        padding: 2rem 1.5rem;
+    }
+
+    .v-member-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .v-vote-btn {
+        width: 100%;
+    }
 }

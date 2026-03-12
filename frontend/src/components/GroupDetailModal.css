@@ -10,7 +10,6 @@
     align-items: center;
     justify-content: center;
     z-index: 2000;
-    animation: fadeIn 0.3s ease;
 }
 
 .gdm-modal {
@@ -18,21 +17,20 @@
     border: 1px solid rgba(138, 43, 226, 0.3);
     border-radius: 32px;
     padding: 3.5rem 3rem;
-    width: 520px;
+    width: 550px;
     max-width: 90vw;
     position: relative;
     box-shadow: 
         0 40px 100px rgba(0,0,0,0.8),
         0 0 50px rgba(138, 43, 226, 0.1);
-    animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     max-height: 90vh;
     overflow-y: auto;
 }
 
 .gdm-close {
     position: absolute;
-    top: 2rem;
-    right: 2rem;
+    top: 1rem;
+    right: 1rem;
     background: none;
     border: none;
     color: rgba(255, 255, 255, 0.4);
@@ -40,6 +38,7 @@
     line-height: 1;
     cursor: pointer;
     transition: color 0.2s ease;
+    padding: 10px;
 }
 
 .gdm-close:hover {
@@ -65,135 +64,72 @@
 
 .gdm-tabs {
     display: flex;
-    gap: 0.5rem;
+    gap: 0.4rem;
     margin-bottom: 2rem;
     background: rgba(255, 255, 255, 0.03);
     padding: 0.4rem;
     border-radius: 16px;
     border: 1px solid rgba(255, 255, 255, 0.06);
+    overflow-x: auto;
 }
 
 .gdm-tab {
     flex: 1;
-    padding: 0.8rem;
+    padding: 0.8rem 0.5rem;
     border: none;
     background: transparent;
     color: rgba(255, 255, 255, 0.4);
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     font-weight: 700;
     cursor: pointer;
     border-radius: 12px;
     transition: all 0.3s ease;
-}
-
-.gdm-tab:hover {
-    color: #fff;
-    background: rgba(255, 255, 255, 0.03);
+    white-space: nowrap;
+    min-height: 44px;
 }
 
 .gdm-tab.active {
     background: #8a2be2;
     color: #fff;
-    box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3);
-}
-
-.gdm-history-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
 }
 
 .gdm-history-card {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1.25rem 1.5rem;
+    padding: 1.25rem;
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: 18px;
-    transition: all 0.3s ease;
-}
-
-.gdm-history-card:hover {
-    background: rgba(255, 255, 255, 0.06);
-    border-color: rgba(138, 43, 226, 0.3);
-    transform: scale(1.02);
-}
-
-.gdm-h-left {
-    display: flex;
-    flex-direction: column;
-    gap: 0.2rem;
+    margin-bottom: 0.75rem;
+    gap: 1rem;
 }
 
 .gdm-h-desc {
     font-weight: 700;
-    font-size: 1.1rem;
-}
-
-.gdm-h-meta {
-    font-size: 0.8rem;
-    color: rgba(255, 255, 255, 0.4);
+    font-size: 1.05rem;
 }
 
 .gdm-h-amount {
     font-family: 'Outfit', sans-serif;
     font-weight: 800;
-    font-size: 1.3rem;
-    color: #fff;
-}
-
-.gdm-section {
-    margin-bottom: 2.5rem;
-}
-
-.gdm-section h3 {
-    font-size: 0.9rem;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    color: rgba(255, 255, 255, 0.3);
-    margin-bottom: 1.25rem;
-}
-
-.gdm-chain {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
+    font-size: 1.2rem;
+    white-space: nowrap;
 }
 
 .gdm-chain-item {
     display: flex;
     align-items: center;
-    padding: 1rem 1.25rem;
+    padding: 1rem;
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: 16px;
-    transition: all 0.3s ease;
+    margin-bottom: 0.75rem;
 }
 
 .gdm-chain-item.active {
     background: linear-gradient(135deg, rgba(138, 43, 226, 0.15), rgba(138, 43, 226, 0.05));
     border-color: rgba(138, 43, 226, 0.4);
-    transform: translateX(10px);
-}
-
-.gdm-index {
-    font-size: 1.1rem;
-    font-weight: 800;
-    color: rgba(255, 255, 255, 0.2);
-    margin-right: 1.25rem;
-    min-width: 1.25rem;
-}
-
-.gdm-chain-item.active .gdm-index {
-    color: #8a2be2;
-}
-
-.gdm-username {
-    font-weight: 600;
-    font-size: 1rem;
-    color: #fff;
-    margin-right: 1rem;
 }
 
 .gdm-turn-badge {
@@ -203,129 +139,30 @@
     font-weight: 800;
     padding: 0.25rem 0.6rem;
     border-radius: 100px;
-    margin-right: auto;
-    letter-spacing: 0.5px;
-}
-
-.gdm-prefs {
-    display: flex;
-    gap: 0.4rem;
-    margin-left: auto;
+    margin-left: 0.5rem;
 }
 
 .gdm-bill-section {
     background: rgba(138, 43, 226, 0.05);
     border: 1px solid rgba(138, 43, 226, 0.15);
     border-radius: 24px;
-    padding: 2rem;
-    animation: fadeIn 0.5s ease;
-}
-
-.gdm-instruction {
-    font-size: 0.9rem;
-    color: rgba(255, 255, 255, 0.6);
-    margin-bottom: 1.5rem;
-}
-
-.gdm-scanner-prompt {
-    margin-bottom: 1.5rem;
+    padding: 1.5rem;
 }
 
 .gdm-scanner-btn {
     width: 100%;
-    padding: 1.25rem;
+    padding: 1rem;
     background: rgba(138, 43, 226, 0.1);
     border: 2px dashed rgba(138, 43, 226, 0.3);
     border-radius: 18px;
     color: #fff;
-    font-size: 1rem;
     font-weight: 700;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.75rem;
-    transition: all 0.3s ease;
-}
-
-.gdm-scanner-btn:hover:not(:disabled) {
-    background: rgba(138, 43, 226, 0.2);
-    border-color: rgba(138, 43, 226, 0.5);
-    transform: translateY(-2px);
-}
-
-.gdm-scanner-btn:disabled {
-    cursor: wait;
-    opacity: 0.7;
-    border-style: solid;
-}
-
-.gdm-ocr-disclaimer {
-    font-size: 0.7rem;
-    color: rgba(255, 255, 255, 0.4);
-    margin-top: 0.75rem;
-    text-align: center;
-    font-weight: 500;
-    font-style: italic;
-    letter-spacing: 0.5px;
-}
-
-.gdm-bill-form {
-    display: flex;
-    flex-direction: column;
-    gap: 1.25rem;
-}
-
-.gdm-preview {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 16px;
-    padding: 1.25rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-}
-
-.gdm-preview-row {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.85rem;
-    color: rgba(255, 255, 255, 0.5);
-}
-
-.gdm-preview-row strong {
-    color: #fff;
-}
-
-.gdm-preview-total {
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    padding-top: 0.75rem;
-    margin-top: 0.25rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-    font-size: 0.9rem;
-    font-weight: 700;
-    color: #00ff80;
-}
-
-.gdm-preview-error {
-    color: #ff3d00;
-    font-size: 0.85rem;
-    text-align: center;
-}
-
-.gdm-presence-section {
-    margin-top: 0.5rem;
-}
-
-.gdm-presence-label {
-    display: block;
-    font-size: 0.8rem;
-    color: rgba(255, 255, 255, 0.4);
-    margin-bottom: 1rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    gap: 0.5rem;
+    min-height: 44px;
 }
 
 .gdm-member-checklist {
@@ -334,7 +171,7 @@
     gap: 0.5rem;
     background: rgba(0, 0, 0, 0.2);
     border-radius: 16px;
-    padding: 1rem;
+    padding: 0.75rem;
     max-height: 200px;
     overflow-y: auto;
 }
@@ -342,64 +179,23 @@
 .gdm-check-item {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    padding: 0.75rem 1rem;
+    gap: 0.75rem;
+    padding: 0.75rem;
     background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: 12px;
     cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.gdm-check-item:hover {
-    background: rgba(255, 255, 255, 0.06);
-}
-
-.gdm-check-item input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-    accent-color: #8a2be2;
-    cursor: pointer;
-}
-
-.gdm-check-name {
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: #fff;
-    flex: 1;
-}
-
-.gdm-check-prefs {
-    display: flex;
-    gap: 0.4rem;
-    font-size: 0.8rem;
-}
-
-.gdm-input-group label {
-    display: block;
-    font-size: 0.8rem;
-    color: rgba(255, 255, 255, 0.4);
-    margin-bottom: 0.5rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    min-height: 44px;
 }
 
 .gdm-input-group input {
     width: 100%;
-    padding: 0.9rem 1.25rem;
+    padding: 1rem;
     background: rgba(0, 0, 0, 0.3);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 12px;
     color: #fff;
     font-size: 1.1rem;
-    font-family: 'Outfit', sans-serif;
-    transition: all 0.3s ease;
-}
-
-.gdm-input-group input:focus {
-    outline: none;
-    border-color: #8a2be2;
-    background: rgba(138, 43, 226, 0.05);
+    min-height: 44px;
 }
 
 .gdm-split-btn {
@@ -412,146 +208,73 @@
     font-size: 1.1rem;
     font-weight: 700;
     cursor: pointer;
-    box-shadow: 0 10px 30px rgba(138, 43, 226, 0.3);
-    transition: all 0.3s ease;
-}
-
-.gdm-split-btn:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 15px 40px rgba(138, 43, 226, 0.4);
-}
-
-.gdm-waiting {
-    padding: 2rem;
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px dashed rgba(255, 255, 255, 0.1);
-    border-radius: 20px;
-    text-align: center;
-    color: rgba(255, 255, 255, 0.5);
-    margin-bottom: 2rem;
-}
-
-.gdm-takeover-box {
-    margin-top: 1.5rem;
-    padding: 1.5rem;
-    background: rgba(138, 43, 226, 0.05);
-    border: 1px solid rgba(138, 43, 226, 0.2);
-    border-radius: 16px;
-    animation: fadeIn 0.4s ease;
-}
-
-.gdm-takeover-box p {
-    color: #fff;
-    margin-bottom: 1rem;
-    font-size: 0.95rem;
-    font-weight: 500;
-}
-
-.gdm-takeover-btn {
-    background: #8a2be2;
-    color: #fff;
-    border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: 12px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3);
-}
-
-.gdm-takeover-btn:hover {
-    background: #9d4edd;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(138, 43, 226, 0.4);
-}
-
-.gdm-settlements {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
+    min-height: 44px;
 }
 
 .gdm-settlement-card {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem 1.5rem;
+    padding: 1rem;
     background: rgba(0, 255, 128, 0.03);
     border: 1px solid rgba(0, 255, 128, 0.1);
     border-radius: 16px;
-    gap: 1rem;
-}
-
-.gdm-settlement-info {
-    display: flex;
-    align-items: center;
-    flex: 1;
-}
-
-.gdm-s-user {
-    font-weight: 600;
-    color: #fff;
-}
-
-.gdm-s-user.is-me {
-    color: #00ff80;
-}
-
-.gdm-s-arrow {
-    margin: 0 0.75rem;
-    font-size: 0.7rem;
-    color: rgba(255, 255, 255, 0.3);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    white-space: nowrap;
-}
-
-.gdm-s-amount {
-    margin-left: auto;
-    font-family: 'Outfit', sans-serif;
-    font-weight: 800;
-    font-size: 1.1rem;
-    color: #00ff80;
+    gap: 0.75rem;
+    flex-wrap: wrap;
 }
 
 .gdm-settle-btn {
     background: rgba(0, 255, 128, 0.1);
     border: 1px solid rgba(0, 255, 128, 0.3);
     color: #00ff80;
-    padding: 0.4rem 0.8rem;
+    padding: 0.6rem 1rem;
     border-radius: 10px;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     font-weight: 700;
     cursor: pointer;
-    transition: all 0.2s ease;
-    white-space: nowrap;
+    min-height: 44px;
 }
 
-.gdm-settle-btn:hover {
-    background: #00ff80;
-    color: #000;
-    transform: translateY(-1px);
-}
+@media (max-width: 600px) {
+    .gdm-modal {
+        padding: 2.5rem 1.5rem 2rem;
+        border-radius: 28px;
+    }
 
-.gdm-success {
-    background: rgba(0, 255, 128, 0.1);
-    color: #00ff80;
-    padding: 1rem;
-    border-radius: 12px;
-    text-align: center;
-    font-weight: 600;
-    margin-top: 1rem;
-}
+    .gdm-header h2 {
+        font-size: 1.8rem;
+    }
 
-.gdm-error {
-    background: rgba(255, 61, 0, 0.1);
-    color: #ff3d00;
-    padding: 1rem;
-    border-radius: 12px;
-    text-align: center;
-    font-weight: 600;
-    margin-top: 1rem;
-}
+    .gdm-header p {
+        font-size: 1rem;
+    }
 
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    .gdm-tabs {
+        padding: 0.25rem;
+    }
+
+    .gdm-tab {
+        padding: 0.6rem 0.3rem;
+        font-size: 0.75rem;
+    }
+
+    .gdm-bill-section {
+        padding: 1.25rem;
+    }
+
+    .gdm-settlement-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .gdm-settle-btn {
+        width: 100%;
+        text-align: center;
+    }
+
+    .gdm-s-amount {
+        margin-left: 0;
+        margin-top: 0.25rem;
+        display: block;
+    }
+}
