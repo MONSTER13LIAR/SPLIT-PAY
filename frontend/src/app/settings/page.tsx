@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { apiFetch } from '@/utils/api';
 import './settings.css';
+import { useIsMobile } from '@/hooks/useIsMobile';
+import MobileSettings from '@/components/mobile/MobileSettings';
 
 export default function SettingsPage() {
     const { user, logout, login, isLoading, isAuthenticated } = useAuth();
@@ -14,6 +16,7 @@ export default function SettingsPage() {
     const [isDrinker, setIsDrinker] = useState(user?.is_drinker || false);
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState({ text: '', type: '' });
+    const isMobile = useIsMobile();
 
     useEffect(() => {
         if (!isLoading && !isAuthenticated) {
@@ -68,6 +71,22 @@ export default function SettingsPage() {
             }}>
                 Loading settings...
             </div>
+        );
+    }
+
+    if (isMobile) {
+        return (
+            <MobileSettings 
+                user={user}
+                isNonVeg={isNonVeg}
+                setIsNonVeg={setIsNonVeg}
+                isDrinker={isDrinker}
+                setIsDrinker={setIsDrinker}
+                handleSave={handleSave}
+                logout={logout}
+                loading={loading}
+                message={message}
+            />
         );
     }
 

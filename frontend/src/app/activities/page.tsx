@@ -6,6 +6,8 @@ import { useAuth } from '@/context/AuthContext';
 import { apiFetch } from '@/utils/api';
 import BackgroundParticles from '@/components/BackgroundParticles';
 import SplineBackground from '@/components/SplineBackground';
+import { useIsMobile } from '@/hooks/useIsMobile';
+import MobileActivities from '@/components/mobile/MobileActivities';
 
 interface User {
     id: number;
@@ -36,6 +38,7 @@ export default function ActivitiesPage() {
     const [error, setError] = useState('');
     const [warning, setWarning] = useState('');
     const [confirmSuspectId, setConfirmSuspectId] = useState<number | null>(null);
+    const isMobile = useIsMobile();
 
     const fetchGroups = useCallback(async () => {
         try {
@@ -136,6 +139,76 @@ export default function ActivitiesPage() {
     }
 
     if (!user) return null;
+
+    if (isMobile) {
+        return (
+            <>
+                <MobileActivities 
+                    setShowVoteModal={setShowVoteModal}
+                />
+                {showVoteModal && (
+                    <div className="v-modal-overlay" onClick={() => { setShowVoteModal(false); setSelectedGroup(null); }}>
+                        <div className="v-modal" onClick={e => e.stopPropagation()} style={{ width: '90%' }}>
+                            <button className="v-close" onClick={() => { setShowVoteModal(false); setSelectedGroup(null); }}>&times;</button>
+                            <h2 style={{ fontSize: '1.2rem' }}>Vote Out Member</h2>
+                            
+                            {!selectedGroup ? (
+                                <div className="v-group-list">
+                                    <p>Select a group:</p>
+                                    {groups.map(g => (
+                                        <button key={g.id} className="v-group-btn" onClick={() => setSelectedGroup(g)}>
+                                            {g.name}
+                                        </button>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="v-member-list">
+                                    <button className="v-back" onClick={() => setSelectedGroup(null)}>← Back to Groups</button>
+                                    <p>Members of <strong>{selectedGroup.name}</strong>:</p>
+                                    {selectedGroup.members.map(m => {
+                                        if (m.id === user?.id) return null;
+                                        const voteCount = groupVotes.filter(v => v.suspect.id === m.id).length;
+                                        const hasIVoted = groupVotes.some(v => v.suspect.id === m.id && v.voter.id === user?.id);
+                                        
+                                        return (
+                                            <div key={m.id} className="v-member-card">
+                                                <div className="v-member-info">
+                                                    <span className="v-username">@{m.username}</span>
+                                                    <span className="v-count">{voteCount} / {selectedGroup.members.length - 1}</span>
+                                                </div>
+                                                {hasIVoted ? (
+                                                    <span className="v-status">Voted ✓</span>
+                                                ) : (
+                                                    <button 
+                                                        className="v-vote-btn" 
+                                                        disabled={loading}
+                                                        onClick={() => handleVote(m.id)}
+                                                        style={{ padding: '6px 12px', fontSize: '0.8rem' }}
+                                                    >
+                                                        Vote
+                                                    </button>
+                                                )}
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            )}
+
+                            {warning && (
+                                <div className="v-warning-box">
+                                    <p style={{ fontSize: '0.8rem' }}>⚠️ {warning}</p>
+                                    <button className="v-confirm-btn" onClick={() => confirmSuspectId && handleVote(confirmSuspectId, true)}>
+                                        Vote anyway
+                                    </button>
+                                </div>
+                            )}
+                            {error && <p className="v-error">{error}</p>}
+                        </div>
+                    </div>
+                )}
+            </>
+        );
+    }
 
     return (
         <div className="activities-container" ref={containerRef}>

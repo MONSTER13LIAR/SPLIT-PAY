@@ -8,6 +8,8 @@ import BackgroundParticles from '@/components/BackgroundParticles';
 import SplineBackground from '@/components/SplineBackground';
 import SetUsernameModal from '@/components/SetUsernameModal';
 import CreateGroupModal from '@/components/CreateGroupModal';
+import { useIsMobile } from '@/hooks/useIsMobile';
+import MobileDashboard from '@/components/mobile/MobileDashboard';
 
 interface GroupData {
     id: number;
@@ -53,6 +55,7 @@ export default function Dashboard() {
     const [inviteUsername, setInviteUsername] = useState('');
     const [inviteError, setInviteError] = useState('');
     const [inviteLoading, setInviteLoading] = useState(false);
+    const isMobile = useIsMobile();
 
     const fetchGroups = useCallback(async () => {
         try {
@@ -195,6 +198,56 @@ export default function Dashboard() {
     const totalDebts = settlements.debts.reduce((acc, curr) => acc + parseFloat(curr.amount), 0);
     const totalCredits = settlements.credits.reduce((acc, curr) => acc + parseFloat(curr.amount), 0);
     const netBalance = totalCredits - totalDebts;
+
+    if (isMobile) {
+        return (
+            <>
+                <MobileDashboard 
+                    user={user}
+                    groups={groups}
+                    invitations={invitations}
+                    settlements={settlements}
+                    setShowCreateGroup={setShowCreateGroup}
+                    handleRespondInvitation={handleRespondInvitation}
+                    respondingId={respondingId}
+                />
+                {user && !user.has_set_username && (
+                    <SetUsernameModal onUsernameSet={(updatedUser) => updateUser(updatedUser)} />
+                )}
+                {showCreateGroup && (
+                    <CreateGroupModal onClose={() => setShowCreateGroup(false)} onGroupCreated={() => { fetchGroups(); }} />
+                )}
+                {statusModal && (
+                    <div className="invite-modal-overlay" onClick={() => setStatusModal(null)}>
+                        <div className="invite-modal" style={{ width: '400px', textAlign: 'center' }} onClick={e => e.stopPropagation()}>
+                            <div style={{ fontSize: '3.5rem', marginBottom: '1rem' }}>
+                                {statusModal.type === 'success' ? '✅' : '❌'}
+                            </div>
+                            <h3 style={{ fontFamily: 'Outfit', fontSize: '1.6rem', marginBottom: '1rem' }}>
+                                {statusModal.type === 'success' ? 'Success!' : 'Oops!'}
+                            </h3>
+                            <p style={{ color: 'rgba(255,255,255,0.7)', marginBottom: '2rem', fontSize: '1rem' }}>{statusModal.message}</p>
+                            <button 
+                                onClick={() => setStatusModal(null)} 
+                                style={{ 
+                                    width: '100%', 
+                                    padding: '1rem', 
+                                    background: statusModal.type === 'success' ? '#00e676' : '#ff3d00', 
+                                    border: 'none', 
+                                    borderRadius: '16px', 
+                                    color: '#fff', 
+                                    fontWeight: '800', 
+                                    cursor: 'pointer' 
+                                }}
+                            >
+                                Got it
+                            </button>
+                        </div>
+                    </div>
+                )}
+            </>
+        );
+    }
 
     return (
         <div className="dashboard-container" ref={dashboardRef}>

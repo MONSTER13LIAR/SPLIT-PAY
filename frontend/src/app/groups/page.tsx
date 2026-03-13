@@ -8,6 +8,8 @@ import BackgroundParticles from '@/components/BackgroundParticles';
 import SplineBackground from '@/components/SplineBackground';
 import CreateGroupModal from '@/components/CreateGroupModal';
 import GroupDetailModal from '@/components/GroupDetailModal';
+import { useIsMobile } from '@/hooks/useIsMobile';
+import MobileGroups from '@/components/mobile/MobileGroups';
 
 interface User {
     id: number;
@@ -47,6 +49,7 @@ export default function GroupsPage() {
     const [inviteUsername, setInviteUsername] = useState('');
     const [inviteError, setInviteError] = useState('');
     const [inviteLoading, setInviteLoading] = useState(false);
+    const isMobile = useIsMobile();
 
     const fetchGroups = useCallback(async () => {
         try {
@@ -170,6 +173,63 @@ export default function GroupsPage() {
     if (!user) return null;
 
     const selectedGroup = groups.find(g => g.id === selectedGroupId);
+
+    if (isMobile) {
+        return (
+            <>
+                <MobileGroups 
+                    groups={groups}
+                    invitations={invitations}
+                    setShowCreateGroup={setShowCreateGroup}
+                    setSelectedGroupId={setSelectedGroupId}
+                    handleRespond={handleRespond}
+                    respondingId={respondingId}
+                />
+                {showCreateGroup && (
+                    <CreateGroupModal
+                        onClose={() => setShowCreateGroup(false)}
+                        onGroupCreated={fetchGroups}
+                    />
+                )}
+                {selectedGroup && (
+                    <GroupDetailModal
+                        group={selectedGroup as any}
+                        currentUserId={user?.id || 0}
+                        onClose={() => setSelectedGroupId(null)}
+                        onUpdate={fetchGroups}
+                    />
+                )}
+                {statusModal && (
+                    <div className="invite-modal-overlay" onClick={() => setStatusModal(null)}>
+                        <div className="invite-modal" style={{ width: '400px', textAlign: 'center' }} onClick={e => e.stopPropagation()}>
+                            <div style={{ fontSize: '3.5rem', marginBottom: '1rem' }}>
+                                {statusModal.type === 'success' ? '✅' : '❌'}
+                            </div>
+                            <h3 style={{ fontFamily: 'Outfit', fontSize: '1.6rem', marginBottom: '1rem' }}>
+                                {statusModal.type === 'success' ? 'Success!' : 'Oops!'}
+                            </h3>
+                            <p style={{ color: 'rgba(255,255,255,0.7)', marginBottom: '2rem', fontSize: '1rem' }}>{statusModal.message}</p>
+                            <button 
+                                onClick={() => setStatusModal(null)} 
+                                style={{ 
+                                    width: '100%', 
+                                    padding: '1rem', 
+                                    background: statusModal.type === 'success' ? '#00e676' : '#ff3d00', 
+                                    border: 'none', 
+                                    borderRadius: '16px', 
+                                    color: '#fff', 
+                                    fontWeight: '800', 
+                                    cursor: 'pointer' 
+                                }}
+                            >
+                                Got it
+                            </button>
+                        </div>
+                    </div>
+                )}
+            </>
+        );
+    }
 
     return (
         <div className="groups-page" ref={containerRef}>

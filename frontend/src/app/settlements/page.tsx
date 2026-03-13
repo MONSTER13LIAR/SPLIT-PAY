@@ -6,6 +6,8 @@ import { useAuth } from '@/context/AuthContext';
 import { apiFetch } from '@/utils/api';
 import BackgroundParticles from '@/components/BackgroundParticles';
 import SplineBackground from '@/components/SplineBackground';
+import { useIsMobile } from '@/hooks/useIsMobile';
+import MobileSettlements from '@/components/mobile/MobileSettlements';
 
 interface SettlementData {
     id: number;
@@ -41,6 +43,7 @@ export default function SettlementsPage() {
     const [requests, setRequests] = useState<SettlementRequestsResponse>({ received: [], sent: [] });
     const [isPageLoading, setIsPageLoading] = useState(true);
     const [isActionLoading, setIsActionLoading] = useState<number | null>(null);
+    const isMobile = useIsMobile();
 
     const fetchSettlements = useCallback(async () => {
         try {
@@ -155,6 +158,18 @@ export default function SettlementsPage() {
     }
 
     if (!user) return null;
+
+    if (isMobile) {
+        return (
+            <MobileSettlements 
+                settlements={settlements}
+                requests={requests}
+                handleSettleRequest={handleSettleRequest}
+                handleRespondRequest={handleRespondRequest}
+                isActionLoading={isActionLoading}
+            />
+        );
+    }
 
     const totalDebts = settlements.debts.reduce((acc, curr) => acc + parseFloat(curr.amount), 0);
     const totalCredits = settlements.credits.reduce((acc, curr) => acc + parseFloat(curr.amount), 0);
